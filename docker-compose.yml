@@ -1,0 +1,58 @@
+version: '3'
+services:
+  db:
+    image: mysql:8.0.20
+    command: --default-authentication-plugin=mysql_native_password
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./logs:/var/log/mysql
+    environment:
+      MYSQL_HOST: 127.0.0.1
+      MYSQL_ROOT_PASSWORD: password
+    restart: always
+    ports:
+      - "4306:3306"
+    cap_add:
+      - SYS_NICE
+        
+  api:
+    build: .
+    command: bash -c "rm -f tmp/pids/server.pid && service cron start && bundle exec rails s -p 3000 -b '0.0.0.0'"
+    tty: true
+    stdin_open: true
+    depends_on:
+      - db
+    ports:
+      - "3000:3000"
+    volumes:
+      - .:/cim
+      - ~/.ssh:/root/.ssh
+      - /cim/vendor
+      - /cim/tmp
+      - /cim/log
+      - /cim/.git
+      # - sockets:/cim/tmp/sockets
+  # nginx:
+  #   build:
+  #     context: .
+  #     dockerfile: ./nginx/Dockerfile
+  #   ports:
+  #     - '80:80'
+  #   depends_on:
+  #     - web
+  #   volumes:
+  #     - public_data:/cim/public
+  #     - tmp_data:/cim/tmp
+  #     - sockets:/cim/tmp/sockets
+  # stripe-cli:
+  #   image: stripe/stripe-cli:latest
+  #   command: listen --forward-to localhost:3000/stripe_endpoint --api-key $STRIPE_TEST_SPI_KEY
+  #   network_mode: host
+  #   depends_on:
+  #     - web
+    
+volumes:
+  mysql_data:
+  # public_data:
+  # tmp_data:
+  # sockets:
