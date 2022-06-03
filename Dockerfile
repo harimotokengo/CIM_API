@@ -38,7 +38,7 @@ RUN bundle install
 COPY . $APP_ROOT
 
 # wheneverでcrontab書き込み
-RUN bundle exec whenever --update-crontab 
+# RUN bundle exec whenever --update-crontab 
 
 # # puma.sockを配置するディレクトリを作成
 # RUN mkdir -p tmp/sockets
