@@ -22,6 +22,11 @@ module Cim
   class Application < Rails::Application
     # Initialize configuration defaults for originally generated Rails version.
     config.load_defaults 7.0
+    config.i18n.default_locale = :ja
+    config.i18n.load_path += Dir[Rails.root.join('config', 'locales', '**', '*.yml').to_s]
+    config.time_zone = 'Tokyo'
+    config.active_record.default_timezone = :local
+    config.autoload_paths += %W[#{config.root}/lib/autoloads]
 
     # Configuration for the application, engines, and railties goes here.
     #
