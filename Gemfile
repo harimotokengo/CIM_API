@@ -43,6 +43,8 @@ group :development, :test do
   gem 'pry-rails'
   gem 'rspec-rails'
   gem 'rspec_junit_formatter'
+  gem 'faker'
+  gem 'gimei'
 end
 
 group :development do
@@ -54,5 +56,6 @@ gem 'active_hash'
 gem 'aws-sdk-s3', require: false
 gem 'sorcery'
 gem 'will_paginate'
-
+gem 'rails-i18n'
+gem 'ransack'
 

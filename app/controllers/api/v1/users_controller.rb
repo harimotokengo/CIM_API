@@ -1,14 +1,20 @@
 module Api
   module V1
-    class users_controller < Api::Base
+    class UsersController < Api::V1::Base
+      # skip_before_action :require_login, only: [:create]
+      p 2222222222
       def create
+        binding.pry
+        access_token = request.headers[:HTTP_ACCESS_TOKEN]
         @user = User.new(user_params)
+        
         if @user.save
           auto_login(@user)
+          render json: {id: @user.id, email: @user.email}
           response_success('UsersController', 'create')
         else
-          flash.now[:alert] = '登録出来ません。入力必須項目を確認してください'
-          # badrequestを返す 400
+          render json: {errors: @user.errors}
+          response_bad_request
         end
       end
     
@@ -57,7 +63,19 @@ module Api
         redirect_to users_path
       end
 
+      private
 
+      def user_params
+        params.require(:user).permit(
+          :email,           :archive,
+          :last_name,       :first_name,
+          :last_name_kana,  :first_name_kana,
+          :membership_number, :user_job_id,
+          :password,
+          :password_confirmation
+          # :avatar,
+        )
+      end
     end
   end
 end
