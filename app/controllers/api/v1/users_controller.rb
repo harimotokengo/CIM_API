@@ -1,20 +1,16 @@
 module Api
   module V1
-    class UsersController < Api::V1::Base
-      # skip_before_action :require_login, only: [:create]
+    class UsersController < ApplicationController
       p 2222222222
       def create
-        binding.pry
         access_token = request.headers[:HTTP_ACCESS_TOKEN]
         @user = User.new(user_params)
-        
         if @user.save
-          auto_login(@user)
-          render json: {id: @user.id, email: @user.email}
-          response_success('UsersController', 'create')
+          logout
+          login(params[:user][:email], params[:user][:password])
+          render json: {message: "登録しました", id: current_user.id, email: current_user.email}
         else
-          render json: {errors: @user.errors}
-          response_bad_request
+          render status: 400, json: { status: 400, message: '登録出来ません。入力必須項目を確認してください', errors: @user.errors }
         end
       end
     

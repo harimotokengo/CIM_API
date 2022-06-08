@@ -2,7 +2,7 @@ module Api
   module V1
     class Base < ApplicationController
       skip_forgery_protection
-      p 000000000000000000
+      
       # 200 Success
       def response_success(class_name, action_name)
         render status: 200, json: { status: 200, message: "Success #{class_name.capitalize} #{action_name.capitalize}" }
