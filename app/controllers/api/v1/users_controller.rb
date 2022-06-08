@@ -1,14 +1,17 @@
 module Api
   module V1
-    class UsersController < ApplicationController
-      p 2222222222
+    class UsersController < Api::V1::Base
+      before_action :response_unauthorized, only: [:update], unless: :logged_in?
+      before_action :set_user, only: [:update]
+
       def create
         access_token = request.headers[:HTTP_ACCESS_TOKEN]
         @user = User.new(user_params)
         if @user.save
           logout
+          binding.pry
           login(params[:user][:email], params[:user][:password])
-          render json: {message: "登録しました", id: current_user.id, email: current_user.email}
+          render json: { status: 200, message: "登録しました", id: current_user.id, email: current_user.email}
         else
           render status: 400, json: { status: 400, message: '登録出来ません。入力必須項目を確認してください', errors: @user.errors }
         end
@@ -38,28 +41,29 @@ module Api
 
       def update
         if @user.update(user_params)
-          flash[:notice] = '更新しました'
-          redirect_to user_path(@user)
+          response_success('UsersController', 'update')
         else
-          flash.now[:alert] = '更新出来ません。入力必須項目を確認してください'
-          render :edit
+          render status: 400, json: { status: 400, message: '更新出来ません。入力必須項目を確認してください', errors: @user.errors }
         end
       end
 
-      def destroy
-        # 事務所を退所
-        @belonging_info.status_id = '退所'
-        if @belonging_info.save
-          # 事務所が有料プランに入っている場合、有料アカウントの使用数を更新する
-          @office.subscription_quantity_update
-          flash[:notice] = '退所処理しました'
-        else
-          flash[:alert] = '退所処理に失敗しました'
-        end
-        redirect_to users_path
-      end
+      # def destroy
+      #   @belonging_info.status_id = '退所'
+      #   if @belonging_info.save
+      #     # 事務所が有料プランに入っている場合、有料アカウントの使用数を更新する
+      #     @office.subscription_quantity_update
+      #     flash[:notice] = '退所処理しました'
+      #   else
+      #     flash[:alert] = '退所処理に失敗しました'
+      #   end
+      #   redirect_to users_path
+      # end
 
       private
+
+      def set_user
+        User.find(params[:id])
+      end
 
       def user_params
         params.require(:user).permit(
@@ -75,4 +79,16 @@ module Api
     end
   end
 end
+
+# 単体サインアップ
+# create
+# update
+
+# showだけ後回し
+
+# すでにログイン
+# ログインしてない
+
+# model_spec
+# request_spec
 
