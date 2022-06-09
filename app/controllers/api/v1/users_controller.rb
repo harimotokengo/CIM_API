@@ -1,7 +1,7 @@
 module Api
   module V1
     class UsersController < Api::V1::Base
-      before_action :response_unauthorized, only: [:update], unless: :logged_in?
+      before_action :response_unauthorized, except: [:create], unless: :logged_in?
       before_action :set_user, only: [:update]
 
       def create
@@ -9,7 +9,6 @@ module Api
         @user = User.new(user_params)
         if @user.save
           logout
-          binding.pry
           login(params[:user][:email], params[:user][:password])
           render json: { status: 200, message: "登録しました", id: current_user.id, email: current_user.email}
         else
@@ -72,8 +71,8 @@ module Api
           :last_name_kana,  :first_name_kana,
           :membership_number, :user_job_id,
           :password,
-          :password_confirmation
-          # :avatar,
+          :password_confirmation.
+          :avatar
         )
       end
     end

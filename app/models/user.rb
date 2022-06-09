@@ -1,5 +1,4 @@
 class User < ApplicationRecord
-  p 33333333333
   authenticates_with_sorcery!
   has_one_attached :avatar
 
@@ -23,15 +22,17 @@ class User < ApplicationRecord
   validates :password, format: { with: VALID_PASSWORD_REGEX }, allow_blank: true, on: :update
   validates :password, confirmation: true, on: :update
   validates :password_confirmation, presence: true, on: :update, if: :password_present
-
-  def password_present
-    password.present?
-  end
+  validates :last_name, presence: true, length: { maximum: 15 }
+  validates :first_name, presence: true, length: { maximum: 15 }
+  validates :user_job_id, presence: true,
+    numericality: {
+      only_integer: true,
+      greater_than_or_equal_to: 1,
+      less_than_or_equal_to: 8
+    }
   validates :membership_number,
             numericality: {
               only_integer: true
-              # greater_than_or_equal_to: 1,
-              # less_than_or_equal_to: 8,
             },
             allow_blank: true
   validates :last_name_kana,
@@ -45,4 +46,34 @@ class User < ApplicationRecord
             format: { with: /\A[ぁ-んー－]+\z/,
                       message: 'は全角ひらがなで入力して下さい' }
 
+  validate :validate_avatar
+  
+  # emailを小文字に変換
+  before_save { self.email = email.downcase }
+
+  def password_present
+    password.present?
+  end
+
+  # フルネームで表示させるためのメソッド
+  def full_name
+    last_name + first_name
+  end
+
+  def validate_avatar
+    return unless avatar.attached? # ファイルがアタッチされていない場合は何もしない
+
+    if avatar.blob.byte_size > 5.megabytes
+      errors.add(:avatar, 'ファイルのサイズは5MBまでにしてください')
+    elsif !avatar_is_image?
+      errors.add(:avatar, 'ファイルが対応している形式ではありません')
+    end
+  end
+
+  private
+
+  # アタッチしたファイルが画像かどうかを判別
+  def avatar_is_image?
+    %w[image/jpg image/jpeg image/gif image/png].include?(avatar.blob.content_type)
+  end
 end
