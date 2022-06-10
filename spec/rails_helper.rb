@@ -20,7 +20,7 @@ require 'rspec/rails'
 # directory. Alternatively, in the individual `*_spec.rb` files, manually
 # require only the support files necessary.
 #
-# Dir[Rails.root.join('spec', 'support', '**', '*.rb')].sort.each { |f| require f }
+Dir[Rails.root.join('spec', 'support', '**', '*.rb')].sort.each { |f| require f }
 
 # Checks for pending migrations and applies them before tests are run.
 # If you are not using ActiveRecord, you can remove these lines.
@@ -63,9 +63,7 @@ RSpec.configure do |config|
   # arbitrary gems may also be filtered via:
   # config.filter_gems_from_backtrace("gem name")
 
-  # loginmacrosのincludeを忘れないこと！
-  # config.include LoginMacros
-  # config.include Sorcery::TestHelpers::Rails::Request, type: :request
+  config.include Sorcery::TestHelpers::Rails::Request, type: :request
   # # RSpecによる画像はテスト後に削除する設定を追加
   config.after(:all) do
     FileUtils.rm_rf(Dir[Rails.root.join("public/uploads/#{Rails.env}/").to_s]) if Rails.env.test?

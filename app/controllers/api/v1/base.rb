@@ -18,6 +18,11 @@ module Api
         render status: 401, json: { status: 401, message: 'Unauthorized' }
       end
 
+      # 403 Forbidden
+      def response_forbidden
+        render status: 403, json: { status: 403, message: 'Forbidden' }
+      end
+
       # 404 Not Found
       def response_not_found(class_name = 'page')
         render status: 404, json: { status: 404, message: "#{class_name.capitalize} Not Found" }

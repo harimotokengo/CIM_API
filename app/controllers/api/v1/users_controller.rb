@@ -2,8 +2,9 @@ module Api
   module V1
     class UsersController < Api::V1::Base
       before_action :response_unauthorized, except: [:create], unless: :logged_in?
+      before_action :response_bad_request, only: [:create], if: :logged_in?
       before_action :set_user, only: [:update]
-
+      before_action :correct_user, only: [:update]
       def create
         access_token = request.headers[:HTTP_ACCESS_TOKEN]
         @user = User.new(user_params)
@@ -61,19 +62,24 @@ module Api
       private
 
       def set_user
-        User.find(params[:id])
+        @user = User.find(params[:id])
       end
 
       def user_params
         params.require(:user).permit(
-          :email,           :archive,
-          :last_name,       :first_name,
-          :last_name_kana,  :first_name_kana,
+          :email,             :archive,
+          :last_name,         :first_name,
+          :last_name_kana,    :first_name_kana,
           :membership_number, :user_job_id,
-          :password,
-          :password_confirmation.
+          :password,          :password_confirmation, 
           :avatar
         )
+      end
+
+      def correct_user
+        unless @user == current_user
+          response_forbidden
+        end
       end
     end
   end

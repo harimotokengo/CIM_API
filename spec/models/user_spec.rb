@@ -5,13 +5,11 @@ RSpec.describe User, type: :model do
   let!(:other_user) { create(:user) }
 
   describe 'validates' do
-    # before do
-    #   user.avatar = fixture_file_upload('/files/test.jpg')
-    # end
-    
     context '正常系' do
-      it 'userモデル項目全て存在すれば登録できる' do
+      before do
         user.avatar = fixture_file_upload('test.jpg')
+      end
+      it 'userモデル項目全て存在すれば登録できる' do
         expect(user).to be_valid
       end
       it 'last_nameが15文字の場合は登録できること' do
@@ -83,30 +81,6 @@ RSpec.describe User, type: :model do
         user.save
         expect(user.reload.email).to eq 'sample@sample.jp'
       end
-  
-      # it 'passwordが無いと登録できないこと' do
-      #   user = build(:user, password: nil)
-      #   user.valid?
-      #   expect(user.errors).to be_added(:password, :blank)
-      # end
-  
-      # # 8文字以上英大文字小文字数字記号でリリースの予定
-      # it 'passwordが6文字以上なら有効であること' do
-      #   user.password = user.password_confirmation = 'a' * 6
-      #   expect(user).to be_valid
-      # end
-  
-      # it 'passwordが6文字未満なら無効であること' do
-      #   user.password = user.password_confirmation = 'a' * 5
-      #   user.valid?
-      #   expect(user.errors).to be_added(:password, :too_short, count: 6)
-      # end
-  
-      # it 'passwordが128文字を超えるなら無効であること' do
-      #   user.password = user.password_confirmation = 'a' * 129
-      #   user.valid?
-      #   expect(user.errors).to be_added(:password, :too_long, count: 128)
-      # end
   
       it 'last_name_kanaが無いと登録できないこと' do
         user.last_name_kana = nil
