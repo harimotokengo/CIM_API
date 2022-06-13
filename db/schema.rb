@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2022_06_09_133402) do
+ActiveRecord::Schema[7.0].define(version: 2022_06_13_014902) do
   create_table "active_storage_attachments", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.string "name", null: false
     t.string "record_type", null: false
@@ -39,6 +39,29 @@ ActiveRecord::Schema[7.0].define(version: 2022_06_09_133402) do
     t.index ["blob_id", "variation_digest"], name: "index_active_storage_variant_records_uniqueness", unique: true
   end
 
+  create_table "belonging_infos", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
+    t.bigint "user_id"
+    t.bigint "office_id"
+    t.integer "status_id"
+    t.integer "default_price"
+    t.boolean "admin"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["office_id"], name: "index_belonging_infos_on_office_id"
+    t.index ["user_id"], name: "index_belonging_infos_on_user_id"
+  end
+
+  create_table "offices", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
+    t.string "name", null: false
+    t.string "phone_number", null: false
+    t.string "post_code"
+    t.string "prefecture"
+    t.string "address"
+    t.boolean "archive", default: true, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
   create_table "users", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.string "email", null: false
     t.string "crypted_password"
@@ -56,7 +79,6 @@ ActiveRecord::Schema[7.0].define(version: 2022_06_09_133402) do
     t.string "first_name_kana", null: false
     t.integer "membership_number"
     t.integer "user_job_id", null: false
-    t.boolean "admin", default: false
     t.integer "office_id"
     t.boolean "archive", default: true, null: false
     t.datetime "created_at", null: false
@@ -68,4 +90,6 @@ ActiveRecord::Schema[7.0].define(version: 2022_06_09_133402) do
 
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
+  add_foreign_key "belonging_infos", "offices"
+  add_foreign_key "belonging_infos", "users"
 end

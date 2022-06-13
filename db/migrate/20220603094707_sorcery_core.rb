@@ -17,7 +17,6 @@ class SorceryCore < ActiveRecord::Migration[7.0]
       t.string :first_name_kana, null: false
       t.integer :membership_number
       t.integer :user_job_id, null: false
-      t.boolean :admin, default: false
       t.integer :office_id
       t.boolean :archive, default: true, null: false
       t.timestamps                null: false
