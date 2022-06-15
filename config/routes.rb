@@ -3,7 +3,8 @@ Rails.application.routes.draw do
     namespace 'v1' , defaults: { format: 'json' } do
       post '/login' => 'sessions#create'
       post '/logout' => 'sessions#destroy'
-      resources :users
+      resources :users, only: [:create, :update]
+      resources :offices, only: [:create, :show, :update]
     end
   end
 end

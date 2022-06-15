@@ -3,6 +3,7 @@ class BelongingInfo < ApplicationRecord
   belongs_to :office
 
   scope :belonging, -> { where(status_id: 1) }
+  scope :belonged, -> { where(status_id: 2) }
 
   validates :default_price,
             numericality: {
