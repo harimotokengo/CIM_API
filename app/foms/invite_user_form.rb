@@ -2,10 +2,11 @@ class InviteUserForm
   include ActiveModel::Model
   attr_accessor :email, :password, :password_confirmation,
                 :last_name, :first_name, :last_name_kana, :first_name_kana,
-                :user_id, :office_id, :status_id, :user_job_id
+                :user_id, :office_id, :status_id, :user_job_id, :membership_number
 
   VALID_EMAIL_REGEX = /\A[\w+\-.]+@[a-z\d\-.]+\.[a-z]+\z/i.freeze
 
+  
   validates :email, presence: true,
                     length: { maximum: 255 },
                     format: { with: VALID_EMAIL_REGEX,
@@ -31,9 +32,13 @@ class InviteUserForm
                             greater_than_or_equal_to: 1,
                             less_than_or_equal_to: 8
                           }
+  validates :membership_number,
+  numericality: {
+    only_integer: true
+  },
+  allow_blank: true
 
   validates :status_id, presence: true
-
   validate :email_unique?, if: -> { email.present? }
 
   def save
@@ -49,7 +54,6 @@ class InviteUserForm
 
   def email_unique?
     return true unless User.exists?(email: email)
-
     errors.add(:email, :taken)
   end
 end

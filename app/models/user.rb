@@ -2,7 +2,7 @@ class User < ApplicationRecord
   authenticates_with_sorcery!
   has_many :belonging_info, dependent: :destroy
   has_one :current_belonging, -> { belonging }, class_name: 'BelongingInfo'
-  has_one :belonging_office, through: :current_belonging. source: :office
+  has_one :belonging_office, through: :current_belonging, source: :office
 
 
   has_one_attached :avatar

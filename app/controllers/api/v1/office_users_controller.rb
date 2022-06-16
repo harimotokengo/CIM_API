@@ -35,9 +35,9 @@ module Api
 
       # 所属から退所へ更新
       def detroy
-        @user = User.find(params[:id])
-        @user.current_belonging.status_id = '退所'
-        @user.save
+        user = User.find(params[:id])
+        user.current_belonging.status_id = '退所'
+        user.save
         render json: { status: 200, message: "退所しました"}
       end
     end

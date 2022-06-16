@@ -5,7 +5,8 @@ Rails.application.routes.draw do
       post '/logout' => 'sessions#destroy'
       resources :users, only: [:create, :update]
       resources :offices, only: [:create, :show, :update] do
-        
+        resources :office_users
+      end
     end
   end
 end
