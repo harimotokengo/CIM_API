@@ -7,6 +7,7 @@ module Api
       before_action :correct_user, only: [:update]
       def create
         access_token = request.headers[:HTTP_ACCESS_TOKEN]
+        binding.pry
         @user = User.new(user_params)
         if @user.save
           logout

@@ -36,6 +36,7 @@ class Office < ApplicationRecord
   
   # 事務所を登録して自身を所属させる
   def save_office(current_user)
+    binding.pry
     return false if invalid?
 
     office = self.save
