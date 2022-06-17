@@ -34,7 +34,8 @@
     - 招待URLを踏んでユーザー登録済なら事務所に所属
   - 所属ユーザー一覧
   - 更新
-    
+    - admin_userのみ事務所情報を更新可能
+
 ## ER図
 以下URLの通り
 https://lucid.app/lucidchart/67df0b81-a2d6-4245-9c98-4910db3cbd42/edit?invitationId=inv_3aacf30b-aff7-4cdb-b876-d206ebfe502f&page=0_0#

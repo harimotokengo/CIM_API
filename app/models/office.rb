@@ -36,10 +36,8 @@ class Office < ApplicationRecord
   
   # 事務所を登録して自身を所属させる
   def save_office(current_user)
-    binding.pry
     return false if invalid?
-
-    office = self.save
-    BelonginInfo.create!(user_id: current_user.id, office_id: office.id, status_id: '所属', admin: true)
+    save!
+    BelongingInfo.create!(user_id: current_user.id, office_id: id, status_id: '所属', admin: true)
   end
 end
