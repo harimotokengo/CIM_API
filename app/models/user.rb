@@ -3,7 +3,7 @@ class User < ApplicationRecord
   has_many :belonging_info, dependent: :destroy
   has_one :current_belonging, -> { belonging }, class_name: 'BelongingInfo'
   has_one :belonging_office, through: :current_belonging, source: :office
-
+  has_many :sent_user_invites, class_name: 'UserInvite', foreign_key: 'sender_id', dependent: :destroy
 
   has_one_attached :avatar
 
