@@ -33,6 +33,7 @@ module Api
           render json: ( status: 200, user_invite: @user_invite )
         else
           response_internal_server_error
+        end
       end
 
       # GET 事務所参加確認画面

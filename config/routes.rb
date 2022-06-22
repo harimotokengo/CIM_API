@@ -7,6 +7,12 @@ Rails.application.routes.draw do
       resources :offices, only: [:create, :show, :update] do
         resources :office_users
       end
+      resources :user_invies, only: [:new, :create, :show] do
+        collection do
+          post 'join'
+          post 'reg_and_join'
+        end
+      end
     end
   end
 end
