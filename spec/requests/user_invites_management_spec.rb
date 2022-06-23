@@ -13,34 +13,42 @@ RSpec.describe 'user_invites', type: :request do
   let!(:other_belonging_info) { create(:belonging_info, user: other_user, office: other_office) }
   let!(:admin_belonging_info) { create(:belonging_info, user: admin_user, office: office, admin: true) }
   let!(:other_admin_belonging_info) { create(:belonging_info, user: other_admin_user, office: other_office, admin: true) }
+  let!(:user_invite) { create(:user_invite, sender: admin_user) }
 
   describe 'GET #new' do
     context '正常系' do
-      context '管理ユーザーでログイン' do
-        it 'リクエストが成功すること' do
-          login_user(admin_belonging_info.user, 'Test-1234', login_path)
-          get new_user_invite_path, xhr: true
-          expect(response).to have_http_status 200
+      context 'URL発行前、管理ユーザーでログイン' do
+        it '204が返ってくること' do
+          login_user(admin_user, 'Test-1234', api_v1_login_path)
+          get new_api_v1_user_invite_path
+          expect(response).to have_http_status 204
         end
       end
       context 'create後' do
-        xit '招待URLが発行されること' do
-
+        it 'リクエストが成功すること' do
+          login_user(admin_user, 'Test-1234', api_v1_login_path)
+          get new_api_v1_user_invite_path(user_invite: user_invite)
+          expect(response).to have_http_status 200
+        end
+        it '招待URLが発行されること' do
+          login_user(admin_user, 'Test-1234', api_v1_login_path)
+          get new_api_v1_user_invite_path(user_invite: user_invite)
+          expect(JSON.parse(response.body)['token_url']).to eq("http://localhost:3000/api/v1/user_invites/#{user_invite.id}?tk=" + user_invite.token)
         end
       end
     end
     context '準正常系' do
       context '未ログイン' do
         it '401エラーが返ってくること' do
-          get new_user_invite_path
+          get new_api_v1_user_invite_path
           expect(response.status).to eq 401
           expect(JSON.parse(response.body)['message']).to eq "Unauthorized"
         end
       end
       context '一般ユーザーでログイン' do
         it '403エラーが返ってくること' do
-          login_user(belonging_info.user, 'Test-1234', login_path)
-          get new_user_invite_path
+          login_user(user, 'Test-1234', api_v1_login_path)
+          get new_api_v1_user_invite_path
           expect(response.status).to eq 403
           expect(JSON.parse(response.body)['message']).to eq "Forbidden"
         end
@@ -52,141 +60,176 @@ RSpec.describe 'user_invites', type: :request do
     context '正常系' do
       context '管理ユーザーでログイン' do
         it 'リクエストが成功すること' do
-          login_user(admin_belonging_info.user, 'Test-1234', login_path)
-          get make_invite_url_user_invites_path
-          expect(response).to have_http_status 302
-          expect(response).to redirect_to new_user_invite_path(user_invite: UserInvite.first)
+          login_user(admin_user, 'Test-1234', api_v1_login_path)
+          post api_v1_user_invites_path(admin_user)
+          expect(response.status).to eq 200
         end
         it '登録されること' do
-          login_user(admin_user, 'Test-1234', login_path)
+          login_user(admin_user, 'Test-1234', api_v1_login_path)
           expect do
-            post api_v1_user_invies_path, params: { user: user_params }
-          end.to_not change(User, :count)
+            post api_v1_user_invites_path(admin_user)
+          end.to change(UserInvite, :count).by(1)
         end
-
-    end
-    context '準正常系' do
-      it '未ログインの場合、ログイン画面にリダイレクトされること' do
-        get make_invite_url_user_invites_path
-        expect(response).to have_http_status 302
-        expect(response).to redirect_to login_path
       end
-      it '一般ユーザーでログインの場合、ルートにリダイレクトされること' do
-        login_user(belonging_info.user, 'Test-1234', login_path)
-        get make_invite_url_user_invites_path
-        expect(response).to have_http_status 302
-        expect(response).to redirect_to root_path
+    end
+
+    context '準正常系' do
+      context '未ログイン' do
+        it '401エラーが返ってくること' do
+          post api_v1_user_invites_path(admin_user)
+          expect(response.status).to eq 401
+          expect(JSON.parse(response.body)['message']).to eq "Unauthorized"
+        end
+        it '登録されないこと' do
+          expect do
+            post api_v1_user_invites_path(admin_user)
+          end.to_not change(UserInvite, :count)
+        end
+      end
+      context '一般ユーザーでログイン' do
+        it '403エラーが返ってくること' do
+          login_user(user, 'Test-1234', api_v1_login_path)
+          post api_v1_user_invites_path(user)
+          expect(response.status).to eq 403
+          expect(JSON.parse(response.body)['message']).to eq "Forbidden"
+        end
+        it '登録されないこと' do
+          login_user(user, 'Test-1234', api_v1_login_path)
+          expect do
+            post api_v1_user_invites_path(user)
+          end.to_not change(UserInvite, :count)
+        end
       end
     end
   end
 
   describe 'GET #show' do
     context '正常系' do
-      it '招待URLが有効な場合、リクエストが成功すること' do
-        get user_invite_path(user_invite.id, tk: user_invite.token)
-        expect(response).to have_http_status 200
+      context '招待URLが有効' do
+        it 'リクエストが成功すること' do
+          get api_v1_user_invite_path(user_invite.id, tk: user_invite.token)
+          expect(response).to have_http_status 200
+        end
       end
     end
     context '準正常系' do
-      it '招待URLが無効な場合、ルートにリダイレクトすること' do
-        get user_invite_path(user_invite.id, tk: 'NG_token')
-        expect(response).to have_http_status 302
-        expect(response).to redirect_to root_path
+      context '招待URLが無効' do
+        it '400エラーが返ってくること' do
+          get api_v1_user_invite_path(user_invite.id, tk: 'NG_token')
+          expect(response).to have_http_status 400
+          expect(JSON.parse(response.body)['message']).to eq "無効なURLです。"
+        end
       end
     end
   end
 
   describe 'POST #join' do
     context '正常系' do
-      it '他事務所ユーザーでログインの場合、ルートにリダイレクトされること' do
-        login_user(other_belonging_info.user, 'Test-1234', login_path)
-        post user_invites_path(user_invite_id: user_invite.id)
-        expect(response).to have_http_status 302
-        expect(response).to redirect_to root_path
+      context '未ログイン' do
+        it 'リクエストが成功' do
+          post join_api_v1_user_invites_path(user_invite_id: user_invite.id),
+            params: { email: other_user.email, password: 'Test-1234' }
+          expect(response).to have_http_status 200
+        end
+        it '移籍処理されること' do
+          expect do
+            post join_api_v1_user_invites_path(user_invite_id: user_invite.id),
+              params: { email: other_user.email, password: 'Test-1234' }
+          end.to change(BelongingInfo.where(user_id: other_user.id), :count).by(1) and
+            change(BelongingInfo.where(user_id: other_user.id, office: other_office), :join).from('所属').to('退所') and
+            change(UserInvite.find(user_invite.id), :join).from(false).to(true)
+        end
       end
-      it '他事務所ユーザーでログインの場合、移籍処理されること' do
-        login_user(other_belonging_info.user, 'Test-1234', login_path)
-        expect do
-          post user_invites_path(user_invite_id: user_invite.id)
-        end.to change(BelongingInfo.where(user_id: other_belonging_info.user.id), :count).by(1) and
-          change(BelongingInfo.where(user_id: other_belonging_info.user.id, office: other_office), :join).from('所属').to('退所') and
-          change(UserInvite.find(user_invite.id), :join).from(false).to(true)
+      context '他事務所ユーザーでログイン' do
+        it 'リクエストが成功' do
+          login_user(other_user, 'Test-1234', api_v1_login_path)
+          post join_api_v1_user_invites_path(user_invite_id: user_invite.id),
+            params: { email: other_user.email, password: 'Test-1234' }
+          expect(response).to have_http_status 200
+        end
+        it '移籍処理されること' do
+          login_user(other_user, 'Test-1234', api_v1_login_path)
+          expect do
+            post join_api_v1_user_invites_path(user_invite_id: user_invite.id),
+              params: { email: other_user.email, password: 'Test-1234' }
+          end.to change(BelongingInfo.where(user_id: other_user.id), :count).by(1) and
+            change(BelongingInfo.where(user_id: other_user.id, office: other_office), :join).from('所属').to('退所') and
+            change(UserInvite.find(user_invite.id), :join).from(false).to(true)
+        end
       end
     end
     context '準正常系' do
-      it '未ログインの場合、ログインして招待画面にリダイレクトされること' do
-        post user_invites_path(user_invite_id: user_invite.id)
-        expect(response).to have_http_status 302
-        expect(response).to redirect_to new_session_user_invites_path(user_invite_id: user_invite.id)
+      context '自事務所ユーザーでログイン' do
+        it '409エラーが返ってくること' do
+          login_user(user, 'Test-1234', api_v1_login_path)
+          post join_api_v1_user_invites_path(user_invite_id: user_invite.id),
+            params: { email: user.email, password: 'Test-1234' }
+          expect(response).to have_http_status 409
+          expect(JSON.parse(response.body)['message']).to eq "Belonginginfo Conflict"
+        end
+        it '移籍処理されないこと' do
+          login_user(user, 'Test-1234', api_v1_login_path)
+          expect do
+            post join_api_v1_user_invites_path(user_invite_id: user_invite.id),
+              params: { email: user.email, password: 'Test-1234' }
+          end.to_not change(BelongingInfo.where(user_id: user.id), :count)
+        end
       end
-      it '未ログインの場合、移籍処理されないこと' do
-        expect do
-          post user_invites_path(user_invite_id: user_invite.id)
-        end.to_not change(BelongingInfo.where(user_id: other_belonging_info.user.id), :count)
+      context '他事務所管理ユーザーでログイン' do
+        it '403エラーが返ってくること' do
+          login_user(other_admin_user, 'Test-1234', api_v1_login_path)
+          post join_api_v1_user_invites_path(user_invite_id: user_invite.id),
+            params: { email: other_admin_user.email, password: 'Test-1234' }
+          expect(response).to have_http_status 403
+          expect(JSON.parse(response.body)['message']).to eq "管理ユーザーは移籍出来ません"
+        end
+        it '他事務所管理ユーザーでログインの場合、移籍処理されないこと' do
+          login_user(other_admin_user, 'Test-1234', api_v1_login_path)
+          expect do
+            post join_api_v1_user_invites_path(user_invite_id: user_invite.id),
+              params: { email: other_admin_user.email, password: 'Test-1234' }
+          end.to_not change(BelongingInfo.where(user_id: other_admin_user.id), :count)
+        end
       end
-      it '自事務所ユーザーでログインの場合、ルートにリダイレクトされること' do
-        login_user(belonging_info.user, 'Test-1234', login_path)
-        post user_invites_path(user_invite_id: user_invite.id)
-        expect(response).to have_http_status 302
-        expect(response).to redirect_to root_path
-      end
-      it '自事務所ユーザーでログインの場合、移籍処理されないこと' do
-        login_user(belonging_info.user, 'Test-1234', login_path)
-        expect do
-          post user_invites_path(user_invite_id: user_invite.id)
-        end.to_not change(BelongingInfo.where(user_id: other_belonging_info.user.id), :count)
-      end
-      it '他事務所管理ユーザーでログインの場合、ルートにリダイレクトされること' do
-        login_user(other_admin_belonging_info.user, 'Test-1234', login_path)
-        post user_invites_path(user_invite_id: user_invite.id)
-        expect(response).to have_http_status 302
-        expect(response).to redirect_to root_path
-      end
-      it '他事務所管理ユーザーでログインの場合、移籍処理されないこと' do
-        login_user(other_admin_belonging_info.user, 'Test-1234', login_path)
-        expect do
-          post user_invites_path(user_invite_id: user_invite.id)
-        end.to_not change(BelongingInfo.where(user_id: other_belonging_info.user.id), :count)
-      end
-      # 招待URLが期限切れ
+        # 招待URLが期限切れ
     end
   end
 
-  describe 'POST #reg_and_join' do
-    context '正常系' do
-      it '未ログイン状態の場合ルートにリダイレクトされること' do
-        user_params = attributes_for(:invite_user_form, office_id: office.id)
-        post create_and_user_reg_user_invites_path(user_invite_id: user_invite.id),
-             params: { invite_user_form: user_params }
-        expect(response).to have_http_status 302
-        expect(response).to redirect_to root_path
-      end
-      it '未ログイン状態の場合、招待者の事務所にユーザー登録されること' do
-        user_params = attributes_for(:invite_user_form, office_id: office.id)
-        expect do
-          post create_and_user_reg_user_invites_path(user_invite_id: user_invite.id),
-               params: { invite_user_form: user_params }
-        end.to change(BelongingInfo.where(office_id: office.id), :count).by(1) and
-          change(UserInvite.find(user_invite.id), :join).from(false).to(true)
-      end
-    end
-    context '準正常系' do
-      it 'ログイン状態の場合,、ルートにリダイレクトされること' do
-        login_user(belonging_info.user, 'Test-1234', login_path)
-        user_params = attributes_for(:invite_user_form, office_id: office.id)
-        post create_and_user_reg_user_invites_path(user_invite_id: user_invite.id),
-             params: { invite_user_form: user_params }
-        expect(response).to have_http_status 302
-        expect(response).to redirect_to root_path
-      end
-      it 'ログイン状態の場合、招待者の事務所にユーザー登録されないこと' do
-        login_user(belonging_info.user, 'Test-1234', login_path)
-        user_params = attributes_for(:invite_user_form, office_id: office.id)
-        expect do
-          post create_and_user_reg_user_invites_path(user_invite_id: user_invite.id),
-               params: { invite_user_form: user_params }
-        end.to_not change(BelongingInfo.where(office_id: office.id), :count)
-      end
-    end
-  end
+  # describe 'POST #reg_and_join' do
+  #   context '正常系' do
+  #     it '未ログイン状態の場合ルートにリダイレクトされること' do
+  #       user_params = attributes_for(:invite_user_form, office_id: office.id)
+  #       post create_and_user_reg_user_invites_path(user_invite_id: user_invite.id),
+  #            params: { invite_user_form: user_params }
+  #       expect(response).to have_http_status 302
+  #       expect(response).to redirect_to root_path
+  #     end
+  #     it '未ログイン状態の場合、招待者の事務所にユーザー登録されること' do
+  #       user_params = attributes_for(:invite_user_form, office_id: office.id)
+  #       expect do
+  #         post create_and_user_reg_user_invites_path(user_invite_id: user_invite.id),
+  #              params: { invite_user_form: user_params }
+  #       end.to change(BelongingInfo.where(office_id: office.id), :count).by(1) and
+  #         change(UserInvite.find(user_invite.id), :join).from(false).to(true)
+  #     end
+  #   end
+  #   context '準正常系' do
+  #     it 'ログイン状態の場合,、ルートにリダイレクトされること' do
+  #       login_user(belonging_info.user, 'Test-1234', login_path)
+  #       user_params = attributes_for(:invite_user_form, office_id: office.id)
+  #       post create_and_user_reg_user_invites_path(user_invite_id: user_invite.id),
+  #            params: { invite_user_form: user_params }
+  #       expect(response).to have_http_status 302
+  #       expect(response).to redirect_to root_path
+  #     end
+  #     it 'ログイン状態の場合、招待者の事務所にユーザー登録されないこと' do
+  #       login_user(belonging_info.user, 'Test-1234', login_path)
+  #       user_params = attributes_for(:invite_user_form, office_id: office.id)
+  #       expect do
+  #         post create_and_user_reg_user_invites_path(user_invite_id: user_invite.id),
+  #              params: { invite_user_form: user_params }
+  #       end.to_not change(BelongingInfo.where(office_id: office.id), :count)
+  #     end
+  #   end
+  # end
 end
