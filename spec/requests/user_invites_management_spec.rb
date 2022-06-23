@@ -13,7 +13,6 @@ RSpec.describe 'user_invites', type: :request do
   let!(:other_belonging_info) { create(:belonging_info, user: other_user, office: other_office) }
   let!(:admin_belonging_info) { create(:belonging_info, user: admin_user, office: office, admin: true) }
   let!(:other_admin_belonging_info) { create(:belonging_info, user: other_admin_user, office: other_office, admin: true) }
-  let!(:user_invite) { create(:user_invite, sender: admin_user) }
 
   describe 'GET #new' do
     context '正常系' do
@@ -195,41 +194,60 @@ RSpec.describe 'user_invites', type: :request do
     end
   end
 
-  # describe 'POST #reg_and_join' do
-  #   context '正常系' do
-  #     it '未ログイン状態の場合ルートにリダイレクトされること' do
-  #       user_params = attributes_for(:invite_user_form, office_id: office.id)
-  #       post create_and_user_reg_user_invites_path(user_invite_id: user_invite.id),
-  #            params: { invite_user_form: user_params }
-  #       expect(response).to have_http_status 302
-  #       expect(response).to redirect_to root_path
-  #     end
-  #     it '未ログイン状態の場合、招待者の事務所にユーザー登録されること' do
-  #       user_params = attributes_for(:invite_user_form, office_id: office.id)
-  #       expect do
-  #         post create_and_user_reg_user_invites_path(user_invite_id: user_invite.id),
-  #              params: { invite_user_form: user_params }
-  #       end.to change(BelongingInfo.where(office_id: office.id), :count).by(1) and
-  #         change(UserInvite.find(user_invite.id), :join).from(false).to(true)
-  #     end
-  #   end
-  #   context '準正常系' do
-  #     it 'ログイン状態の場合,、ルートにリダイレクトされること' do
-  #       login_user(belonging_info.user, 'Test-1234', login_path)
-  #       user_params = attributes_for(:invite_user_form, office_id: office.id)
-  #       post create_and_user_reg_user_invites_path(user_invite_id: user_invite.id),
-  #            params: { invite_user_form: user_params }
-  #       expect(response).to have_http_status 302
-  #       expect(response).to redirect_to root_path
-  #     end
-  #     it 'ログイン状態の場合、招待者の事務所にユーザー登録されないこと' do
-  #       login_user(belonging_info.user, 'Test-1234', login_path)
-  #       user_params = attributes_for(:invite_user_form, office_id: office.id)
-  #       expect do
-  #         post create_and_user_reg_user_invites_path(user_invite_id: user_invite.id),
-  #              params: { invite_user_form: user_params }
-  #       end.to_not change(BelongingInfo.where(office_id: office.id), :count)
-  #     end
-  #   end
-  # end
+  describe 'POST #reg_and_join' do
+    context '正常系' do
+      context '未ログイン' do
+        it 'リクエストが成功' do
+          user_params = attributes_for(:invite_user_form, office_id: office.id)
+          post reg_and_join_api_v1_user_invites_path(user_invite_id: user_invite.id),
+              params: { invite_user_form: user_params }
+          expect(response).to have_http_status 200
+        end
+        it '招待者の事務所にユーザー登録されること' do
+          user_params = attributes_for(:invite_user_form, office_id: office.id)
+          expect do
+            post reg_and_join_api_v1_user_invites_path(user_invite_id: user_invite.id),
+                params: { invite_user_form: user_params }
+          end.to change(BelongingInfo.where(office_id: office.id), :count).by(1) and
+            change(UserInvite.find(user_invite.id), :join).from(false).to(true)
+        end
+      end
+      context 'ログイン状態' do
+        it 'リクエストが成功' do
+          login_user(user, 'Test-1234', api_v1_login_path)
+          user_params = attributes_for(:invite_user_form, office_id: office.id)
+          post reg_and_join_api_v1_user_invites_path(user_invite_id: user_invite.id),
+              params: { invite_user_form: user_params }
+          expect(response).to have_http_status 200
+        end
+        it '招待者の事務所にユーザー登録されること' do
+          login_user(user, 'Test-1234', api_v1_login_path)
+          user_params = attributes_for(:invite_user_form, office_id: office.id)
+          expect do
+            post reg_and_join_api_v1_user_invites_path(user_invite_id: user_invite.id),
+                params: { invite_user_form: user_params }
+          end.to change(BelongingInfo.where(office_id: office.id), :count).by(1) and
+            change(UserInvite.find(user_invite.id), :join).from(false).to(true)
+        end
+      end
+    end
+    context '準正常系' do
+      context 'パラメータが不正' do
+        it '400エラーが返ってくること' do
+          user_params = attributes_for(:invite_user_form, office_id: office.id, last_name: '')
+          post reg_and_join_api_v1_user_invites_path(user_invite_id: user_invite.id),
+              params: { invite_user_form: user_params }
+          expect(response).to have_http_status 400
+          expect(JSON.parse(response.body)['message']).to eq "登録出来ません。入力必須項目を確認してください"
+        end
+        it '登録されないこと' do
+          user_params = attributes_for(:invite_user_form, office_id: office.id, last_name: '')
+          expect do
+            post reg_and_join_api_v1_user_invites_path(user_invite_id: user_invite.id),
+                params: { invite_user_form: user_params }
+          end.to_not change(BelongingInfo.where(office_id: office.id), :count)
+        end
+      end
+    end
+  end
 end
