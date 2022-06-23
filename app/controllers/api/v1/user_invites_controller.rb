@@ -84,18 +84,18 @@ module Api
       end
 
       # # POST アカウントを作成して事務所参加
-      # def reg_and_join
-      #   access_token = request.headers[:HTTP_ACCESS_TOKEN]
-      #   # officeをセット
-      #   @invite_user_form = InviteUserForm.new(user_params)
-      #   if @invite_user_form.save
-      #     logout
-      #     login(user_params[:email], user_params[:password])
-      #     render json: { status: 200, message: "登録しました", id: current_user.id, email: current_user.email} 
-      #   else
-      #     render status: 400, json: { status: 400, message: '登録出来ません。入力必須項目を確認してください', errors: @user.errors }
-      #   end
-      # end
+      def reg_and_join
+        access_token = request.headers[:HTTP_ACCESS_TOKEN]
+        # officeをセット
+        @invite_user_form = InviteUserForm.new(user_params)
+        if @invite_user_form.save
+          logout
+          login(user_params[:email], user_params[:password])
+          render json: { status: 200, message: "登録しました", id: current_user.id, email: current_user.email} 
+        else
+          render status: 400, json: { status: 400, message: '登録出来ません。入力必須項目を確認してください', errors: @invite_user_form.errors }
+        end
+      end
       
       private
 
