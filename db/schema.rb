@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2022_06_20_015523) do
+ActiveRecord::Schema[7.0].define(version: 2022_06_27_124539) do
   create_table "active_storage_attachments", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.string "name", null: false
     t.string "record_type", null: false
@@ -51,6 +51,105 @@ ActiveRecord::Schema[7.0].define(version: 2022_06_20_015523) do
     t.index ["user_id"], name: "index_belonging_infos_on_user_id"
   end
 
+  create_table "client_joins", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
+    t.bigint "office_id"
+    t.bigint "user_id"
+    t.bigint "client_id", null: false
+    t.integer "belong_side_id", null: false
+    t.boolean "admin", default: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["client_id"], name: "index_client_joins_on_client_id"
+    t.index ["office_id"], name: "index_client_joins_on_office_id"
+    t.index ["user_id"], name: "index_client_joins_on_user_id"
+  end
+
+  create_table "clients", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
+    t.string "name", null: false
+    t.string "first_name"
+    t.string "name_kana", null: false
+    t.string "first_name_kana"
+    t.string "maiden_name"
+    t.string "maiden_name_kana"
+    t.text "profile"
+    t.string "indentification_number"
+    t.date "birth_date"
+    t.integer "client_type_id", null: false
+    t.boolean "archive", default: true, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
+  create_table "contact_addresses", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
+    t.integer "category", null: false
+    t.string "memo"
+    t.string "post_code"
+    t.string "prefecture"
+    t.string "address"
+    t.string "building_name"
+    t.boolean "send_by_personal", default: false
+    t.bigint "client_id"
+    t.bigint "opponent_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["client_id"], name: "index_contact_addresses_on_client_id"
+    t.index ["opponent_id"], name: "index_contact_addresses_on_opponent_id"
+  end
+
+  create_table "contact_emails", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
+    t.integer "category", null: false
+    t.string "memo"
+    t.string "email"
+    t.bigint "client_id"
+    t.bigint "opponent_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["client_id"], name: "index_contact_emails_on_client_id"
+    t.index ["opponent_id"], name: "index_contact_emails_on_opponent_id"
+  end
+
+  create_table "contact_phone_numbers", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
+    t.integer "category", null: false
+    t.string "memo"
+    t.string "phone_number"
+    t.bigint "client_id"
+    t.bigint "opponent_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["client_id"], name: "index_contact_phone_numbers_on_client_id"
+    t.index ["opponent_id"], name: "index_contact_phone_numbers_on_opponent_id"
+  end
+
+  create_table "matter_joins", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
+    t.bigint "office_id"
+    t.bigint "user_id"
+    t.bigint "matter_id", null: false
+    t.integer "belong_side_id", null: false
+    t.boolean "admin", default: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["matter_id"], name: "index_matter_joins_on_matter_id"
+    t.index ["office_id"], name: "index_matter_joins_on_office_id"
+    t.index ["user_id"], name: "index_matter_joins_on_user_id"
+  end
+
+  create_table "matters", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.bigint "client_id", null: false
+    t.integer "matter_genre_id", null: false
+    t.integer "service_price"
+    t.text "description"
+    t.date "start_date"
+    t.date "finish_date"
+    t.integer "matter_status_id", null: false
+    t.boolean "archive", default: true, null: false
+    t.string "status_memo"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["client_id"], name: "index_matters_on_client_id"
+    t.index ["user_id"], name: "index_matters_on_user_id"
+  end
+
   create_table "offices", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.string "name", null: false
     t.string "phone_number", null: false
@@ -60,6 +159,23 @@ ActiveRecord::Schema[7.0].define(version: 2022_06_20_015523) do
     t.boolean "archive", default: true, null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+  end
+
+  create_table "opponents", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
+    t.string "name", null: false
+    t.string "name_kana", null: false
+    t.string "first_name"
+    t.string "first_name_kana"
+    t.string "maiden_name"
+    t.string "maiden_name_kana"
+    t.text "profile"
+    t.date "birth_date"
+    t.integer "opponent_type"
+    t.integer "opponent_relation_type", null: false
+    t.bigint "matter_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["matter_id"], name: "index_opponents_on_matter_id"
   end
 
   create_table "user_invites", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
@@ -101,4 +217,19 @@ ActiveRecord::Schema[7.0].define(version: 2022_06_20_015523) do
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
   add_foreign_key "belonging_infos", "offices"
   add_foreign_key "belonging_infos", "users"
+  add_foreign_key "client_joins", "clients"
+  add_foreign_key "client_joins", "offices"
+  add_foreign_key "client_joins", "users"
+  add_foreign_key "contact_addresses", "clients"
+  add_foreign_key "contact_addresses", "opponents"
+  add_foreign_key "contact_emails", "clients"
+  add_foreign_key "contact_emails", "opponents"
+  add_foreign_key "contact_phone_numbers", "clients"
+  add_foreign_key "contact_phone_numbers", "opponents"
+  add_foreign_key "matter_joins", "matters"
+  add_foreign_key "matter_joins", "offices"
+  add_foreign_key "matter_joins", "users"
+  add_foreign_key "matters", "clients"
+  add_foreign_key "matters", "users"
+  add_foreign_key "opponents", "matters"
 end
