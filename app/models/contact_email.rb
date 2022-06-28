@@ -15,7 +15,7 @@ class ContactEmail < ApplicationRecord
   validate :parent_present
 
   def parent_present
-    if client.blank? ^ opponent.blank?
+    if client.blank? && opponent.blank?
       if client.blank?
         errors.add(:base, 'クライアントに紐づかない電話番号は登録できません。')
       elsif opponent.blank?
@@ -27,4 +27,6 @@ class ContactEmail < ApplicationRecord
   enum category: {
     私用: 100, 仕事用: 200, 家族: 300, 友人: 400, その他: 999
   }
+
+  # 親の排他チェック
 end

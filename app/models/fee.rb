@@ -10,12 +10,7 @@ class Fee < ApplicationRecord
   belongs_to_active_hash :monthly_date
 
   with_options presence: true do
-    validates :fee_type_id,
-              numericality: {
-                only_integer: true,
-                greater_than_or_equal_to: 1,
-                less_than_or_equal_to: 7
-              }
+    validates :fee_type_id
     validates :price, numericality: { only_integer: true, greater_than_or_equal_to: 0 }
     validates :pay_times, numericality: { only_integer: true, greater_than_or_equal_to: 1 }
   end
@@ -41,7 +36,7 @@ class Fee < ApplicationRecord
             },
             allow_blank: true
   validate :check_current_payment
-  
+
   enum fee_type_id: {
     着手金: 1, 成功報酬: 2, 顧問料: 3,
     相談料: 4, 実費: 5, タイムチャージ: 6,

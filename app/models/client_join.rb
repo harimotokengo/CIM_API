@@ -6,12 +6,7 @@ class ClientJoin < ApplicationRecord
   with_options presence: true do
     validates :office_id, if: :user_id_blank
     validates :user_id, if: :office_id_blank
-    validates :belong_side_id,
-              numericality: {
-                only_integer: true,
-                greater_than_or_equal_to: 1,
-                less_than_or_equal_to: 2
-              }
+    validates :belong_side_id
   end
 
   enum belong_side_id: {

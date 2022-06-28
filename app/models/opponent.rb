@@ -12,6 +12,7 @@ class Opponent < ApplicationRecord
   with_options presence: true do
     validates :name
     validates :name_kana
+    validates :opponent_relation_type
   end
 
   def name=(value)

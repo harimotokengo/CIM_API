@@ -18,7 +18,7 @@ class ContactAddress < ApplicationRecord
   validates :address,
             length: { maximum: 50 },
             allow_blank: true
-  validate :pearent_present
+  validate :parent_present
   validate :input_confirmation
 
   enum category: {
@@ -26,7 +26,7 @@ class ContactAddress < ApplicationRecord
   }
 
   def parent_present
-    if client.blank? ^ opponent.blank?
+    if client.blank? && opponent.blank?
       if client.blank?
         errors.add(:base, 'クライアントに紐づかない電話番号は登録できません。')
       elsif opponent.blank?
@@ -34,6 +34,8 @@ class ContactAddress < ApplicationRecord
       end
     end
   end
+
+  # 親の排他チェック
 
   def input_confirmation
     if post_code.blank? && prefecture.blank? && address.blank?

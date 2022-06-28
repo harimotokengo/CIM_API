@@ -3,7 +3,6 @@ class CreateMatters < ActiveRecord::Migration[7.0]
     create_table :matters do |t|
       t.references :user, null: false, foreign_key: true
       t.references :client, null: false, foreign_key: true
-      t.integer :matter_genre_id, null: false
       t.integer :service_price
       t.text :description
       t.date :start_date

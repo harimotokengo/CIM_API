@@ -11,7 +11,7 @@ class ContactPhoneNumber < ApplicationRecord
   validate :parent_present
 
   def parent_present
-    if client.blank? ^ opponent.blank?
+    if client.blank? && opponent.blank?
       if client.blank?
         errors.add(:base, 'クライアントに紐づかない電話番号は登録できません。')
       elsif opponent.blank?
@@ -19,4 +19,6 @@ class ContactPhoneNumber < ApplicationRecord
       end
     end
   end
+
+  # 親の排他チェック
 end

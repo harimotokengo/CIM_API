@@ -6,8 +6,8 @@ class Matter < ApplicationRecord
   has_many :occurrences, dependent: :destroy
   has_many :tasks, dependent: :destroy
   has_many :fees, dependent: :destroy
-  has_many :charges, dependent: :destroy
-  has_many :matter_assigns, dependent: :destroy
+  # has_many :charges, dependent: :destroy
+  # has_many :matter_assigns, dependent: :destroy
   # has_many :work_logs, dependent: :destroy
   has_many :work_details, dependent: :destroy
   has_many :folder_urls, dependent: :destroy
@@ -15,7 +15,7 @@ class Matter < ApplicationRecord
   has_many :tags, through: :matter_tags
   # has_many :invite_urls, dependent: :destroy
   has_many :matter_joins, dependent: :destroy
-  has_many :matter_genre, dependent: :destroy
+  # has_many :matter_genre, dependent: :destroy
   # has_many :assigned_users, through: :matter_assigns, source: :user
   # has_many :notifications, dependent: :destroy
   # has_many :edit_logs, dependent: :destroy
@@ -26,25 +26,22 @@ class Matter < ApplicationRecord
   accepts_nested_attributes_for :matter_joins, reject_if: :all_blank, allow_destroy: true
 
   with_options presence: true do
-    validates :user_id
-    validates :matter_genre_id,
-              numericality: {
-                only_integer: true,
-                greater_than_or_equal_to: 1,
-                less_than_or_equal_to: 10
-              }
-    validates :matter_status_id,
-              numericality: {
-                only_integer: true,
-                greater_than_or_equal_to: 1,
-                less_than_or_equal_to: 5
-              }
+    validates :user_id,:matter_status_id
   end
 
   enum matter_status_id: {
     受任: 1, 先方検討中: 2, 当方準備中: 3,
     相談のみ: 4, 終了: 5
   }
+
+  validates_inclusion_of :matter_status_id, in: ->(inst) { inst.class.matter_status_ids.keys }
+
+  # enumのバリデーション用にArgumentErrorをオーバーライド
+  def matter_status_id=(value)
+    self[:matter_status_id] = value
+  rescue ArgumentError
+    self[:matter_status_id] = nil
+  end
 
   # scope作って消す
   def self.active_matters

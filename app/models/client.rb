@@ -14,13 +14,7 @@ class Client < ApplicationRecord
 
   validates :name, presence: true
   validates :name_kana, presence: true
-  validates :client_type_id,
-            presence: true,
-            numericality: {
-              only_integer: true,
-              greater_than_or_equal_to: 1,
-              less_than_or_equal_to: 2
-            }
+  validates :client_type_id, presence: true
   validates :indentification_number,
             format: { with: VALID_INDENTIFICATION_NUMBER_REGEX,
                       message: 'でない値が入力されています' },

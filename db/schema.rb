@@ -164,7 +164,6 @@ ActiveRecord::Schema[7.0].define(version: 2022_06_28_100614) do
   create_table "matters", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.bigint "user_id", null: false
     t.bigint "client_id", null: false
-    t.integer "matter_genre_id", null: false
     t.integer "service_price"
     t.text "description"
     t.date "start_date"
