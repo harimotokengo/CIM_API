@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2022_06_27_124539) do
+ActiveRecord::Schema[7.0].define(version: 2022_06_28_100614) do
   create_table "active_storage_attachments", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.string "name", null: false
     t.string "record_type", null: false
@@ -120,6 +120,25 @@ ActiveRecord::Schema[7.0].define(version: 2022_06_27_124539) do
     t.index ["opponent_id"], name: "index_contact_phone_numbers_on_opponent_id"
   end
 
+  create_table "fees", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
+    t.integer "fee_type_id", null: false
+    t.integer "price", null: false
+    t.text "description"
+    t.date "deadline"
+    t.integer "pay_times", null: false
+    t.integer "monthly_date_id"
+    t.integer "current_payment"
+    t.integer "price_type", null: false
+    t.date "paid_date"
+    t.integer "paid_amount"
+    t.boolean "pay_off", default: false, null: false
+    t.boolean "archive", default: true, null: false
+    t.bigint "matter_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["matter_id"], name: "index_fees_on_matter_id"
+  end
+
   create_table "matter_joins", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.bigint "office_id"
     t.bigint "user_id"
@@ -131,6 +150,15 @@ ActiveRecord::Schema[7.0].define(version: 2022_06_27_124539) do
     t.index ["matter_id"], name: "index_matter_joins_on_matter_id"
     t.index ["office_id"], name: "index_matter_joins_on_office_id"
     t.index ["user_id"], name: "index_matter_joins_on_user_id"
+  end
+
+  create_table "matter_tags", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
+    t.bigint "tag_id", null: false
+    t.bigint "matter_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["matter_id"], name: "index_matter_tags_on_matter_id"
+    t.index ["tag_id"], name: "index_matter_tags_on_tag_id"
   end
 
   create_table "matters", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
@@ -170,12 +198,17 @@ ActiveRecord::Schema[7.0].define(version: 2022_06_27_124539) do
     t.string "maiden_name_kana"
     t.text "profile"
     t.date "birth_date"
-    t.integer "opponent_type"
     t.integer "opponent_relation_type", null: false
     t.bigint "matter_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["matter_id"], name: "index_opponents_on_matter_id"
+  end
+
+  create_table "tags", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
+    t.string "tag_name"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
   end
 
   create_table "user_invites", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
@@ -226,9 +259,12 @@ ActiveRecord::Schema[7.0].define(version: 2022_06_27_124539) do
   add_foreign_key "contact_emails", "opponents"
   add_foreign_key "contact_phone_numbers", "clients"
   add_foreign_key "contact_phone_numbers", "opponents"
+  add_foreign_key "fees", "matters"
   add_foreign_key "matter_joins", "matters"
   add_foreign_key "matter_joins", "offices"
   add_foreign_key "matter_joins", "users"
+  add_foreign_key "matter_tags", "matters"
+  add_foreign_key "matter_tags", "tags"
   add_foreign_key "matters", "clients"
   add_foreign_key "matters", "users"
   add_foreign_key "opponents", "matters"

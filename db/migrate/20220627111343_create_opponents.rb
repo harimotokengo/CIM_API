@@ -9,7 +9,6 @@ class CreateOpponents < ActiveRecord::Migration[7.0]
       t.string :maiden_name_kana
       t.text :profile
       t.date :birth_date
-      t.integer :opponent_type
       t.integer :opponent_relation_type, null: false
       t.references :matter, null: false, foreign_key: true
       t.timestamps

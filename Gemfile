@@ -53,6 +53,7 @@ group :development do
 end
 
 gem 'active_hash'
+gem 
 gem 'aws-sdk-s3', require: false
 gem 'sorcery'
 gem 'will_paginate'
