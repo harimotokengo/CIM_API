@@ -1,7 +1,7 @@
 class Matter < ApplicationRecord
   belongs_to :user, optional: true
   belongs_to :client
-  belongs_to :inquiry, optional: true
+  belongs_to :matter_category
   has_many :opponents, dependent: :destroy
   has_many :occurrences, dependent: :destroy
   has_many :tasks, dependent: :destroy
@@ -15,7 +15,7 @@ class Matter < ApplicationRecord
   has_many :tags, through: :matter_tags
   # has_many :invite_urls, dependent: :destroy
   has_many :matter_joins, dependent: :destroy
-  # has_many :matter_genre, dependent: :destroy
+  
   # has_many :assigned_users, through: :matter_assigns, source: :user
   # has_many :notifications, dependent: :destroy
   # has_many :edit_logs, dependent: :destroy
