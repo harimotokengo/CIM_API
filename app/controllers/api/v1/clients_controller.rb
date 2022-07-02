@@ -136,7 +136,10 @@ module Api
 
       # updateとshowで
       def correct_user
-
+        setしたclientのclient_joinを呼び出す
+        client_join.user = current_user
+        client_join.office = current_user.belonging_office
+        office
       end
     end
   end
