@@ -1,11 +1,14 @@
 module Api
   module V1
-    class ClientsController < ApplicationController
+    class ClientsController < Api::V1::Base
       before_action :response_unauthorized, unless: :logged_in?
       # before_action :set_client, only: %i[show update]
 
       def index
-        # デザインで確認
+        user_clients = current_user.join_clients
+        office_clients = current_user.belonging_office
+        cliants =  (user_clients + office_clients).distinct
+        render json: { status: 200, clients: clients}
       end
 
       def show
@@ -15,7 +18,7 @@ module Api
       def get_matter_category
         matter_category_parents = MatterCategory.where(ancestry: nil)
         matter_category_children = MatterCategory.find(params[:category_parent_id]).children
-        render json: {matter_categories: category_parents
+        render json: {matter_categories: category_parents,
           matter_category_children: matter_category_children}
       end
 
@@ -30,8 +33,6 @@ module Api
 
       def create
         @client = Client.new(client_params)
-        # paramsに
-        @client.client_type_id = params[:tab_btn]
         # @client.matters[0].set_joinメソッドを作ってまとめる
         if @client.matters[0].matter_joins[0].belong_side_id == 1
           @client.matters[0].matter_joins[0].office_id = @office.id
@@ -42,14 +43,12 @@ module Api
         tag_list = params[:client][:matters_attributes][:"0"][:tag_name].split(',') unless params[:client][:matters_attributes][:"0"][:tag_name].nil?
         if @client.save
           @client.matters[0].save_matter_tags(tag_list) unless params[:client][:matters_attributes][:"0"][:tag_name].nil?
-          @client.matters[0].save_matter_tasks
+          # @client.matters[0].save_matter_tasks
           # @client.create_client_log(current_user)
           
-          flash[:notice] = '登録しました。'
-          # redirect_to matter_path(@client.matters[0])
+          render json: { status: 200, message: "登録しました"}
         else
-          flash.now[:alert] = '登録出来ません。入力必須項目を確認してください。'
-          render :new
+          render status: 400, json: { status: 400, message: '登録出来ません。入力必須項目を確認してください', errors: @client.errors }
         end
       end
 
@@ -60,7 +59,28 @@ module Api
           # @client.update_client_log(current_user) if @client.saved_changes?
           render json: { status: 200, message: "更新しました"}
         else
-          render status: 400, json: { status: 400, message: '更新出来ません。入力必須項目を確認してください', errors: belonging.errors }
+          render status: 400, json: { status: 400, message: '更新出来ません。入力必須項目を確認してください', errors: @client.errors }
+        end
+      end
+
+      def conflict_check
+        @name = params[:name]
+        @first_name = params[:first_name]
+        @full_name = @name + @first_name
+        @harf_space_fullname = @name + ' ' + @first_name
+        @hull_space_fullname = @name + '　' + @first_name
+        @clients = Client.joins(matters: :matter_joins).where(['matters.archive = ?', true]).where(['matter_joins.office_id = ? OR matter_joins.user_id = ?', @office.id, current_user.id])
+                         .where(['name = ? AND first_name = ?', @name, @first_name]).distinct
+        @opponents = Opponent.joins(matter: :matter_joins).where(['matters.archive = ?', true]).where(['matter_joins.office_id = ? OR matter_joins.user_id = ?', @office.id, current_user.id])
+                             .where(['name = ? OR name = ? OR name = ?', @full_name, @harf_space_fullname, @hull_space_fullname]).distinct
+        if !@clients && !@opponents
+          render json: { status: 200, message: 'OK' }
+        elsif @clients
+          render json: { status: 200, clients: @clients }
+        elsif @opponents
+          render json: { status: 200, opponents: @opponents }
+        else
+          render json: { status: 200, clients: @clients, opponents: @opponents }
         end
       end
 
@@ -98,7 +118,8 @@ module Api
             :id, :user_id, :service_price,
             :folder_url, :description, :matter_status_id,
             :start_date, :finish_date, 
-            # :matter_category_id,:task_group_template_id, 
+            :matter_category_id,
+            # :task_group_template_id, 
             :_destroy,
             { matter_joins_attributes: %i[
               id belong_side_id admin office_id user_id _destroy

@@ -13,6 +13,11 @@ Rails.application.routes.draw do
           post 'reg_and_join'
         end
       end
+      resources :clients, only: [:index, :create, :show, :update, :destroy ] do
+        collection do
+          get 'conflict_check'
+        end
+      end
     end
   end
 end

@@ -5,6 +5,8 @@ class User < ApplicationRecord
   has_one :belonging_office, through: :current_belonging, source: :office
   has_many :sent_user_invites, class_name: 'UserInvite', foreign_key: 'sender_id', dependent: :destroy
   has_many :matter_joins, dependent: :destroy
+  has_many :join_matters, through: :matter_joins, source: :matter
+  has_many :join_clients, through: :join_matters, source: :client
   has_one_attached :avatar
 
   VALID_EMAIL_REGEX = /\A[\w+\-.]+@[a-z\d\-.]+\.[a-z]+\z/i.freeze

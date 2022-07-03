@@ -43,6 +43,28 @@ class Matter < ApplicationRecord
     self[:matter_status_id] = nil
   end
 
+  def save_matter_tags(sent_matter_tags)
+    # 現在の案件が持っているtagsを引っ張ってきている
+    current_tags = tags.pluck(:tag_name) unless tags.nil?
+    # 今postが持っているタグと今回保存されたものの差をすでにあるタグとする。古いタグは消す。
+    old_tags = current_tags - sent_matter_tags
+    # 今回保存されたものと現在の差を新しいタグとする。新しいタグは保存
+    new_tags = sent_matter_tags - current_tags
+    # Destroy old taggings:
+    old_tags.each do |old_tag|
+      tags.delete Tag.find_by(tag_name: old_tag)
+    end
+
+    # Create new taggings:
+    new_tags.each do |new_tag|
+      matter_tag = Tag.find_or_create_by(tag_name: new_tag)
+      # 配列に保存
+      if matter_tag.valid?
+        tags << matter_tag
+      end
+    end
+  end
+  
   # scope作って消す
   def self.active_matters
     where(archive: true)
