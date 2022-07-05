@@ -6,8 +6,12 @@ class Office < ApplicationRecord
   has_many :past_belongings, -> { belonged }, class_name: 'BelongingInfo'
   has_many :belonged_users, through: :current_belongings, source: :user
 
-  has_many :tasks, through: :users
-  # has_many :matter_joins, dependent: :destroy
+  # has_many :tasks, through: :users
+  has_many :matter_joins, dependent: :destroy
+  has_many :join_matters, through: :matter_joins, source: :matter
+  has_many :join_matter_clients, through: :join_matters, source: :client
+  has_many :client_joins, dependent: :destroy
+  has_many :join_clients, through: :client_joins, source: :client
   # has_one :subscription, dependent: :destroy
   # has_many :status_groups, dependent: :destroy
 

@@ -68,6 +68,8 @@ GEM
       i18n (>= 1.6, < 2)
       minitest (>= 5.1)
       tzinfo (~> 2.0)
+    ancestry (4.2.0)
+      activerecord (>= 5.2.6)
     aws-eventstream (1.2.0)
     aws-partitions (1.595.0)
     aws-sdk-core (3.131.1)
@@ -247,6 +249,7 @@ PLATFORMS
 
 DEPENDENCIES
   active_hash
+  ancestry
   aws-sdk-s3
   bootsnap
   debug

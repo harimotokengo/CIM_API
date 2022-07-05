@@ -11,17 +11,17 @@ module Api
         render json: { status: 200, data: @users}
       end
 
-      def create
-        access_token = request.headers[:HTTP_ACCESS_TOKEN]
-        @invite_user_form = InviteUserForm.new(user_params)
-        if @invite_user_form.save
-          logout
-          login(params[:invite_user_form][:email], params[:invite_user_form][:password])
-          render json: { status: 200, message: "登録しました", id: current_user.id, email: current_user.email}
-        else
-          render status: 400, json: { status: 400, message: '登録出来ません。入力必須項目を確認してください', errors: @user.errors }
-        end
-      end
+      # def create
+      #   access_token = request.headers[:HTTP_ACCESS_TOKEN]
+      #   @invite_user_form = InviteUserForm.new(user_params)
+      #   if @invite_user_form.save
+      #     logout
+      #     login(params[:invite_user_form][:email], params[:invite_user_form][:password])
+      #     render json: { status: 200, message: "登録しました", id: current_user.id, email: current_user.email}
+      #   else
+      #     render status: 400, json: { status: 400, message: '登録出来ません。入力必須項目を確認してください', errors: @user.errors }
+      #   end
+      # end
 
       # default_priceとadminの更新
       def update
@@ -34,7 +34,7 @@ module Api
       end
 
       # 所属から退所へ更新
-      def detroy
+      def destroy
         user = User.find(params[:id])
         user.current_belonging.status_id = '退所'
         user.save
