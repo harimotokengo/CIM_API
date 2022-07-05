@@ -5,14 +5,21 @@ module Api
       # before_action :set_client, only: %i[show update]
 
       def index
+        user_matter_clients = current_user.join_matter_clients
+        office_matter_clients = current_user.belonging_office.join_matter_clients
         user_clients = current_user.join_clients
-        office_clients = current_user.belonging_office
+        office_clients = current_user.belonging_office.join_clients
         cliants =  (user_clients + office_clients).distinct
         render json: { status: 200, clients: clients}
       end
 
       def show
         @client = Client.find(params[:id])
+        if correct_user
+          render json: { status: 200, client: @client}
+        else
+          response_forbidden
+        end
       end
 
       def get_matter_category
@@ -33,6 +40,11 @@ module Api
 
       def create
         @client = Client.new(client_params)
+        if @client.client_joins[0].belong_side_id == 1
+          @client.client_joins[0].office_id = @office.id
+        else
+          @client.client_joins[0].user_id = current_user.id
+        end
         # @client.matters[0].set_joinメソッドを作ってまとめる
         if @client.matters[0].matter_joins[0].belong_side_id == 1
           @client.matters[0].matter_joins[0].office_id = @office.id
@@ -54,6 +66,7 @@ module Api
 
       def update
         @client = Client.find(params[:id])
+        correct_user
         @client.client_type_id = params[:tab_btn]
         if @client.update(client_params)
           # @client.update_client_log(current_user) if @client.saved_changes?
@@ -87,9 +100,9 @@ module Api
       # clientの個人情報を空白にして更新する
       # archiveをfalseに更新
       # client_joinしてるofficeかuserのadmin権限
-      def destroy
+      # def destroy
 
-      end
+      # end
 
       private
 
@@ -114,6 +127,9 @@ module Api
           contact_phone_numbers_attributes: [
             :id, :category, :memo, :phone_number, :extension_number, :_destroy
           ],
+          client_joins_attributes: %i[
+            id belong_side_id admin office_id user_id _destroy
+            ],
           matters_attributes: [
             :id, :user_id, :service_price,
             :folder_url, :description, :matter_status_id,
@@ -155,12 +171,17 @@ module Api
         )
       end
 
-      # updateとshowで
       def correct_user
-        setしたclientのclient_joinを呼び出す
-        client_join.user = current_user
-        client_join.office = current_user.belonging_office
-        office
+        if current_user.belonging_office
+          client_join_check = @client.client_joins.exists?(['client_joins.office_id = ? OR client_joins.user_id = ?', current_user.belonging_office.id, current_user.id])
+          matter_join_check = @client.matters.joins(:matter_joins).exists?(['matter_joins.office_id = ? OR matter_joins.user_id = ?', current_user.belonging_office.id, current_user.id])
+        else
+          client_join_check = @client.client_joins.exists?(['client_joins.user_id = ?',current_user.id])
+          matter_join_check = @client.matters.joins(:matter_joins).exists?(['matter_joins.user_id = ?', current_user.id])
+        end
+        unless client_join_check && matter_join_check
+          return false
+        end
       end
     end
   end

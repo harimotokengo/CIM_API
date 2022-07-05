@@ -3,8 +3,10 @@ class Client < ApplicationRecord
   has_many :contact_addresses, dependent: :destroy
   has_many :contact_emails, dependent: :destroy
   has_many :contact_phone_numbers, dependent: :destroy
-  has_many :matter_joins, dependent: :destroy
+  has_many :client_joins, dependent: :destroy
+  has_many :join_users, through: :client_joins #activeがtrueのscope経由にあとで直す
 
+  accepts_nested_attributes_for :client_joins, reject_if: :all_blank, allow_destroy: true
   accepts_nested_attributes_for :matters, reject_if: :all_blank, allow_destroy: true
   accepts_nested_attributes_for :contact_addresses, reject_if: :all_blank, allow_destroy: true
   accepts_nested_attributes_for :contact_emails, reject_if: :all_blank, allow_destroy: true
