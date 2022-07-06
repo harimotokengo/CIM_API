@@ -94,4 +94,32 @@ class Client < ApplicationRecord
         birth_date client_type_id archive]
   end
 
+  def join_check(current_user)
+    return true if client_join_check(current_user) || matter_join_check(current_user)
+  end
+
+  
+
+  def admin_check(current_user)
+    client_joins.where(admin: true, user_id: current_user).or(
+      client_joins.where(admin: true, office_id: current_user.belonging_office)
+    ).exists?
+  end
+
+  
+
+  private
+
+  def client_join_check(current_user)
+    client_joins.where(user_id: current_user).or(
+      client_joins.where(office_id: current_user.belonging_office)
+    ).exists?
+  end
+
+  def matter_join_check(current_user)
+    matters.joins(:matter_joins).where(
+      matter_joins: {user_id: current_user}).or(
+        matters.joins(:matter_joins).where(
+          matter_joins: {office_id: current_user.belonging_office})).exists?
+  end
 end

@@ -6,7 +6,7 @@ class Matter < ApplicationRecord
   has_many :occurrences, dependent: :destroy
   has_many :tasks, dependent: :destroy
   has_many :fees, dependent: :destroy
-  # has_many :charges, dependent: :destroy
+  has_many :charges, dependent: :destroy
   # has_many :matter_assigns, dependent: :destroy
   # has_many :work_logs, dependent: :destroy
   has_many :work_details, dependent: :destroy
@@ -94,6 +94,16 @@ class Matter < ApplicationRecord
     end
     return sum_price
   end
+
+  # def join_check(current_user)
+  #   p 11111111111111111111111111111111111
+  #   matter_joins.where(user_id: current_user.id).or(
+  #     matter_joins.where(office_id: current_user.belonging_office)
+  #   ).exists?
+  # end
+
+
+
 
   # correct_userを作って消す
   def check_matter_admin(current_user, office, current_belonging_info)

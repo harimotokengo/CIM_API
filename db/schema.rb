@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2022_06_28_100614) do
+ActiveRecord::Schema[7.0].define(version: 2022_07_06_113911) do
   create_table "active_storage_attachments", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.string "name", null: false
     t.string "record_type", null: false
@@ -49,6 +49,15 @@ ActiveRecord::Schema[7.0].define(version: 2022_06_28_100614) do
     t.datetime "updated_at", null: false
     t.index ["office_id"], name: "index_belonging_infos_on_office_id"
     t.index ["user_id"], name: "index_belonging_infos_on_user_id"
+  end
+
+  create_table "charges", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.bigint "matter_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["matter_id"], name: "index_charges_on_matter_id"
+    t.index ["user_id"], name: "index_charges_on_user_id"
   end
 
   create_table "client_joins", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
@@ -258,6 +267,8 @@ ActiveRecord::Schema[7.0].define(version: 2022_06_28_100614) do
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
   add_foreign_key "belonging_infos", "offices"
   add_foreign_key "belonging_infos", "users"
+  add_foreign_key "charges", "matters"
+  add_foreign_key "charges", "users"
   add_foreign_key "client_joins", "clients"
   add_foreign_key "client_joins", "offices"
   add_foreign_key "client_joins", "users"

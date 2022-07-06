@@ -78,6 +78,13 @@ class User < ApplicationRecord
     end
   end
 
+  # 一人事務所ユーザーか管理ユーザーであればtrueを返す
+  def admin_check
+    if current_belonging.blank? || current_belonging.admin?
+      return true
+    end
+  end
+
   private
 
   # アタッチしたファイルが画像かどうかを判別

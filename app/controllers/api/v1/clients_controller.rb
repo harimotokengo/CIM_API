@@ -2,24 +2,23 @@ module Api
   module V1
     class ClientsController < Api::V1::Base
       before_action :response_unauthorized, unless: :logged_in?
-      # before_action :set_client, only: %i[show update]
+      # before_action :set_client, only: %i[show update destroy]
+      # before_action :response_forbidden, only: %i[show update destroy], unless: :correct_user
 
       def index
-        user_matter_clients = current_user.join_matter_clients
-        office_matter_clients = current_user.belonging_office.join_matter_clients
-        user_clients = current_user.join_clients
-        office_clients = current_user.belonging_office.join_clients
-        cliants =  (user_clients + office_clients).distinct
+
+        # user_matter_clients = current_user.join_matter_clients
+        # office_matter_clients = current_user.belonging_office.join_matter_clients
+        # user_clients = current_user.join_clients
+        # office_clients = current_user.belonging_office.join_clients
+        # cliants =  (user_clients + office_clients).distinct
         render json: { status: 200, clients: clients}
       end
 
       def show
         @client = Client.find(params[:id])
-        if correct_user
-          render json: { status: 200, client: @client}
-        else
-          response_forbidden
-        end
+        return response_forbidden unless correct_user
+        render json: { status: 200, client: @client}
       end
 
       def get_matter_category
@@ -66,7 +65,7 @@ module Api
 
       def update
         @client = Client.find(params[:id])
-        correct_user
+        return response_forbidden unless correct_user
         @client.client_type_id = params[:tab_btn]
         if @client.update(client_params)
           # @client.update_client_log(current_user) if @client.saved_changes?
@@ -100,9 +99,15 @@ module Api
       # clientの個人情報を空白にして更新する
       # archiveをfalseに更新
       # client_joinしてるofficeかuserのadmin権限
-      # def destroy
-
-      # end
+      def destroy
+        @client = Client.find(params[:id])
+        return response_forbidden unless correct_user
+        @client.update(
+          name: '',
+          first_name: '',
+          first_name: 
+        )
+      end
 
       private
 
@@ -172,15 +177,12 @@ module Api
       end
 
       def correct_user
-        if current_user.belonging_office
-          client_join_check = @client.client_joins.exists?(['client_joins.office_id = ? OR client_joins.user_id = ?', current_user.belonging_office.id, current_user.id])
-          matter_join_check = @client.matters.joins(:matter_joins).exists?(['matter_joins.office_id = ? OR matter_joins.user_id = ?', current_user.belonging_office.id, current_user.id])
+        if action_name == 'show'
+          return true if @client.join_check(current_user)
+        elsif action_name == 'update'
+          return true if @client.admin_check(current_user)
         else
-          client_join_check = @client.client_joins.exists?(['client_joins.user_id = ?',current_user.id])
-          matter_join_check = @client.matters.joins(:matter_joins).exists?(['matter_joins.user_id = ?', current_user.id])
-        end
-        unless client_join_check && matter_join_check
-          return false
+          return true if @client.admin_check(current_iser) && current_user.admin_check
         end
       end
     end
