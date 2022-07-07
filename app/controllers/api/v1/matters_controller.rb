@@ -14,18 +14,18 @@ module Api
 
       def create
         @client = Client.find(params[:client_id])
+        return response_forbidden unless correct_user
         @matter = current_user.matters.new(matter_params)
         case @matter.matter_joins[0].belong_side_id
-        when 1
-          @matter.matter_joins[0].office_id = @current_belonging_info.office.id
-        when 2
+        when '組織'
+          @matter.matter_joins[0].office_id = current_user.belonging_office.id
+        when '個人'
           @matter.matter_joins[0].user_id = current_user.id
         end
         @matter.matter_joins[0].admin = true
         @matter.client_id = @client.id
         @matter.start_date = Time.now if @matter.matter_status_id == 1 && @matter.start_date.blank?
         tag_list = params[:matter][:tag_name].split(',') unless params[:matter][:tag_name].nil?
-
         if @matter.save
           @matter.save_matter_tags(tag_list) unless params[:matter][:tag_name].nil?
           # @matter.create_matter_log(current_user)
@@ -112,7 +112,9 @@ module Api
       # show関係はclientかmatterに参加している
       # destroyはclientかmatterのadminおよび管理ユーザーか
       def correct_user
-
+        if action_name == 'create'
+          return true if @client.admin_check(current_user)
+        end
       end
 
     end

@@ -39,8 +39,8 @@ module Api
 
       def create
         @client = Client.new(client_params)
-        if @client.client_joins[0].belong_side_id == 1
-          @client.client_joins[0].office_id = @office.id
+        if @client.client_joins[0].belong_side_id == '組織'
+          @client.client_joins[0].office_id = current_user.belonging_office.id
         else
           @client.client_joins[0].user_id = current_user.id
         end
