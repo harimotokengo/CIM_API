@@ -25,14 +25,13 @@ module Api
         @matter.client_id = @client.id
         @matter.start_date = Time.now if @matter.matter_status_id == 1 && @matter.start_date.blank?
         tag_list = params[:matter][:tag_name].split(',') unless params[:matter][:tag_name].nil?
+
         if @matter.save
           @matter.save_matter_tags(tag_list) unless params[:matter][:tag_name].nil?
           # @matter.create_matter_log(current_user)
-          flash[:notice] = '登録しました。'
-          redirect_to matter_path(@matter)
+          render json: { status: 200, message: "登録しました"}
         else
-          flash.now[:alert] = '登録出来ません。入力必須項目を確認してください。'
-          render :new
+          render status: 400, json: { status: 400, message: '登録出来ません。入力必須項目を確認してください', errors: @matter.errors }
         end
       end
 

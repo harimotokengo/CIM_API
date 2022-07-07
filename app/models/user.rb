@@ -4,6 +4,7 @@ class User < ApplicationRecord
   has_one :current_belonging, -> { belonging }, class_name: 'BelongingInfo'
   has_one :belonging_office, through: :current_belonging, source: :office
   has_many :sent_user_invites, class_name: 'UserInvite', foreign_key: 'sender_id', dependent: :destroy
+  has_many :matters, dependent: :destroy
   has_many :matter_joins, dependent: :destroy
   has_many :join_matters, through: :matter_joins, source: :matter
   has_many :join_matter_clients, through: :join_matters, source: :client
