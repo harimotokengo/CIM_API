@@ -36,26 +36,17 @@ module Api
       end
 
       def update
-        @tag_list = @matter.tags.pluck(:tag_name).join(',')
+        @client = Client.find(params[:client_id])
+        @matter = Matter.active_matters.find(params[:id])
         tag_list = params[:matter][:tag_name].split(',') unless params[:matter][:tag_name].nil?
-        if params[:matter][:archive] == 'false' # アーカイブ用
-          if @matter.check_matter_admin(@current_user, @office, @current_belonging_info) == false
-            redirect_to root_path, alert: '不正なアクセスです。'
-          else
-            @matter.update(matter_params)
-            @matter.delete_matter_log(current_user)
-            redirect_to clients_path, alert: '案件を削除しました。'
-          end
-        elsif @matter.update(matter_params)
+        if @matter.update(matter_params)
           @matter.save_matter_tags(tag_list) unless params[:matter][:tag_name].nil?
           @matter.update(start_date: Time.now) if @matter.matter_status_id == 1 && @matter.start_date.blank?
           @matter.update(finish_date: Time.now) if @matter.matter_status_id == 5 && @matter.finish_date.blank?
-          @matter.update_matter_log(current_user)
-          flash[:notice] = '更新しました。'
-          redirect_back(fallback_location: matter_path(@matter))
+          # @matter.update_matter_log(current_user)
+          render json: { status: 200, message: "更新しました"}
         else
-          flash.now[:alert] = '更新出来ません。入力必須項目を確認してください。'
-          render :edit
+          render status: 400, json: { status: 400, message: '更新出来ません。入力必須項目を確認してください', errors: @matter.errors }
         end
       end
 
@@ -112,11 +103,12 @@ module Api
       # show関係はclientかmatterに参加している
       # destroyはclientかmatterのadminおよび管理ユーザーか
       def correct_user
-        if action_name == 'create'
-          return true if @client.admin_check(current_user)
+        if action_name == 'create' || action_name == 'show'
+          return true if @client.join_check(current_user)
+        else
+          return true if @client.admin_check(current_user) && current_user.admin_check
         end
       end
-
     end
   end
 end

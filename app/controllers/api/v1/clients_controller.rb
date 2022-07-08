@@ -179,10 +179,8 @@ module Api
       def correct_user
         if action_name == 'show'
           return true if @client.join_check(current_user)
-        elsif action_name == 'update'
-          return true if @client.admin_check(current_user)
         else
-          return true if @client.admin_check(current_iser) && current_user.admin_check
+          return true if @client.admin_check(current_user) && current_user.admin_check
         end
       end
     end
