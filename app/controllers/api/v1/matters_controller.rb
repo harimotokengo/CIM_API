@@ -5,6 +5,9 @@ module Api
 
       # show以外のread関係はまだ作らない
       def show
+        @client = Client.find(params[:client_id])
+        @matter = Matter.active_matters.find(params[:id])
+        return response_forbidden unless correct_user
         # 表示内容はデザインで確認
         # @work_logs = @matter.work_logs.order(created_at: 'desc').paginate(page: params[:page], per_page: 10)
         # @work_log_admin = @matter.matter_joins.find_by(['office_id = ? OR user_id = ?', @office.id, current_user.id])
@@ -38,6 +41,7 @@ module Api
       def update
         @client = Client.find(params[:client_id])
         @matter = Matter.active_matters.find(params[:id])
+        return response_forbidden unless correct_user
         tag_list = params[:matter][:tag_name].split(',') unless params[:matter][:tag_name].nil?
         if @matter.update(matter_params)
           @matter.save_matter_tags(tag_list) unless params[:matter][:tag_name].nil?
@@ -103,10 +107,16 @@ module Api
       # show関係はclientかmatterに参加している
       # destroyはclientかmatterのadminおよび管理ユーザーか
       def correct_user
-        if action_name == 'create' || action_name == 'show'
+        if action_name == 'create'
           return true if @client.join_check(current_user)
+        elsif action_name == 'show'
+          return true if @client.join_check(current_user) || @matter.join_check(current_user)
         else
-          return true if @client.admin_check(current_user) && current_user.admin_check
+          # clientの管理権限
+          # またはmatterの管理権限
+          if @client.admin_check(current_user) || @matter.admin_check(current_user)
+            return true if current_user.admin_check
+          end
         end
       end
     end

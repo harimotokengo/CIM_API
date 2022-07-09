@@ -83,6 +83,8 @@ RSpec.describe "Clients", type: :request do
   #   end
   # end
 
+  # 登録者または登録者の事務所がclient_joinのadminに登録されること
+  # 事務所なしユーザーは組織で登録できない
   describe 'POST #create' do
     before do
       contact_phone_number_params = {contact_phone_numbers_attributes: { "0": attributes_for(:contact_phone_number)}}

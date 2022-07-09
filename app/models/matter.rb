@@ -95,30 +95,31 @@ class Matter < ApplicationRecord
     return sum_price
   end
 
-  # def join_check(current_user)
-  #   p 11111111111111111111111111111111111
-  #   matter_joins.where(user_id: current_user.id).or(
-  #     matter_joins.where(office_id: current_user.belonging_office)
-  #   ).exists?
-  # end
+  def join_check(current_user)
+    return true if client_join_check(current_user) || matter_join_check(current_user)
+  end
 
+  def admin_check(current_user)
+    user_admin_check = matter_joins.where(admin: true, user_id: current_user).exists?
+    office_admin_check = matter_joins.where(admin: true, 
+      office_id: current_user.belonging_office).exists? if current_user.belonging_office
+    return true if user_admin_check || office_admin_check
+  end
 
+  private
 
+  def matter_join_check(current_user)
+    user_join_check = matter_joins.where(user_id: current_user).exists?
+    office_join_check = matter_joins.where(
+      office_id: current_user.belonging_office).exists? if current_user.belonging_office
+    return true if user_join_check || office_join_check
+  end
 
-  # correct_userを作って消す
-  def check_matter_admin(current_user, office, current_belonging_info)
-    @matter_joins = matter_joins.where(['office_id = ? OR user_id = ?', office.id, current_user.id])
-    @matter_join = if @matter_joins.exists?(admin: true)
-                     @matter_joins.find_by(admin: true)
-                   else
-                     @matter_joins.first
-                   end
-
-    # 案件参加 and 案件管理者 and (事務所管理者 or 個人参加)
-    if @matter_joins.present? && @matter_join.admin? && (current_belonging_info.admin? || @matter_join.belong_side_id == 2)
-      true
-    else
-      false
-    end
+  def client_join_check(current_user)
+    user_join_check = client.joins(:client_joins).where(
+      client_joins: {user_id: current_user}).exists?
+    office_join_check = client.joins(:client_joins).where(
+      client_joins: {office_id: current_user.belonging_office}).exists? if current_user.belonging_office
+    return true if user_join_check || office_join_check
   end
 end
