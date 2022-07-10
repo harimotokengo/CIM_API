@@ -4,7 +4,14 @@ module Api
       before_action :response_unauthorized, unless: :logged_in?
 
       def index
-        matters = (current_user.join_matters + current_user.join_client_matters).distinct
+        user_client_matters = current_user.join_clients.joins(:matters).where(client_joins: {user_id: current_user}).to_a
+        office_client_matters = current_user.join_clients.joins(:matters).where(client_joins: {office_id: current_user.belonging_office}).to_a.compact
+        user_matters = current_user.join_matters.to_a
+        office_matters = (current_user.belonging_office.join_matters if current_user.belonging_office).to_a.compact
+        matters = (user_client_matters+office_client_matters).uniq
+
+        # office_matters = current_user.belonging_office.join_matters + current_user.belonging_office.join_client_matters
+        # matter_list = (user_matters + office_matters).distinct
         # 案件検索メソッドでmatter_listを作る
 
         # # とりあえずリクエストテスト用
@@ -17,7 +24,7 @@ module Api
         #   client_name_list << matter.client.full_name
         #   category_list << matter.matter_category.name
         # end
-        # render json: {status: 200, data: [matter_list, client_name_list, category_list]}
+        render json: {status: 200, data: matters}
       end
 
       def create
@@ -122,6 +129,10 @@ module Api
             id name url _destroy
           ]
         )
+      end
+
+      def matter_search_params
+
       end
 
       def correct_user

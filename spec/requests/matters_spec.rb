@@ -25,6 +25,7 @@ RSpec.describe 'matters_requests', type: :request do
 
   let!(:client) { create(:client) }
   let!(:matter) { create(:matter, client: client, matter_category_id: matter_category.id) }
+  let!(:opponent) { create(:opponent, matter: matter) }
   let!(:office_matter_join) { create(:matter_join, matter: matter, office: matter_join_office, belong_side_id: '組織', admin: false) }
   let!(:admin_office_matter_join) { create(:matter_join, matter: matter, office: matter_admin_office, belong_side_id: '組織') }
   let!(:user_matter_join) { create(:matter_join, matter: matter, user: matter_join_user, belong_side_id: '個人', admin: false) }
@@ -43,6 +44,66 @@ RSpec.describe 'matters_requests', type: :request do
 
   let!(:injoin_belonging_info) { create(:belonging_info, user: injoin_user, office: injoin_office) }
 
+  # dataの内容については検索実装後
+  describe 'GET #index' do
+    context '正常系' do
+      context '案件参加ユーザーでログイン' do
+        it 'リクエストが成功すること' do
+          login_user(matter_join_user, 'Test-1234', api_v1_login_path)
+          get api_v1_matters_path
+          expect(response).to have_http_status 200
+        end
+      end
+      context '案件参加事務所ユーザーでログイン' do
+        it 'リクエストが成功すること' do
+          login_user(matter_join_office_user, 'Test-1234', api_v1_login_path)
+          get api_v1_matters_path
+          expect(response).to have_http_status 200
+        end
+      end
+      context 'クライアント参加ユーザーでログイン' do
+        it 'リクエストが成功すること' do
+          login_user(client_join_user, 'Test-1234', api_v1_login_path)
+          get api_v1_matters_path
+          expect(response).to have_http_status 200
+        end
+      end
+      context 'クライアント参加事務所ユーザーでログイン' do
+        it 'リクエストが成功すること' do
+          login_user(client_join_user, 'Test-1234', api_v1_login_path)
+          get api_v1_matters_path
+          expect(response).to have_http_status 200
+        end
+      end
+      context '不参加事務所ユーザーでログイン' do
+        it 'リクエストが成功すること' do
+          login_user(injoin_user, 'Test-1234', api_v1_login_path)
+          get api_v1_matters_path
+          expect(response).to have_http_status 200
+          expect(JSON.parse(response.body)['data'].count).to eq 0
+        end
+      end
+      context '不参加事務所ユーザーでログイン' do
+        it 'リクエストが成功すること' do
+          login_user(injoin_office_user, 'Test-1234', api_v1_login_path)
+          get api_v1_matters_path
+          expect(response).to have_http_status 200
+          expect(JSON.parse(response.body)['data'].count).to eq 0
+        end
+      end
+    end
+    context '準正常系' do
+      context '未ログイン' do
+        it '401エラーが返ってくること' do
+          get api_v1_matters_path
+          expect(response).to have_http_status 401
+          expect(JSON.parse(response.body)['message']).to eq "Unauthorized"
+          expect(JSON.parse(response.body)['data']).to eq nil
+        end
+      end
+      # 値が不正な場合
+    end
+  end
   # ログ未実装
   # 登録者または登録者の事務所がmatter_joinのadminに登録される
   # 個人は組織でjoinできないこと
@@ -509,8 +570,24 @@ RSpec.describe 'matters_requests', type: :request do
     end
   end
 
-  # index
-  # destroy
+  describe 'DELETE #destroy' do
+    context '正常系' do
+      context '案件管理ユーザーでログイン' do
+        it 'リクエストが成功すること' do
+          login_user(matter_admin_user, 'Test-1234', api_v1_login_path)
+          delete api_v1_matter_path(matter)
+          expect(response.status).to eq 200
+        end
+        it '更新されること' do
+          login_user(matter_admin_user, 'Test-1234', api_v1_login_path)
+          expect do
+            delete api_v1_matter_path(matter)
+          end.to change { Matter.find(matter.id).archive }.from(true).to(false) and change {
+            Matter.find(matter.id).opponents.first.name }.from('テスト姓').to('削除済み')
+        end
+      end
+    end
+  end
   # conflict
 end
 

@@ -6,6 +6,7 @@ class User < ApplicationRecord
   has_many :sent_user_invites, class_name: 'UserInvite', foreign_key: 'sender_id', dependent: :destroy
   has_many :matters, dependent: :destroy
   has_many :matter_joins, dependent: :destroy
+  has_many :client_joins, dependent: :destroy
   has_many :join_matters, through: :matter_joins, source: :matter
   has_many :join_matter_clients, through: :join_matters, source: :client
   has_many :join_clients, through: :client_joins, source: :client #activeがtrueのscope経由にあとで直す
