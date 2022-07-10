@@ -9,6 +9,7 @@ class User < ApplicationRecord
   has_many :join_matters, through: :matter_joins, source: :matter
   has_many :join_matter_clients, through: :join_matters, source: :client
   has_many :join_clients, through: :client_joins, source: :client #activeがtrueのscope経由にあとで直す
+  has_many :join_client_matters, through: :join_clients, source: :matter
   has_one_attached :avatar
 
   VALID_EMAIL_REGEX = /\A[\w+\-.]+@[a-z\d\-.]+\.[a-z]+\z/i.freeze

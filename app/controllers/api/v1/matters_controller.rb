@@ -3,16 +3,21 @@ module Api
     class MattersController < Api::V1::Base
       before_action :response_unauthorized, unless: :logged_in?
 
-      # show以外のread関係はまだ作らない
-      def show
-        @client = Client.find(params[:client_id])
-        @matter = Matter.active_matters.find(params[:id])
-        return response_forbidden unless correct_user
-        # 表示内容はデザインで確認
-        # @work_logs = @matter.work_logs.order(created_at: 'desc').paginate(page: params[:page], per_page: 10)
-        # @work_log_admin = @matter.matter_joins.find_by(['office_id = ? OR user_id = ?', @office.id, current_user.id])
-        # @work_log = @matter.work_logs.build
-        render json: { status: 200, matter: @matter}
+      def index
+        matters = (current_user.join_matters + current_user.join_client_matters).distinct
+        # 案件検索メソッドでmatter_listを作る
+
+        # # とりあえずリクエストテスト用
+        # matter_list = []
+        # client_name_list = []
+        # category_list = []
+
+        # matters.each |matter| do
+        #   matter_list << matter
+        #   client_name_list << matter.client.full_name
+        #   category_list << matter.matter_category.name
+        # end
+        # render json: {status: 200, data: [matter_list, client_name_list, category_list]}
       end
 
       def create
@@ -38,9 +43,16 @@ module Api
         end
       end
 
-      def update
-        @client = Client.find(params[:client_id])
+      def show
         @matter = Matter.active_matters.find(params[:id])
+        @client = @matter.client
+        return response_forbidden unless correct_user
+        render json: { status: 200, data: @matter}
+      end
+
+      def update
+        @matter = Matter.active_matters.find(params[:id])
+        @client = @matter.client
         return response_forbidden unless correct_user
         tag_list = params[:matter][:tag_name].split(',') unless params[:matter][:tag_name].nil?
         if @matter.update(matter_params)
@@ -61,7 +73,17 @@ module Api
         tags_sql = Tag.sanitize_sql("tag_name like '%#{params[:term]}%'")
         tags = tags.select(:tag_name).where(tags_sql)
         tags = tags.map(&:tag_name)
-        render json: tags.to_json
+        render json: {status: 200, data: tags}
+      end
+
+      # 関係者の個人情報を空白にしてmatter.archiveをfalseにする
+      # レコードは全部残す
+      def destroy
+        @matter = Matter.active_matters.find(params[:id])
+        @client = @matter.client
+        return response_forbidden unless correct_user
+        @matter.destroy_update
+        render json: {status: 200, message: '削除しました'}
       end
 
       private
@@ -102,18 +124,12 @@ module Api
         )
       end
 
-      # createはclientに参加している
-      # updateはmatterかclientの管理権限
-      # show関係はclientかmatterに参加している
-      # destroyはclientかmatterのadminおよび管理ユーザーか
       def correct_user
         if action_name == 'create'
           return true if @client.join_check(current_user)
         elsif action_name == 'show'
-          return true if @client.join_check(current_user) || @matter.join_check(current_user)
+          return true if @matter.join_check(current_user)
         else
-          # clientの管理権限
-          # またはmatterの管理権限
           if @client.admin_check(current_user) || @matter.admin_check(current_user)
             return true if current_user.admin_check
           end

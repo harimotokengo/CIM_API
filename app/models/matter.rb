@@ -116,10 +116,10 @@ class Matter < ApplicationRecord
   end
 
   def client_join_check(current_user)
-    user_join_check = client.joins(:client_joins).where(
-      client_joins: {user_id: current_user}).exists?
-    office_join_check = client.joins(:client_joins).where(
-      client_joins: {office_id: current_user.belonging_office}).exists? if current_user.belonging_office
+    user_join_check = client.client_joins.where(
+      user_id: current_user).exists?
+    office_join_check = client.client_joins.where(
+      office_id: current_user.belonging_office).exists? if current_user.belonging_office
     return true if user_join_check || office_join_check
   end
 end

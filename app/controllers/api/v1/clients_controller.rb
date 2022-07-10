@@ -6,19 +6,32 @@ module Api
       # before_action :response_forbidden, only: %i[show update destroy], unless: :correct_user
 
       def index
-
-        # user_matter_clients = current_user.join_matter_clients
-        # office_matter_clients = current_user.belonging_office.join_matter_clients
-        # user_clients = current_user.join_clients
-        # office_clients = current_user.belonging_office.join_clients
-        # cliants =  (user_clients + office_clients).distinct
-        render json: { status: 200, clients: clients}
+        # 検索メソッドに処理をまとめる
+        user_matter_clients = current_user.join_matter_clients
+        office_matter_clients = current_user.belonging_office.join_matter_clients
+        user_clients = current_user.join_clients
+        office_clients = current_user.belonging_office.join_clients
+        cliants =  (user_clients + office_clients).distinct
+        render json: { status: 200, data: clients}
       end
 
       def show
         @client = Client.find(params[:id])
         return response_forbidden unless correct_user
-        render json: { status: 200, client: @client}
+        render json: { status: 200, data: @client}
+      end
+
+      def matters
+        @client = Client.find(params[:id])
+        # pageとかsortとかは必要であれば追加
+        matters = @client.active_matters
+        matter_list = matters.each |matter| do
+                        matter.full_name
+                        matter.matter_category.name
+                        matter.assign_users
+                        matter.matter_status_id
+                      end
+        render json: { status: 200, data: matter_list}
       end
 
       def get_matter_category
@@ -83,16 +96,18 @@ module Api
         @hull_space_fullname = @name + '　' + @first_name
         @clients = Client.joins(matters: :matter_joins).where(['matters.archive = ?', true]).where(['matter_joins.office_id = ? OR matter_joins.user_id = ?', @office.id, current_user.id])
                          .where(['name = ? AND first_name = ?', @name, @first_name]).distinct
+        # ================client_joinしてるclientにもコンフリがないか確認
         @opponents = Opponent.joins(matter: :matter_joins).where(['matters.archive = ?', true]).where(['matter_joins.office_id = ? OR matter_joins.user_id = ?', @office.id, current_user.id])
                              .where(['name = ? OR name = ? OR name = ?', @full_name, @harf_space_fullname, @hull_space_fullname]).distinct
+        # ＝＝＝＝＝＝＝＝＝＝client_joinしてるmatterのopponentにコンフリが発生してるかも確認
         if !@clients && !@opponents
           render json: { status: 200, message: 'OK' }
-        elsif @clients
-          render json: { status: 200, clients: @clients }
-        elsif @opponents
-          render json: { status: 200, opponents: @opponents }
+        # elsif @clients
+        #   render json: { status: 200, data: @clients }
+        # elsif @opponents
+        #   render json: { status: 200, data: @opponents }
         else
-          render json: { status: 200, clients: @clients, opponents: @opponents }
+          render json: { status: 200, message: "#{@clients.count + @opponents.count}件見つかりました", data: [@clients, @opponents] }
         end
       end
 
@@ -105,7 +120,8 @@ module Api
         @client.update(
           name: '',
           first_name: '',
-          first_name: 
+          first_name_kana: ''
+          
         )
       end
 
