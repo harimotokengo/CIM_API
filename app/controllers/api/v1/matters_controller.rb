@@ -1,29 +1,17 @@
-module Api
+vmodule Api
   module V1
     class MattersController < Api::V1::Base
       before_action :response_unauthorized, unless: :logged_in?
 
       def index
+        # とりあえずリクエストテスト用
+        # apiモードでの検索機能は別ブランチ
         user_client_matters = current_user.join_clients.joins(:matters).where(client_joins: {user_id: current_user}).to_a
         office_client_matters = current_user.join_clients.joins(:matters).where(client_joins: {office_id: current_user.belonging_office}).to_a.compact
         user_matters = current_user.join_matters.to_a
         office_matters = (current_user.belonging_office.join_matters if current_user.belonging_office).to_a.compact
         matters = (user_client_matters+office_client_matters).uniq
-
-        # office_matters = current_user.belonging_office.join_matters + current_user.belonging_office.join_client_matters
-        # matter_list = (user_matters + office_matters).distinct
-        # 案件検索メソッドでmatter_listを作る
-
-        # # とりあえずリクエストテスト用
-        # matter_list = []
-        # client_name_list = []
-        # category_list = []
-
-        # matters.each |matter| do
-        #   matter_list << matter
-        #   client_name_list << matter.client.full_name
-        #   category_list << matter.matter_category.name
-        # end
+        
         render json: {status: 200, data: matters}
       end
 

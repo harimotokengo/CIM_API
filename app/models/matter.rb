@@ -108,6 +108,7 @@ class Matter < ApplicationRecord
 
   def destroy_update
     update(archive: false)
+    # あとでopponentモデルに処理を書いて整理
     opponents.each do |opponent|
       opponent.update(
         name: '削除済',

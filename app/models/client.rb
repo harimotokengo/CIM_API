@@ -107,7 +107,21 @@ class Client < ApplicationRecord
     return true if user_admin_check || office_admin_check
   end
 
-
+  def destroy_update
+    update(
+      name: '削除済',
+      first_name: '削除済',
+      name_kana: 'さくじょずみ',
+      first_name_kana: 'さくじょずみ',
+      maiden_name: '削除済',
+      maiden_name_kana: 'さくじょずみ',
+      birth_date: nil,
+      archive: false
+    )
+    matters.each do ||matter|
+      matter.destroy_update
+    end
+  end
 
   private
 
