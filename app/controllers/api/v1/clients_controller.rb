@@ -2,24 +2,34 @@ module Api
   module V1
     class ClientsController < Api::V1::Base
       before_action :response_unauthorized, unless: :logged_in?
-      # before_action :set_client, only: %i[show update]
+      # before_action :set_client, only: %i[show update destroy]
+      # before_action :response_forbidden, only: %i[show update destroy], unless: :correct_user
 
       def index
-        user_matter_clients = current_user.join_matter_clients
-        office_matter_clients = current_user.belonging_office.join_matter_clients
-        user_clients = current_user.join_clients
-        office_clients = current_user.belonging_office.join_clients
-        cliants =  (user_clients + office_clients).distinct
-        render json: { status: 200, clients: clients}
+        # 検索メソッドに処理をまとめる
+        user_client_matters = current_user.join_clients.joins(:matters).where(client_joins: {user_id: current_user}).to_a
+        office_client_matters = current_user.join_clients.joins(:matters).where(client_joins: {office_id: current_user.belonging_office}).to_a.compact
+        matters = (user_client_matters+office_client_matters).uniq
+        render json: { status: 200, data: clients}
       end
 
       def show
         @client = Client.find(params[:id])
-        if correct_user
-          render json: { status: 200, client: @client}
-        else
-          response_forbidden
-        end
+        return response_forbidden unless correct_user
+        render json: { status: 200, data: @client}
+      end
+
+      def matters
+        @client = Client.find(params[:id])
+        # pageとかsortとかは必要であれば追加
+        matters = @client.active_matters
+        # matter_list = matters.each |matter| do
+        #                 matter.full_name
+        #                 matter.matter_category.name
+        #                 matter.assign_users
+        #                 matter.matter_status_id
+        #               end
+        render json: { status: 200, data: matters}
       end
 
       def get_matter_category
@@ -40,8 +50,8 @@ module Api
 
       def create
         @client = Client.new(client_params)
-        if @client.client_joins[0].belong_side_id == 1
-          @client.client_joins[0].office_id = @office.id
+        if @client.client_joins[0].belong_side_id == '組織'
+          @client.client_joins[0].office_id = current_user.belonging_office.id
         else
           @client.client_joins[0].user_id = current_user.id
         end
@@ -66,7 +76,7 @@ module Api
 
       def update
         @client = Client.find(params[:id])
-        correct_user
+        return response_forbidden unless correct_user
         @client.client_type_id = params[:tab_btn]
         if @client.update(client_params)
           # @client.update_client_log(current_user) if @client.saved_changes?
@@ -84,25 +94,30 @@ module Api
         @hull_space_fullname = @name + '　' + @first_name
         @clients = Client.joins(matters: :matter_joins).where(['matters.archive = ?', true]).where(['matter_joins.office_id = ? OR matter_joins.user_id = ?', @office.id, current_user.id])
                          .where(['name = ? AND first_name = ?', @name, @first_name]).distinct
+        # ============追加====client_joinしてるclientにもコンフリがないか確認
         @opponents = Opponent.joins(matter: :matter_joins).where(['matters.archive = ?', true]).where(['matter_joins.office_id = ? OR matter_joins.user_id = ?', @office.id, current_user.id])
                              .where(['name = ? OR name = ? OR name = ?', @full_name, @harf_space_fullname, @hull_space_fullname]).distinct
+        # ＝＝＝＝＝＝＝追加＝＝＝client_joinしてるmatterのopponentにコンフリが発生してるかも確認
         if !@clients && !@opponents
           render json: { status: 200, message: 'OK' }
-        elsif @clients
-          render json: { status: 200, clients: @clients }
-        elsif @opponents
-          render json: { status: 200, opponents: @opponents }
+        # elsif @clients
+        #   render json: { status: 200, data: @clients }
+        # elsif @opponents
+        #   render json: { status: 200, data: @opponents }
         else
-          render json: { status: 200, clients: @clients, opponents: @opponents }
+          render json: { status: 200, message: "#{@clients.count + @opponents.count}件見つかりました", data: [@clients, @opponents] }
         end
       end
 
       # clientの個人情報を空白にして更新する
       # archiveをfalseに更新
       # client_joinしてるofficeかuserのadmin権限
-      # def destroy
-
-      # end
+      def destroy
+        @client = Client.find(params[:id])
+        return response_forbidden unless correct_user
+        @client.destroy_update
+        render json: {status: 200, message: '削除しました'}
+      end
 
       private
 
@@ -172,15 +187,10 @@ module Api
       end
 
       def correct_user
-        if current_user.belonging_office
-          client_join_check = @client.client_joins.exists?(['client_joins.office_id = ? OR client_joins.user_id = ?', current_user.belonging_office.id, current_user.id])
-          matter_join_check = @client.matters.joins(:matter_joins).exists?(['matter_joins.office_id = ? OR matter_joins.user_id = ?', current_user.belonging_office.id, current_user.id])
+        if action_name == 'show'
+          return true if @client.join_check(current_user)
         else
-          client_join_check = @client.client_joins.exists?(['client_joins.user_id = ?',current_user.id])
-          matter_join_check = @client.matters.joins(:matter_joins).exists?(['matter_joins.user_id = ?', current_user.id])
-        end
-        unless client_join_check && matter_join_check
-          return false
+          return true if @client.admin_check(current_user) && current_user.admin_check
         end
       end
     end
