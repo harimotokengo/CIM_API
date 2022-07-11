@@ -94,4 +94,49 @@ class Client < ApplicationRecord
         birth_date client_type_id archive]
   end
 
+  def join_check(current_user)
+    return true if client_join_check(current_user) || matter_join_check(current_user)
+  end
+
+  
+
+  def admin_check(current_user)
+    user_admin_check = client_joins.where(admin: true, user_id: current_user).exists?
+    office_admin_check = client_joins.where(admin: true, 
+      office_id: current_user.belonging_office).exists? if current_user.belonging_office
+    return true if user_admin_check || office_admin_check
+  end
+
+  def destroy_update
+    update(
+      name: '削除済',
+      first_name: '削除済',
+      name_kana: 'さくじょずみ',
+      first_name_kana: 'さくじょずみ',
+      maiden_name: '削除済',
+      maiden_name_kana: 'さくじょずみ',
+      birth_date: nil,
+      archive: false
+    )
+    matters.each do ||matter|
+      matter.destroy_update
+    end
+  end
+
+  private
+
+  def client_join_check(current_user)
+    user_join_check = client_joins.where(user_id: current_user).exists?
+    office_join_check = client_joins.where(
+      office_id: current_user.belonging_office).exists? if current_user.belonging_office
+    return true if user_join_check || office_join_check
+  end
+
+  def matter_join_check(current_user)
+    user_join_check = matters.joins(:matter_joins).where(
+      matter_joins: {user_id: current_user}).exists?
+    office_join_check = matters.joins(:matter_joins).where(
+      matter_joins: {office_id: current_user.belonging_office}).exists? if current_user.belonging_office
+    return true if user_join_check || office_join_check
+  end
 end

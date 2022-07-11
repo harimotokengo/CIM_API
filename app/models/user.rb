@@ -4,10 +4,12 @@ class User < ApplicationRecord
   has_one :current_belonging, -> { belonging }, class_name: 'BelongingInfo'
   has_one :belonging_office, through: :current_belonging, source: :office
   has_many :sent_user_invites, class_name: 'UserInvite', foreign_key: 'sender_id', dependent: :destroy
+  has_many :matters, dependent: :destroy
   has_many :matter_joins, dependent: :destroy
+  has_many :client_joins, dependent: :destroy
   has_many :join_matters, through: :matter_joins, source: :matter
-  has_many :join_matter_clients, through: :join_matters, source: :client
-  has_many :join_clients, through: :client_joins, source: :client #activeがtrueのscope経由にあとで直す
+  has_many :join_clients, through: :client_joins, source: :client
+
   has_one_attached :avatar
 
   VALID_EMAIL_REGEX = /\A[\w+\-.]+@[a-z\d\-.]+\.[a-z]+\z/i.freeze
@@ -75,6 +77,13 @@ class User < ApplicationRecord
       errors.add(:avatar, 'ファイルのサイズは5MBまでにしてください')
     elsif !avatar_is_image?
       errors.add(:avatar, 'ファイルが対応している形式ではありません')
+    end
+  end
+
+  # 一人事務所ユーザーか管理ユーザーであればtrueを返す
+  def admin_check
+    if current_belonging.blank? || current_belonging.admin?
+      return true
     end
   end
 

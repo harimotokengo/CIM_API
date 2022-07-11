@@ -12,6 +12,7 @@ class Office < ApplicationRecord
   has_many :join_matter_clients, through: :join_matters, source: :client
   has_many :client_joins, dependent: :destroy
   has_many :join_clients, through: :client_joins, source: :client
+  has_many :join_client_matters, through: :join_clients, source: :matter
   # has_one :subscription, dependent: :destroy
   # has_many :status_groups, dependent: :destroy
 

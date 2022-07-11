@@ -6,7 +6,7 @@ class Matter < ApplicationRecord
   has_many :occurrences, dependent: :destroy
   has_many :tasks, dependent: :destroy
   has_many :fees, dependent: :destroy
-  # has_many :charges, dependent: :destroy
+  has_many :charges, dependent: :destroy
   # has_many :matter_assigns, dependent: :destroy
   # has_many :work_logs, dependent: :destroy
   has_many :work_details, dependent: :destroy
@@ -95,20 +95,47 @@ class Matter < ApplicationRecord
     return sum_price
   end
 
-  # correct_userを作って消す
-  def check_matter_admin(current_user, office, current_belonging_info)
-    @matter_joins = matter_joins.where(['office_id = ? OR user_id = ?', office.id, current_user.id])
-    @matter_join = if @matter_joins.exists?(admin: true)
-                     @matter_joins.find_by(admin: true)
-                   else
-                     @matter_joins.first
-                   end
+  def join_check(current_user)
+    return true if client_join_check(current_user) || matter_join_check(current_user)
+  end
 
-    # 案件参加 and 案件管理者 and (事務所管理者 or 個人参加)
-    if @matter_joins.present? && @matter_join.admin? && (current_belonging_info.admin? || @matter_join.belong_side_id == 2)
-      true
-    else
-      false
+  def admin_check(current_user)
+    user_admin_check = matter_joins.where(admin: true, user_id: current_user).exists?
+    office_admin_check = matter_joins.where(admin: true, 
+      office_id: current_user.belonging_office).exists? if current_user.belonging_office
+    return true if user_admin_check || office_admin_check
+  end
+
+  def destroy_update
+    update(archive: false)
+    # あとでopponentモデルに処理を書いて整理
+    opponents.each do |opponent|
+      opponent.update(
+        name: '削除済',
+        name_kana: 'さくじょずみ',
+        first_name: '削除済',
+        first_name_kana: 'さくじょずみ',
+        maiden_name: '削除済',
+        maiden_name_kana: 'さくじょずみ',
+        birth_date: nil
+      )
     end
+  end
+
+  private
+
+  def matter_join_check(current_user)
+    user_join_check = matter_joins.where(user_id: current_user).exists?
+    office_join_check = matter_joins.where(
+      office_id: current_user.belonging_office).exists? if current_user.belonging_office
+    return true if user_join_check || office_join_check
+  end
+
+  def client_join_check(current_user)
+    user_join_check = client.client_joins.where(
+      user_id: current_user).exists?
+    office_join_check = client.client_joins.where(
+      office_id: current_user.belonging_office).exists? if current_user.belonging_office
+    return true if user_join_check || office_join_check
   end
 end
