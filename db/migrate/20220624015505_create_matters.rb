@@ -8,7 +8,6 @@ class CreateMatters < ActiveRecord::Migration[7.0]
       t.date :start_date
       t.date :finish_date
       t.integer :matter_status_id, null: false
-      t.references :matter_category, null: false, foreign_key: true
       t.boolean :archive, default: true, null: false
       t.string :status_memo
       t.timestamps

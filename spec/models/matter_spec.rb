@@ -2,19 +2,13 @@ require 'rails_helper'
 
 RSpec.describe Matter, type: :model do
   let!(:matter) { create(:matter) }
+  
   let!(:user) { create(:user) }
   let!(:other_user) { create(:user) }
 
   describe 'validates' do
     it '有効なファクトリを持つこと' do
       expect(matter).to be_valid
-    end
-
-    # user
-    it 'ユーザーがない場合無効であること' do
-      matter.user = nil
-      matter.valid?
-      # expect(matter.errors).to be_added(:user, :blank)
     end
 
     # client
