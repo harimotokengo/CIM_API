@@ -1,7 +1,6 @@
 class Matter < ApplicationRecord
   belongs_to :user, optional: true
   belongs_to :client
-  belongs_to :matter_category
   has_many :opponents, dependent: :destroy
   has_many :occurrences, dependent: :destroy
   has_many :tasks, dependent: :destroy
@@ -19,11 +18,14 @@ class Matter < ApplicationRecord
   # has_many :assigned_users, through: :matter_assigns, source: :user
   # has_many :notifications, dependent: :destroy
   # has_many :edit_logs, dependent: :destroy
+  has_many :matter_category_joins, dependent: :destroy
+  has_many :matter_categories, through: :matter_category_joins, source: :matter_category
 
   accepts_nested_attributes_for :opponents, reject_if: :all_blank, allow_destroy: true
   accepts_nested_attributes_for :fees, reject_if: :all_blank, allow_destroy: true
   accepts_nested_attributes_for :folder_urls, reject_if: :all_blank, allow_destroy: true
   accepts_nested_attributes_for :matter_joins, reject_if: :all_blank, allow_destroy: true
+  accepts_nested_attributes_for :matter_category_joins , reject_if: :all_blank, allow_destroy: true
 
   with_options presence: true do
     validates :user_id,:matter_status_id
@@ -50,12 +52,11 @@ class Matter < ApplicationRecord
     old_tags = current_tags - sent_matter_tags
     # 今回保存されたものと現在の差を新しいタグとする。新しいタグは保存
     new_tags = sent_matter_tags - current_tags
-    # Destroy old taggings:
+
     old_tags.each do |old_tag|
       tags.delete Tag.find_by(tag_name: old_tag)
     end
 
-    # Create new taggings:
     new_tags.each do |new_tag|
       matter_tag = Tag.find_or_create_by(tag_name: new_tag)
       # 配列に保存
@@ -109,17 +110,17 @@ class Matter < ApplicationRecord
   def destroy_update
     update(archive: false)
     # あとでopponentモデルに処理を書いて整理
-    opponents.each do |opponent|
-      opponent.update(
-        name: '削除済',
-        name_kana: 'さくじょずみ',
-        first_name: '削除済',
-        first_name_kana: 'さくじょずみ',
-        maiden_name: '削除済',
-        maiden_name_kana: 'さくじょずみ',
-        birth_date: nil
-      )
-    end
+    # opponents.each do |opponent|
+    #   opponent.update(
+    #     name: '削除済',
+    #     name_kana: 'さくじょずみ',
+    #     first_name: '削除済',
+    #     first_name_kana: 'さくじょずみ',
+    #     maiden_name: '削除済',
+    #     maiden_name_kana: 'さくじょずみ',
+    #     birth_date: nil
+    #   )
+    # end
   end
 
   private

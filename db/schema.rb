@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2022_07_06_113911) do
+ActiveRecord::Schema[7.0].define(version: 2022_07_11_043523) do
   create_table "active_storage_attachments", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.string "name", null: false
     t.string "record_type", null: false
@@ -155,6 +155,15 @@ ActiveRecord::Schema[7.0].define(version: 2022_07_06_113911) do
     t.datetime "updated_at", null: false
   end
 
+  create_table "matter_category_joins", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
+    t.bigint "matter_id", null: false
+    t.bigint "matter_category_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["matter_category_id"], name: "index_matter_category_joins_on_matter_category_id"
+    t.index ["matter_id"], name: "index_matter_category_joins_on_matter_id"
+  end
+
   create_table "matter_joins", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.bigint "office_id"
     t.bigint "user_id"
@@ -185,13 +194,11 @@ ActiveRecord::Schema[7.0].define(version: 2022_07_06_113911) do
     t.date "start_date"
     t.date "finish_date"
     t.integer "matter_status_id", null: false
-    t.bigint "matter_category_id", null: false
     t.boolean "archive", default: true, null: false
     t.string "status_memo"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["client_id"], name: "index_matters_on_client_id"
-    t.index ["matter_category_id"], name: "index_matters_on_matter_category_id"
     t.index ["user_id"], name: "index_matters_on_user_id"
   end
 
@@ -279,13 +286,14 @@ ActiveRecord::Schema[7.0].define(version: 2022_07_06_113911) do
   add_foreign_key "contact_phone_numbers", "clients"
   add_foreign_key "contact_phone_numbers", "opponents"
   add_foreign_key "fees", "matters"
+  add_foreign_key "matter_category_joins", "matter_categories"
+  add_foreign_key "matter_category_joins", "matters"
   add_foreign_key "matter_joins", "matters"
   add_foreign_key "matter_joins", "offices"
   add_foreign_key "matter_joins", "users"
   add_foreign_key "matter_tags", "matters"
   add_foreign_key "matter_tags", "tags"
   add_foreign_key "matters", "clients"
-  add_foreign_key "matters", "matter_categories"
   add_foreign_key "matters", "users"
   add_foreign_key "opponents", "matters"
 end

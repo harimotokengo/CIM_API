@@ -19,7 +19,7 @@ RSpec.describe "Clients", type: :request do
 
   let!(:client) { create(:client) }
   let!(:other_client) { create(:client) }
-  let!(:matter) { create(:matter, client: client, user: user, matter_category_id: matter_category.id) }
+  let!(:matter) { create(:matter, client: client, user: user) }
   let!(:other_matter) { create(:matter, client: other_client, user: other_user) }
   let!(:matter_join_office) { create(:matter_join, matter: matter, office: office, belong_side_id: 1) }
   let!(:matter_join_other_user) { create(:matter_join, matter: matter, user: other_user, belong_side_id: 2) }
@@ -95,10 +95,11 @@ RSpec.describe "Clients", type: :request do
       contact_opponent_params = {opponents_attributes: { "0": attributes_for(:opponent).merge(contact_phone_number_params, contact_email_params, contact_address_params) }}
       matter_join_params = { matter_joins_attributes: { "0": attributes_for(:matter_join) }}
       client_join_params = { client_joins_attributes: { "0": attributes_for(:client_join) }}
-      matter_params = { matters_attributes: { "0": attributes_for(:matter, user_id: user.id, matter_category_id: matter_category.id).merge(opponent_params, matter_join_params) } }
-      min_matter_params = { matters_attributes: { "0": attributes_for(:matter, user_id: user.id, matter_category_id: matter_category.id).merge(matter_join_params) }}
+      matter_category_join_params = { matter_category_joins_attributes: { "0": attributes_for(:matter_category_join) }}
+      matter_params = { matters_attributes: { "0": attributes_for(:matter, user_id: user.id).merge(opponent_params, matter_join_params, matter_category_join_params) } }
+      min_matter_params = { matters_attributes: { "0": attributes_for(:matter, user_id: user.id).merge(matter_join_params, matter_category_join_params) }}
       contact_matter_params = {matters_attributes: { "0": attributes_for(:matter, user_id: user.id).merge(contact_opponent_params, matter_join_params)}}
-      @client_params = attributes_for(:client).merge(matter_params, client_join_params)
+      @client_params = attributes_for(:client).merge(matter_params, client_join_params, matter_category_join_params)
       @min_client_params =  attributes_for(:client).merge(min_matter_params, client_join_params)
       @contact_client_params = attributes_for(:client).merge(contact_phone_number_params, contact_email_params, contact_address_params, matter_params, client_join_params)
       @contact_opponent_client_params = attributes_for(:client).merge(contact_matter_params, client_join_params)
