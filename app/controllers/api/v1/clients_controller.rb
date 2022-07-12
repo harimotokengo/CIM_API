@@ -149,39 +149,43 @@ module Api
             :id, :user_id, :service_price,
             :folder_url, :description, :matter_status_id,
             :start_date, :finish_date, 
-            :matter_category_id,
             # :task_group_template_id, 
             :_destroy,
-            { matter_joins_attributes: %i[
-              id belong_side_id admin office_id user_id _destroy
+            matter_category_joins_attributes: [
+              :id, :matter_id, :matter_category_id,
+              :_destroy
+            ],
+            matter_joins_attributes: %i[
+              id belong_side_id admin office_id
+              user_id _destroy
+            ],
+            # folder_urls_attributes: %i[
+            #   id name url _destroy
+            # ],
+            fees_attributes: %i[
+              id fee_type_id price price_type
+              monthly_date_id pay_times _destroy
+            ],
+            opponents_attributes: [
+              :id, :name, :name_kana,
+              :first_name, :first_name_kana,
+              :maiden_name, :maiden_name_kana,
+              :phone_number, :profile,
+              :birth_date, :opponent_type,
+              :opponent_relation_type,
+              :_destroy,
+              { contact_addresses_attributes: [
+                :id, :category, :memo, :post_code, :prefecture,
+                :address, :send_by_personal, :_destroy
               ],
-              # folder_urls_attributes: %i[
-              #   id name url _destroy
-              # ],
-              fees_attributes: %i[
-                id fee_type_id price price_type
-                monthly_date_id pay_times _destroy
-              ],
-              opponents_attributes: [
-                :id, :name, :name_kana,
-                :first_name, :first_name_kana,
-                :maiden_name, :maiden_name_kana,
-                :phone_number, :profile,
-                :birth_date, :opponent_type,
-                :opponent_relation_type,
-                :_destroy,
-                { contact_addresses_attributes: [
-                  :id, :category, :memo, :post_code, :prefecture,
-                  :address, :send_by_personal, :_destroy
+                contact_emails_attributes: [
+                  :id, :category, :email, :memo, :_destroy
                 ],
-                  contact_emails_attributes: [
-                    :id, :category, :email, :memo, :_destroy
-                  ],
-                  contact_phone_numbers_attributes: [
-                    :id, :category, :memo, :phone_number, :extension_number, :_destroy
-                  ] }
-              ]
-            }
+                contact_phone_numbers_attributes: [
+                  :id, :category, :memo, :phone_number, :extension_number, :_destroy
+                ] }
+            ]
+            
           ]
         )
       end

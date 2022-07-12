@@ -1,4 +1,4 @@
-vmodule Api
+module Api
   module V1
     class MattersController < Api::V1::Base
       before_action :response_unauthorized, unless: :logged_in?
@@ -88,7 +88,6 @@ vmodule Api
           :matter_genre_id, :service_price,
           :description, :matter_status_id,
           :start_date, :finish_date,
-          :matter_category_id,
           # :task_group_template_id, 
           :archive,
           opponents_attributes: [
@@ -115,6 +114,10 @@ vmodule Api
           ],
           folder_urls_attributes: %i[
             id name url _destroy
+          ],
+          matter_category_joins_attributes: %i[
+            id matter_id matter_category_id
+            _destroy
           ]
         )
       end
