@@ -17,6 +17,9 @@ Rails.application.routes.draw do
         collection do
           get 'conflict_check'
         end
+        member do
+          get 'matters'
+        end
         resources :matters, only: :create
       end
       resources :matters, only: [:index, :show, :update, :destroy]

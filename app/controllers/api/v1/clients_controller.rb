@@ -7,12 +7,11 @@ module Api
 
       def index
         # 検索メソッドに処理をまとめる
-        user_client_matters = current_user.join_clients.joins(:matters).where(client_joins: {user_id: current_user}).to_a
-        office_client_matters = current_user.join_clients.joins(:matters).where(client_joins: {office_id: current_user.belonging_office}).to_a.compact
-        matters = (user_client_matters+office_client_matters).uniq
+        clients = Client.joins(matters: :matter_joins).joins(:client_joins).where('client_joins.user_id = ? or matter_joins.office_id = ? or client_joins.office_id = ? or matter_joins.user_id = ?', 1, 1, 1, 1)
         render json: { status: 200, data: clients}
       end
 
+      
       def show
         @client = Client.find(params[:id])
         return response_forbidden unless correct_user
