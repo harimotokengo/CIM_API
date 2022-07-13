@@ -5,8 +5,26 @@ module Api
       # before_action :set_client, only: %i[show update destroy]
       # before_action :response_forbidden, only: %i[show update destroy], unless: :correct_user
 
+      # params[:q]
+      # params[:page]
+
       def index
         # 検索メソッドに処理をまとめる
+        if params[:q].present? &&
+          (params[:q][:matters_description_or_matters_tags_tag_name_or_name_or_first_name_or_name_kana_or_first_name_kana_or_maiden_name_or_maiden_name_kana_or_profile_or_indentification_number_or_matters_opponents_name_or_matters_opponents_name_kana_or_matters_opponents_first_name_or_matters_opponents_first_name_kana_or_matters_opponents_maiden_name_or_matters_opponents_maiden_name_kana_or_matters_opponents_profile_or_contact_phone_numbers_phone_number_or_contact_emails_email_or_matters_opponents_contact_phone_numbers_phone_number_or_matters_opponents_contact_emails_email_cont_any].present? ||
+          params[:q][:matters_matter_category_name_eq].present?)
+          @clients_key_words = params[:q][:matters_description_or_matters_tags_tag_name_or_name_or_first_name_or_name_kana_or_first_name_kana_or_maiden_name_or_maiden_name_kana_or_profile_or_indentification_number_or_matters_opponents_name_or_matters_opponents_name_kana_or_matters_opponents_first_name_or_matters_opponents_first_name_kana_or_matters_opponents_maiden_name_or_matters_opponents_maiden_name_kana_or_matters_opponents_profile_or_contact_phone_numbers_phone_number_or_contact_emails_email_or_matters_opponents_contact_phone_numbers_phone_number_or_matters_opponents_contact_emails_email_cont_any]
+          # スペースが入力された場合分割
+          key_words = @clients_key_words.split(/[[:blank:]]+/)
+          # 分割したものをhash化
+          grouping_hash = key_words.reduce({}) do |hash, word|
+            hash.merge(word => { matters_description_or_matters_tags_tag_name_or_name_or_first_name_or_name_kana_or_first_name_kana_or_maiden_name_or_maiden_name_kana_or_profile_or_indentification_number_or_matters_opponents_name_or_matters_opponents_name_kana_or_matters_opponents_first_name_or_matters_opponents_first_name_kana_or_matters_opponents_maiden_name_or_matters_opponents_maiden_name_kana_or_matters_opponents_profile_or_contact_phone_numbers_phone_number_or_contact_emails_email_or_matters_opponents_contact_phone_numbers_phone_number_or_matters_opponents_contact_emails_email_cont_any: word })
+          end
+          # ジャンルが検索されている場合ハッシュに追加
+          if params[:q][:matters_matter_genre_id_eq].present?
+            grouping_hash[params[:q][:matters_matter_genre_id_eq]] = { matters_matter_genre_id_eq: params[:q][:matters_matter_genre_id_eq] }
+          end
+        end
         clients = Client.joins(matters: :matter_joins).joins(:client_joins).where('client_joins.user_id = ? or matter_joins.office_id = ? or client_joins.office_id = ? or matter_joins.user_id = ?', 1, 1, 1, 1)
         render json: { status: 200, data: clients}
       end

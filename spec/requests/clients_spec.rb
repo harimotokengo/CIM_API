@@ -46,14 +46,18 @@ RSpec.describe "Clients", type: :request do
   let!(:other_belonging_info5) { create(:belonging_info, user: other_user5, office: other_office) }
   let!(:other2_belonging_info) { create(:belonging_info, user: other2_user, office: other2_office, admin: true) }
   
-  # 検索params
-    # full_name
-    # first_name
-    # last_name
-    # matter_category_name client_full_name
-
-    # 存在しないclient_name
-    # client_name 存在しないmatter_category_name
+  # 検索時テストケース
+    # 正常
+      # 何も入力しない  
+      # client名を入力
+      # client_nama_kanaを入力
+      # client_full_nameを入力
+      # 複数入力
+      # 全部入力
+    # 準正常
+      # 未ログイン
+      # 登録されていないワードを入力
+      # 登録されているclient_nameと
 
   describe "GET #index" do
     context '正常系' do

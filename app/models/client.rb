@@ -72,22 +72,6 @@ class Client < ApplicationRecord
     end
   end
 
-  def full_name
-    if client_type_id == 1
-      name
-    else
-      name + first_name
-    end
-  end
-
-  def full_name_kana
-    if client_type_id == 1
-      name_kana
-    else
-      name_kana + first_name_kana
-    end
-  end
-
   # 更新を許可するカラムを定義
   def self.updatable_client_attributes
     %w[name first_name name_kana first_name_kana profile indentification_number
@@ -109,13 +93,13 @@ class Client < ApplicationRecord
 
   def destroy_update
     update(
-      name: '削除済',
-      first_name: '削除済',
-      name_kana: 'さくじょずみ',
-      first_name_kana: 'さくじょずみ',
-      maiden_name: '削除済',
-      maiden_name_kana: 'さくじょずみ',
-      birth_date: nil,
+      # name: '削除済',
+      # first_name: '削除済',
+      # name_kana: 'さくじょずみ',
+      # first_name_kana: 'さくじょずみ',
+      # maiden_name: '削除済',
+      # maiden_name_kana: 'さくじょずみ',
+      # birth_date: nil,
       archive: false
     )
     matters.each do ||matter|
@@ -138,5 +122,9 @@ class Client < ApplicationRecord
     office_join_check = matters.joins(:matter_joins).where(
       matter_joins: {office_id: current_user.belonging_office}).exists? if current_user.belonging_office
     return true if user_join_check || office_join_check
+  end
+
+  def self.ransackable_scopes(auth_object = nil)
+    %i(full_name_like)
   end
 end
