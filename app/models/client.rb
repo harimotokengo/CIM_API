@@ -124,7 +124,11 @@ class Client < ApplicationRecord
     return true if user_join_check || office_join_check
   end
 
-  def self.ransackable_scopes(auth_object = nil)
-    %i(full_name_like)
+  ransacker :client_full_name do
+    Arel.sql("CONCAT(clients.name, clients.first_name)")
   end
+
+  # def self.ransackable_scopes(auth_object = nil)
+  #   %i(full_name_like)
+  # end
 end
