@@ -191,6 +191,9 @@ module Api
               id belong_side_id admin office_id
               user_id _destroy
             ],
+            matter_assigns_attributes: %i[
+              
+            ],
             # folder_urls_attributes: %i[
             #   id name url _destroy
             # ],

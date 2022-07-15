@@ -6,7 +6,7 @@ class Matter < ApplicationRecord
   has_many :tasks, dependent: :destroy
   has_many :fees, dependent: :destroy
   has_many :charges, dependent: :destroy
-  # has_many :matter_assigns, dependent: :destroy
+  has_many :matter_assigns, dependent: :destroy
   # has_many :work_logs, dependent: :destroy
   has_many :work_details, dependent: :destroy
   has_many :folder_urls, dependent: :destroy
@@ -15,7 +15,7 @@ class Matter < ApplicationRecord
   # has_many :invite_urls, dependent: :destroy
   has_many :matter_joins, dependent: :destroy
   
-  # has_many :assigned_users, through: :matter_assigns, source: :user
+  has_many :assigned_users, through: :matter_assigns, source: :user
   # has_many :notifications, dependent: :destroy
   # has_many :edit_logs, dependent: :destroy
   has_many :matter_category_joins, dependent: :destroy
@@ -26,6 +26,7 @@ class Matter < ApplicationRecord
   accepts_nested_attributes_for :folder_urls, reject_if: :all_blank, allow_destroy: true
   accepts_nested_attributes_for :matter_joins, reject_if: :all_blank, allow_destroy: true
   accepts_nested_attributes_for :matter_category_joins , reject_if: :all_blank, allow_destroy: true
+  accepts_nested_attributes_for :matter_assigns , reject_if: :all_blank, allow_destroy: true
 
   with_options presence: true do
     validates :user_id,:matter_status_id

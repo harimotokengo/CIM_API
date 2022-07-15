@@ -81,6 +81,26 @@ module Api
         render json: {status: 200, message: '削除しました'}
       end
 
+      # matter_assignさせるユーザーを取得
+      def get_join_users
+        # showとeditではmatterがfind出来る
+        @matter = Matter.active_matters.find_by(params[:id])
+        if @matter
+          @client = @matter.client
+          # matter_join_users = @matter.join_users
+          # matter_join_office_users = @matter.joins(matter_join)
+          # @matter.join_users
+          # @matter.join_office_users
+          join_users = User.joins(belonging_office: :matter_joins).joins(belonging_office: :client_joins)
+          .where('matter_joins.matter_id = ? or client_joins.client_id = ?', @matter, @client).distinct
+          # .joins(:matter_joins).joins(:client_joins)
+          
+          
+        else
+          # newではmatterがfindできないのでclientだけでuserを探す
+          @client = Client.find(params[:client_id])
+        join_users = User.
+
       private
 
       def matter_params
@@ -118,6 +138,9 @@ module Api
           matter_category_joins_attributes: %i[
             id matter_id matter_category_id
             _destroy
+          ],
+          matter_assigns_attributes: %i[
+            id user_id _destroy
           ]
         )
       end

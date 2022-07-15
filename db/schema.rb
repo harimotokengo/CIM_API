@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2022_07_11_043523) do
+ActiveRecord::Schema[7.0].define(version: 2022_07_15_071548) do
   create_table "active_storage_attachments", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.string "name", null: false
     t.string "record_type", null: false
@@ -146,6 +146,15 @@ ActiveRecord::Schema[7.0].define(version: 2022_07_11_043523) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["matter_id"], name: "index_fees_on_matter_id"
+  end
+
+  create_table "matter_assigns", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
+    t.bigint "matter_id", null: false
+    t.bigint "user_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["matter_id"], name: "index_matter_assigns_on_matter_id"
+    t.index ["user_id"], name: "index_matter_assigns_on_user_id"
   end
 
   create_table "matter_categories", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
@@ -285,6 +294,8 @@ ActiveRecord::Schema[7.0].define(version: 2022_07_11_043523) do
   add_foreign_key "contact_phone_numbers", "clients"
   add_foreign_key "contact_phone_numbers", "opponents"
   add_foreign_key "fees", "matters"
+  add_foreign_key "matter_assigns", "matters"
+  add_foreign_key "matter_assigns", "users"
   add_foreign_key "matter_category_joins", "matter_categories"
   add_foreign_key "matter_category_joins", "matters"
   add_foreign_key "matter_joins", "matters"
