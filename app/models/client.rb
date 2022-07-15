@@ -31,10 +31,7 @@ class Client < ApplicationRecord
     super(value)
   end
 
-  def name_kana=(value)
-    value.tr!('０-９ａ-ｚＡ-Ｚ', '0-9a-zA-Z') if value.is_a?(String)
-    super(value)
-  end
+
 
   def first_name=(value)
     value.tr!('０-９ａ-ｚＡ-Ｚ', '0-9a-zA-Z') if value.is_a?(String)
@@ -128,7 +125,7 @@ class Client < ApplicationRecord
     Arel.sql("CONCAT(clients.name, clients.first_name)")
   end
 
-  # def self.ransackable_scopes(auth_object = nil)
-  #   %i(full_name_like)
-  # end
+  ransacker :client_full_name_kana do
+    Arel.sql("CONCAT(clients.name_kana, clients.first_name_kana)")
+  end
 end

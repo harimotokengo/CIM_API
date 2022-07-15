@@ -371,11 +371,23 @@ matter_status_arr = ['受任', '先方検討中', '当方準備中', '相談の�
       },
     ],
     matter_category_joins_attributes: [
-      matter_category_id: rand(1..MatterCategory.count)
+      matter_category_id: MatterCategory.where.not(ancestry: nil).order("RAND()").first.id
     ],
   )
 end
-# user_matter
+
+20.times do |n|
+  Tag.create!(
+    tag_name: "テストタグ#{n+1}"
+  )
+end
+
+Matter.count.times do |n|
+  MatterTag.create!(
+    matter_id: n+1,
+    tag_id: rand(1..Tag.count)
+  )
+end
 
 
 # # # task
