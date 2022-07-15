@@ -19,7 +19,7 @@ class Matter < ApplicationRecord
   # has_many :notifications, dependent: :destroy
   # has_many :edit_logs, dependent: :destroy
   has_many :matter_category_joins, dependent: :destroy
-  has_many :matter_categories, through: :matter_category_joins, source: :matter_category
+  has_many :categories, through: :matter_category_joins, source: :matter_category
 
   accepts_nested_attributes_for :opponents, reject_if: :all_blank, allow_destroy: true
   accepts_nested_attributes_for :fees, reject_if: :all_blank, allow_destroy: true

@@ -31,10 +31,7 @@ class Client < ApplicationRecord
     super(value)
   end
 
-  def name_kana=(value)
-    value.tr!('０-９ａ-ｚＡ-Ｚ', '0-9a-zA-Z') if value.is_a?(String)
-    super(value)
-  end
+
 
   def first_name=(value)
     value.tr!('０-９ａ-ｚＡ-Ｚ', '0-9a-zA-Z') if value.is_a?(String)
@@ -54,22 +51,6 @@ class Client < ApplicationRecord
   def maiden_name_kana=(value)
     value.tr!('０-９ａ-ｚＡ-Ｚ', '0-9a-zA-Z') if value.is_a?(String)
     super(value)
-  end
-
-  def full_name
-    if client_type_id == 1
-      name
-    else
-      name + first_name
-    end
-  end
-
-  def full_name_kana
-    if client_type_id == 1
-      name_kana
-    else
-      name_kana + first_name_kana
-    end
   end
 
   def full_name
@@ -109,13 +90,13 @@ class Client < ApplicationRecord
 
   def destroy_update
     update(
-      name: '削除済',
-      first_name: '削除済',
-      name_kana: 'さくじょずみ',
-      first_name_kana: 'さくじょずみ',
-      maiden_name: '削除済',
-      maiden_name_kana: 'さくじょずみ',
-      birth_date: nil,
+      # name: '削除済',
+      # first_name: '削除済',
+      # name_kana: 'さくじょずみ',
+      # first_name_kana: 'さくじょずみ',
+      # maiden_name: '削除済',
+      # maiden_name_kana: 'さくじょずみ',
+      # birth_date: nil,
       archive: false
     )
     matters.each do ||matter|
@@ -138,5 +119,13 @@ class Client < ApplicationRecord
     office_join_check = matters.joins(:matter_joins).where(
       matter_joins: {office_id: current_user.belonging_office}).exists? if current_user.belonging_office
     return true if user_join_check || office_join_check
+  end
+
+  ransacker :client_full_name do
+    Arel.sql("CONCAT(clients.name, clients.first_name)")
+  end
+
+  ransacker :client_full_name_kana do
+    Arel.sql("CONCAT(clients.name_kana, clients.first_name_kana)")
   end
 end

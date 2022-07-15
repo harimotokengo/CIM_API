@@ -46,45 +46,42 @@ RSpec.describe "Clients", type: :request do
   let!(:other_belonging_info5) { create(:belonging_info, user: other_user5, office: other_office) }
   let!(:other2_belonging_info) { create(:belonging_info, user: other2_user, office: other2_office, admin: true) }
   
-  # 検索params
-    # full_name
-    # first_name
-    # last_name
-    # matter_category_name client_full_name
+  # 検索時テストケース
+    # 正常
+      # 何も入力しない  
+      # client名を入力
+      # client_nama_kanaを入力
+      # client_full_nameを入力
+      # 複数入力
+      # 全部入力
+    # 準正常
+      # 未ログイン
+      # 登録されていないワードを入力
+      # 登録されているclient_nameと
 
-    # 存在しないclient_name
-    # client_name 存在しないmatter_category_name
+  describe "GET #index" do
+    context '正常系' do
+      context '参加事務所ユーザーでログイン' do
+        it 'リクエストが成功すること' do
+          login_user(user, 'Test-1234', api_v1_login_path)
+          get api_v1_clients_path
+          expect(response).to have_http_status 200
+        end
+      end
+    end
+    context '準正常系' do
+      context '未ログイン' do
+        it '401エラーが返ってくること' do
+          get api_v1_clients_path
+          expect(response).to have_http_status 401
+          expect(JSON.parse(response.body)['message']).to eq "Unauthorized"
+        end
+      end
+    end
+  end
 
-  # describe "GET #index" do
-  #   context '正常系' do
-  #     context '参加事務所ユーザーでログイン' do
-  #       it 'リクエストが成功すること' do
-
-  #       end
-  #     end
-
-  #     context '参加ユーザーでログイン' do
-  #       it 'リクエストが成功すること' do
-
-  #       end
-  #     end
-  #   end
-
-  #   context '準正常系' do
-  #     context '未ログイン' do
-  #       it '401エラーが返ってくること' do
-
-  #       end
-  #     end
-  #     context '不参加ユーザーでログイン' do
-  #       it '403エラーが返ってくること' do
-  #       end
-  #     end
-  #   end
-  # end
-
-  # 登録者または登録者の事務所がclient_joinのadminに登録されること
-  # 事務所なしユーザーは組織で登録できない
+  # # 登録者または登録者の事務所がclient_joinのadminに登録されること
+  # # 事務所なしユーザーは組織で登録できない
   describe 'POST #create' do
     before do
       contact_phone_number_params = {contact_phone_numbers_attributes: { "0": attributes_for(:contact_phone_number)}}

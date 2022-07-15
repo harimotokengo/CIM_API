@@ -195,7 +195,6 @@ ActiveRecord::Schema[7.0].define(version: 2022_07_11_043523) do
     t.date "finish_date"
     t.integer "matter_status_id", null: false
     t.boolean "archive", default: true, null: false
-    t.string "status_memo"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["client_id"], name: "index_matters_on_client_id"

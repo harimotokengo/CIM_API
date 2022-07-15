@@ -89,4 +89,12 @@ class Opponent < ApplicationRecord
     end
   end
 
+  ransacker :opponent_full_name do
+    Arel.sql("CONCAT(opponents.name, opponents.first_name)")
+  end
+
+  ransacker :opponent_full_name_kana do
+    Arel.sql("CONCAT(opponents.name_kana, opponents.first_name_kana)")
+  end
+
 end

@@ -302,6 +302,7 @@ end
   )
 end
 
+
 matter_status_arr = ['受任', '先方検討中', '当方準備中', '相談のみ', '終了']
 
 # office_matter
@@ -370,11 +371,23 @@ matter_status_arr = ['受任', '先方検討中', '当方準備中', '相談の�
       },
     ],
     matter_category_joins_attributes: [
-      matter_category_id: rand(1..MatterCategory.count)
+      matter_category_id: MatterCategory.where.not(ancestry: nil).order("RAND()").first.id
     ],
   )
 end
-# user_matter
+
+20.times do |n|
+  Tag.create!(
+    tag_name: "テストタグ#{n+1}"
+  )
+end
+
+Matter.count.times do |n|
+  MatterTag.create!(
+    matter_id: n+1,
+    tag_id: rand(1..Tag.count)
+  )
+end
 
 
 # # # task
@@ -769,3 +782,100 @@ end
 #     checked: rand(0..1)
 #   )
 # end
+
+
+# ===========================================
+# クライアント検索用
+# ===========================================
+50.times do |n|
+  client_belong_side_id = rand(1..2)
+  if client_belong_side_id == 1
+    client_user_id = nil
+    client_office_id = User.find(1).belonging_office.id
+  else
+    client_user_id = 1
+    client_office_id = nil
+  end
+
+  Client.create!(
+    name: Gimei.name.last.kanji,
+    first_name: Gimei.name.first.kanji,
+    name_kana: Gimei.name.last.hiragana,
+    first_name_kana: Gimei.name.first.hiragana,
+    profile: '手続きは絶対秘密にしたいとのこと',
+    indentification_number: "#{rand(100000000..999999999)}",
+    birth_date: Faker::Date.birthday(min_age: 18, max_age: 65).strftime('%Y-%m-%d'),
+    client_type_id: rand(1..2),
+    archive: true,
+    contact_phone_numbers_attributes: [
+      {
+        category: "#{rand(1..4)}00".to_i,
+        phone_number: Faker::PhoneNumber.cell_phone.gsub("-", ""),
+      },
+    ],
+    contact_emails_attributes: [
+      {
+        category: "#{rand(1..4)}00".to_i,
+        email: Faker::Internet.unique.email,
+      },
+    ],
+    contact_addresses_attributes: [
+      {
+        category: "#{rand(1..4)}00".to_i,
+        post_code: Faker::Address.zip_code.gsub("-", ""),
+        prefecture: Gimei.address.prefecture.kanji,
+        address: Gimei.address.city.kanji,
+      },
+    ],
+    client_joins_attributes: [
+      {
+        user_id: client_user_id,
+        office_id: client_office_id,
+        belong_side_id: client_belong_side_id,
+        admin: true
+      }
+    ],
+    
+    matters_attributes: [
+      {
+        user_id: rand(1..2),
+        matter_status_id: rand(1..5),
+        archive: true,
+        opponents_attributes: [
+          {
+            name: Gimei.name.last.kanji,
+            first_name: Gimei.name.first.kanji,
+            name_kana: Gimei.name.last.hiragana,
+            first_name_kana: Gimei.name.first.hiragana,
+            birth_date: Faker::Date.birthday(min_age: 18, max_age: 65).strftime('%Y-%m-%d'),
+            opponent_relation_type: rand(1..6)*100,
+            profile: "テストプロフィール#{n}",
+            contact_phone_numbers_attributes: [
+              {
+                category: "#{rand(1..4)}00".to_i,
+                phone_number: Faker::PhoneNumber.cell_phone.gsub("-", ""),
+              },
+            ],
+            contact_emails_attributes: [
+              {
+                category: "#{rand(1..4)}00".to_i,
+                email: Faker::Internet.unique.email,
+              },
+            ],
+            contact_addresses_attributes: [
+              {
+                category: "#{rand(1..4)}00".to_i,
+                post_code: Faker::Address.zip_code.gsub("-", ""),
+                prefecture: Gimei.address.prefecture.kanji,
+                address: Gimei.address.city.kanji,
+              },
+            ],
+          },
+        ],
+        matter_category_joins_attributes: [
+          matter_category_id: rand(1..MatterCategory.count)
+        ],
+      },
+    ],
+  )
+end
