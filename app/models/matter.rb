@@ -149,7 +149,6 @@ class Matter < ApplicationRecord
   end
 
   def already_assign_check(assign_user)
-    self.joins(:matter_assigns)
-        .exists?('matter_assigns.user_id = ? or matter_assigns.office_id = ?', assign_user, assign_user.belonging_office)
+    MatterAssign.where(matter_id: id, user_id: assign_user).empty?
   end
 end
