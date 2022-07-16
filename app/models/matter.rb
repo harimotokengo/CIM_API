@@ -21,6 +21,8 @@ class Matter < ApplicationRecord
   has_many :matter_category_joins, dependent: :destroy
   has_many :categories, through: :matter_category_joins, source: :matter_category
 
+  scope :active, -> { where(archive: true) }
+
   accepts_nested_attributes_for :opponents, reject_if: :all_blank, allow_destroy: true
   accepts_nested_attributes_for :fees, reject_if: :all_blank, allow_destroy: true
   accepts_nested_attributes_for :folder_urls, reject_if: :all_blank, allow_destroy: true
@@ -124,6 +126,11 @@ class Matter < ApplicationRecord
     # end
   end
 
+  def assignable_check(user_id)
+    assign_user = User.find(user_id)
+    return true if join_check(assign_user) && already_assign_check(assign_user)
+  end
+
   private
 
   def matter_join_check(current_user)
@@ -139,5 +146,10 @@ class Matter < ApplicationRecord
     office_join_check = client.client_joins.where(
       office_id: current_user.belonging_office).exists? if current_user.belonging_office
     return true if user_join_check || office_join_check
+  end
+
+  def already_assign_check(assign_user)
+    self.joins(:matter_assigns)
+        .exists?('matter_assigns.user_id = ? or matter_assigns.office_id = ?', assign_user, assign_user.belonging_office)
   end
 end

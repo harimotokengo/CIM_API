@@ -16,13 +16,25 @@ Rails.application.routes.draw do
       resources :clients, only: [:index, :create, :show, :update, :destroy ] do
         collection do
           get 'conflict_check'
+          get 'get_category_parents'
+          get 'get_category_childeren'
+          get 'get_join_users'
         end
         member do
-          get 'matters'
+          get 'get_matters'
         end
-        resources :matters, only: :create
+        resources :matters, only: :create do
+          collection do
+            get 'get_join_users'
+          end
+        end
       end
-      resources :matters, only: [:index, :show, :update, :destroy]
+      resources :matters, only: [:index, :show, :update, :destroy] do
+        member do
+          get 'get_join_users'
+        end
+        resources :matter_assigns, only: [:create, :destroy]
+      end
     end
   end
 end

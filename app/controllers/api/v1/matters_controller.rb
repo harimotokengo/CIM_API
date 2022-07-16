@@ -39,14 +39,14 @@ module Api
       end
 
       def show
-        @matter = Matter.active_matters.find(params[:id])
+        @matter = Matter.active.find(params[:id])
         @client = @matter.client
         return response_forbidden unless correct_user
         render json: { status: 200, data: @matter}
       end
 
       def update
-        @matter = Matter.active_matters.find(params[:id])
+        @matter = Matter.active.find(params[:id])
         @client = @matter.client
         return response_forbidden unless correct_user
         tag_list = params[:matter][:tag_name].split(',') unless params[:matter][:tag_name].nil?
@@ -74,32 +74,29 @@ module Api
       # 関係者の個人情報を空白にしてmatter.archiveをfalseにする
       # レコードは全部残す
       def destroy
-        @matter = Matter.active_matters.find(params[:id])
+        @matter = Matter.active.find(params[:id])
         @client = @matter.client
         return response_forbidden unless correct_user
         @matter.destroy_update
         render json: {status: 200, message: '削除しました'}
       end
 
-      # matter_assignさせるユーザーを取得
       def get_join_users
-        # showとeditではmatterがfind出来る
-        @matter = Matter.active_matters.find_by(params[:id])
-        if @matter
-          @client = @matter.client
-          # matter_join_users = @matter.join_users
-          # matter_join_office_users = @matter.joins(matter_join)
-          # @matter.join_users
-          # @matter.join_office_users
-          join_users = User.joins(belonging_office: :matter_joins).joins(belonging_office: :client_joins)
-          .where('matter_joins.matter_id = ? or client_joins.client_id = ?', @matter, @client).distinct
-          # .joins(:matter_joins).joins(:client_joins)
-          
-          
+        if params[:client_id].blank? && params[:id]
+          @matter = Matter.active.find(params[:id])
+          @client = @matter.client.active
         else
-          # newではmatterがfindできないのでclientだけでuserを探す
-          @client = Client.find(params[:client_id])
-        join_users = User.
+          @client = Client.active.find(params[:client_id])
+          @matter = nil
+        end
+        join_users = []
+        join_users << User.joins(:matter_joins).joins(:client_joins)
+                          .where('matter_joins.matter_id = ? or client_joins.client_id = ?', @matter, @client).distinct
+
+        join_users << User.joins(belonging_office: :matter_joins).joins(belonging_office: :client_joins)
+                            .where('matter_joins.matter_id = ? or client_joins.client_id = ?', @matter, @client).distinct
+        render json: {status: 200, data: join_users.uniq}
+      end
 
       private
 
@@ -143,10 +140,6 @@ module Api
             id user_id _destroy
           ]
         )
-      end
-
-      def matter_search_params
-
       end
 
       def correct_user

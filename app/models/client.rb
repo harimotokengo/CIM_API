@@ -4,7 +4,8 @@ class Client < ApplicationRecord
   has_many :contact_emails, dependent: :destroy
   has_many :contact_phone_numbers, dependent: :destroy
   has_many :client_joins, dependent: :destroy
-  has_many :join_users, through: :client_joins #activeがtrueのscope経由にあとで直す
+  
+  scope :active_client, -> { where(archive: true) }
 
   accepts_nested_attributes_for :client_joins, reject_if: :all_blank, allow_destroy: true
   accepts_nested_attributes_for :matters, reject_if: :all_blank, allow_destroy: true
@@ -102,6 +103,21 @@ class Client < ApplicationRecord
     matters.each do ||matter|
       matter.destroy_update
     end
+  end
+
+  def index_data(clients)
+    data = []
+    clients.each do |client|
+      data << client
+      matter_data = []
+      client.matters.each do |matter|
+        matter_data << matter.categories.first.parent
+        matter_data << matter.categories.first
+        matter_data << matter.tags
+      end
+      data << matter_data
+    end
+    return data
   end
 
   private
