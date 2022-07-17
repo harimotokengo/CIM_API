@@ -4,7 +4,7 @@ class Office < ApplicationRecord
   has_many :current_belongings, -> { belonging }, class_name: 'BelongingInfo'
   has_many :belonging_users, through: :current_belongings, source: :user
   has_many :past_belongings, -> { belonged }, class_name: 'BelongingInfo'
-  has_many :belonged_users, through: :current_belongings, source: :user
+  has_many :past_users, through: :current_belongings, source: :user
 
   # has_many :tasks, through: :users
   has_many :matter_joins, dependent: :destroy

@@ -3,6 +3,9 @@ class ClientJoin < ApplicationRecord
   belongs_to :user, optional: true
   belongs_to :client
 
+  scope :office_join, -> { where(belong_side_id: 1) }
+  scope :user_join, -> { where(belong_side_id: 2) }
+  
   with_options presence: true do
     validates :office_id, if: :user_id_blank
     validates :user_id, if: :office_id_blank
