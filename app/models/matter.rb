@@ -103,6 +103,10 @@ class Matter < ApplicationRecord
     return true if client_join_check(current_user) || matter_join_check(current_user)
   end
 
+  def personal_join_check(current_user)
+    return true if personal_client_join_check(current_user) || personal_matter_join_check(current_user)
+  end
+
   def admin_check(current_user)
     user_admin_check = matter_joins.where(admin: true, user_id: current_user).exists?
     office_admin_check = matter_joins.where(admin: true, 
@@ -135,6 +139,28 @@ class Matter < ApplicationRecord
     return true if join_check(user) && assigning_check(user)
   end
 
+  # matter_join可能か確認
+  def joinable_check(current_user, matter_join)
+    if matter_join.belong_side_id = '組織'
+      # 事務所参加の場合
+      if !join_check(current_user) || matter_join.deadline_check || matter_join.accessed_check
+        return true
+      end
+    else
+      # 個人参加の場合
+      if !personal_join_check(current_user) || matter_join.deadline_check || matter_join.accessed_check
+        return true
+      end
+    end
+  end
+
+  def minimum_required_administrator_check(matter_join)
+    if matter_joins.where(admin: true).count == 1 && matter_join.admin?
+      errors.add(:base, '管理者は最低1人以上必要です。')
+      return false
+    end
+  end
+
   private
 
   def matter_join_check(current_user)
@@ -144,12 +170,22 @@ class Matter < ApplicationRecord
     return true if user_join_check || office_join_check
   end
 
+  def personal_matter_join_check(current_user)
+    user_join_check = matter_joins.where(user_id: current_user).exists?
+    return true if user_join_check || office_join_check
+  end
+
   def client_join_check(current_user)
-    user_join_check = client.client_joins.where(
+    user_join_check = self.client.client_joins.where(
       user_id: current_user).exists?
-    office_join_check = client.client_joins.where(
+    office_join_check = self.client.client_joins.where(
       office_id: current_user.belonging_office).exists? if current_user.belonging_office
     return true if user_join_check || office_join_check
+  end
+
+  def personal_client_join_check(current_user)
+    user_join_check = self.client.client_joins.where(user_id: current_user).exists?
+    return true if user_join_check
   end
 
   def assigning_check(assign_user)
