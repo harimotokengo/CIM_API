@@ -21,6 +21,7 @@ module Api
         @matter_assign = MatterAssign.find(params[:id])
         @matter = @matter_assign.matter
         return response_forbidden unless correct_user
+        return response_bad_request unless @matter.assign_deletable_check(@matter_assign.user)
         @matter_assign.destroy
         render json: { status: 200, message: '担当を削除しました。' }
       end

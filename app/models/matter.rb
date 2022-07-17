@@ -128,7 +128,11 @@ class Matter < ApplicationRecord
 
   def assignable_check(user_id)
     assign_user = User.find(user_id)
-    return true if join_check(assign_user) && already_assign_check(assign_user)
+    return true if join_check(assign_user) && !assigning_check(assign_user)
+  end
+
+  def assign_deletable_check(user)
+    return true if join_check(user) && assigning_check(user)
   end
 
   private
@@ -148,7 +152,7 @@ class Matter < ApplicationRecord
     return true if user_join_check || office_join_check
   end
 
-  def already_assign_check(assign_user)
-    MatterAssign.where(matter_id: id, user_id: assign_user).empty?
+  def assigning_check(assign_user)
+    MatterAssign.where(matter_id: id, user_id: assign_user).exists?
   end
 end
