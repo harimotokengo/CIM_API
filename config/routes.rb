@@ -32,12 +32,17 @@ Rails.application.routes.draw do
       end
       resources :matters, only: [:index, :show, :update, :destroy] do
         resources :matter_assigns, only: [:create, :destroy]
-        resources :matter_joins, only: [:create, :update, :destroy]
+        resources :matter_joins, only: [:create, :update, :destroy] do
+          member do
+            post 'create_token'
+            get 'get_invite_url'
+          end
+        end
         member do
           get 'get_join_users'
         end
       end
-      resources :invite_urls, only: [:create, ]
+      resources :invite_urls, only: :show
     end
   end
 end

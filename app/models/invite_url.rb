@@ -38,4 +38,31 @@ class InviteUrl < ApplicationRecord
       return false
     end
   end
+
+  # parent毎にinvited_destination_nameを取得
+  def get_invited_destination_name
+    if self.matter_id
+      @matter = self.matter
+      return @matter.client.full_name + ',' + @matter.categories.first
+    elsif self.client_id
+      @matter = self.client
+      return @matter.client.full_name + ',' + '全案件'
+    end
+  end
+
+  # 招待URLが正しいかチェック
+  def invite_check(params_token)
+    return true if token_check(params_token) && deadline_check && accessed_check
+  end
+
+  private
+
+  def token_check(params_token)
+    if self.token == params_token
+      return true
+    else
+      errors.add(:base, '不正なアクセスです')
+      return false
+    end
+  end
 end
