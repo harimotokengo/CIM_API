@@ -39,6 +39,16 @@ class InviteUrl < ApplicationRecord
     end
   end
 
+  def get_invite_data
+    inviter = @invite_url.sender.full_name
+    limit_date = @invite_url.limit_date
+    invited_destination_name = @invite_url.get_invited_destination_name
+    data = [inviter: inviter, 
+      limit_date: limit_date, 
+      invited_destination_name: invited_destination_name]
+    return data
+  end
+
   # parent毎にinvited_destination_nameを取得
   def get_invited_destination_name
     if self.matter_id
@@ -51,8 +61,16 @@ class InviteUrl < ApplicationRecord
   end
 
   # 招待URLが正しいかチェック
-  def invite_check(params_token)
+  def invite_url_check(params_token)
     return true if token_check(params_token) && deadline_check && accessed_check
+  end
+
+  def set_token_url
+    if Rails.env.development?
+      return "http://localhost:3000/invite_urls/#{@invite_url.id}?tk=" + @invite_url.token
+    else
+      return "https://www.mrcim.com/invite_urls/#{@invite_url.id}?tk=" + @invite_url.token
+    end
   end
 
   private

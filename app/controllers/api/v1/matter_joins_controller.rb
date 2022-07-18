@@ -30,11 +30,7 @@ module Api
         @matter = Matter.active.find(params[:matter_id])
         return response_forbidden unless correct_user
         @invite_url = current_user.invite_urls.last
-        token_url = if Rails.env.development?
-                      "http://localhost:3000/matter_joins/#{@invite_url.id}?tk=" + @invite_url.token
-                    else
-                      "https://www.mrcim.com/matter_joins/#{@invite_url.id}?tk=" + @invite_url.token
-                    end
+        token_url = @invite_url.set_token_url
         render json: {status: 200, data: token_url}
       end
 
@@ -55,7 +51,7 @@ module Api
         end
       end
 
-      # 管理者権限の更新
+      # indexのmatter_joinの管理者権限の更新
       def update
         @matter = Matter.active.find(params[:matter_id])
         @matter_join = MatterJoin.find(params[:id])
@@ -71,6 +67,7 @@ module Api
         end
       end
 
+      # indexのmatter_joinを削除
       def destroy
         @matter = Matter.active.find(params[:matter_id])
         @matter_join = MatterJoin.find(params[:id])

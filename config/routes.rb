@@ -32,7 +32,7 @@ Rails.application.routes.draw do
       end
       resources :matters, only: [:index, :show, :update, :destroy] do
         resources :matter_assigns, only: [:create, :destroy]
-        resources :matter_joins, only: [:create, :update, :destroy] do
+        resources :matter_joins, only: [:index, :create, :update, :destroy] do
           member do
             post 'create_token'
             get 'get_invite_url'
