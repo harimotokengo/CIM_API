@@ -4,8 +4,6 @@ module Api
       before_action :response_unauthorized, unless: :logged_in?
 
       def index
-        # とりあえずリクエストテスト用
-        # apiモードでの検索機能は別ブランチ
         user_client_matters = current_user.join_clients.joins(:matters).where(client_joins: {user_id: current_user}).to_a
         office_client_matters = current_user.join_clients.joins(:matters).where(client_joins: {office_id: current_user.belonging_office}).to_a.compact
         user_matters = current_user.join_matters.to_a

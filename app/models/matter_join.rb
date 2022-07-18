@@ -23,4 +23,14 @@ class MatterJoin < ApplicationRecord
   def user_id_blank
     user_id.blank?
   end
+
+  # 組織と個人でmatter_joinの親を分岐してセット
+  def set_parent
+    if  @matter_join.belon_side_id == '組織'
+      current_user.belonging_check
+      @matter_join.office_id = current_user.belonging_office.id
+    else
+      @matter_join.user_id = current_user.id
+    end
+  end
 end

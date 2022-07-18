@@ -3,6 +3,14 @@ module Api
     class MatterJoinsController < Api::V1::Base
       before_action :response_unauthorized, unless: :logged_in?
 
+      # matter_joinしてるuserおよびofficeの一覧
+      def index
+        @matter = Matter.active.find(params[:matter_id])
+        return response_forbidden unless correct_user
+        data = @matter.index_matter_join_data
+        render json: {status: 200, data: data}
+      end
+
       # URL発行ボタン
       def create_token
         @matter = Matter.active.find(params[:matter_id])
@@ -38,11 +46,7 @@ module Api
         @matter_join = @matter.matter_joins.new(
           belong_side_id: params[:belong_side_id],
           admin: @invite_url.admin)
-        if  @matter_join.belon_side_id == '組織'
-          @matter_join.office_id = current_user.belonging_office.id
-        else
-          @matter_join.user_id = current_user.id
-        end
+        @matter_join.set_parent
         
         if @matter_join.save
           render json: { status: 200, message: "参加しました"}
@@ -51,6 +55,7 @@ module Api
         end
       end
 
+      # 管理者権限の更新
       def update
         @matter = Matter.active.find(params[:matter_id])
         @matter_join = MatterJoin.find(params[:id])
@@ -70,6 +75,7 @@ module Api
         @matter = Matter.active.find(params[:matter_id])
         @matter_join = MatterJoin.find(params[:id])
         return response_forbidden unless correct_user
+        return response_bad_request if minimum_required_administrator_check(@matter_join)
         @matter_join.destroy
         render json: { status: 200, message: "削除しました"}
       end

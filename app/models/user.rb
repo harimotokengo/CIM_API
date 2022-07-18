@@ -91,6 +91,15 @@ class User < ApplicationRecord
     end
   end
 
+  def belonging_check
+    if current_belonging
+      return true
+    else
+      add.errors(base: '組織に所属していません')
+      return false
+    end
+  end
+
   private
 
   # アタッチしたファイルが画像かどうかを判別

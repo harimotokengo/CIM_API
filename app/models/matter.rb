@@ -12,8 +12,12 @@ class Matter < ApplicationRecord
   has_many :folder_urls, dependent: :destroy
   has_many :matter_tags, dependent: :destroy
   has_many :tags, through: :matter_tags
-  # has_many :invite_urls, dependent: :destroy
+  has_many :invite_urls, dependent: :destroy
   has_many :matter_joins, dependent: :destroy
+  has_many :user_matter_joins, -> { user_join }, class_name: 'MatterJoin'
+  has_many :matter_join_users, through: :user_matter_joins, source: :user
+  has_many :user_matter_joins, -> { office_join }, class_name: 'MatterJoin'
+  has_many :matter_join_offices, through: :user_matter_joins, source: :user
   
   has_many :assigned_users, through: :matter_assigns, source: :user
   # has_many :notifications, dependent: :destroy
@@ -159,6 +163,22 @@ class Matter < ApplicationRecord
       errors.add(:base, '管理者は最低1人以上必要です。')
       return false
     end
+  end
+
+  # matter_joinしてるofficeとuserの一覧表示用データ取得
+  def index_matter_join_data
+    data = []
+    matter_joins = self.matter_joins.eager_load(matter_joins: :office)
+                      .eager_load(matter_joins: :user)
+    matter_joins.each do |matter_join|
+      if matter_join.belong_side_id == '組織'
+        data << matter_join.office
+      else
+        data << matter_join.user
+      end
+      data << matter_join.admin
+    end
+    return data
   end
 
   private
