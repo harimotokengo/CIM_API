@@ -25,7 +25,7 @@ module Api
         render json: { status: 200, message: "招待URLを発行しました"}
       end
 
-      # URL表示画面でgetする情報
+      # URL表示画面で招待URLを表示する
       def get_invite_url
         @matter = Matter.active.find(params[:matter_id])
         return response_forbidden unless correct_user
@@ -37,14 +37,13 @@ module Api
       # 案件参加画面のsubmitボタン
       def create
         @matter = Matter.active.find(params[:matter_id])
-        return response_forbidden unless correct_user
         @invite_url = InviteUrl.find(params[:invite_url_id])
         @invite_url.update(join: true)
         @matter_join = @matter.matter_joins.new(
           belong_side_id: params[:belong_side_id],
           admin: @invite_url.admin)
         @matter_join.set_parent
-        
+        return response_forbidden unless correct_user
         if @matter_join.save
           render json: { status: 200, message: "参加しました"}
         else
@@ -81,8 +80,14 @@ module Api
       private
 
       def correct_user
-        if @client.admin_check(current_user) || @matter.admin_check(current_user)
-          return true if current_user.admin_check
+        if action_name == 'index'
+          return true if @matter.join_check(current_user) || @matter.client.join_check(current_user)
+        elsif  action_name == 'create'
+          return true if @matter.joinable_check(current_user, @matter_join)
+        else
+          if @client.admin_check(current_user) || @matter.admin_check(current_user)
+            return true if current_user.admin_check
+          end
         end
       end
     end

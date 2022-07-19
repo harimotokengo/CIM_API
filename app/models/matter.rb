@@ -72,11 +72,6 @@ class Matter < ApplicationRecord
       end
     end
   end
-  
-  # scope作って消す
-  def self.active_matters
-    where(archive: true)
-  end
 
   # feeモデルにscopeを作って消す
   def fix_fees
@@ -104,11 +99,7 @@ class Matter < ApplicationRecord
   end
 
   def join_check(current_user)
-    return true if client_join_check(current_user) || matter_join_check(current_user)
-  end
-
-  def personal_join_check(current_user)
-    return true if personal_client_join_check(current_user) || personal_matter_join_check(current_user)
+    return true if personal_join_check(current_user) || office_join_check(current_user)
   end
 
   def admin_check(current_user)
@@ -120,40 +111,35 @@ class Matter < ApplicationRecord
 
   def destroy_update
     update(archive: false)
-    # あとでopponentモデルに処理を書いて整理
-    # opponents.each do |opponent|
-    #   opponent.update(
-    #     name: '削除済',
-    #     name_kana: 'さくじょずみ',
-    #     first_name: '削除済',
-    #     first_name_kana: 'さくじょずみ',
-    #     maiden_name: '削除済',
-    #     maiden_name_kana: 'さくじょずみ',
-    #     birth_date: nil
-    #   )
-    # end
   end
 
   def assignable_check(user_id)
     assign_user = User.find(user_id)
-    return true if join_check(assign_user) && !assigning_check(assign_user)
+    if join_check(assign_user) || self.client.join_check(assign_user)
+      return true if !assigning_check(assign_user)
+    end
   end
 
   def assign_deletable_check(user)
-    return true if join_check(user) && assigning_check(user)
+    if join_check(user) || self.client.join_check(user)
+      return true if assigning_check(user)
+    end
   end
 
-  # matter_join可能か確認
   def joinable_check(current_user, matter_join)
-    if matter_join.belong_side_id = '組織'
-      # 事務所参加の場合
-      if !join_check(current_user) || matter_join.deadline_check || matter_join.accessed_check
+    if !join_check(current_user) && !client.joincheck(current_user)
+      return true
+    elsif matter_join.belong_side_id = '組織'
+      if !office_join_check(current_user) || matter_join.deadline_check || matter_join.accessed_check
         return true
+      else
+        return false
       end
     else
-      # 個人参加の場合
       if !personal_join_check(current_user) || matter_join.deadline_check || matter_join.accessed_check
         return true
+      else
+        return false
       end
     end
   end
@@ -183,29 +169,13 @@ class Matter < ApplicationRecord
 
   private
 
-  def matter_join_check(current_user)
-    user_join_check = matter_joins.where(user_id: current_user).exists?
-    office_join_check = matter_joins.where(
-      office_id: current_user.belonging_office).exists? if current_user.belonging_office
-    return true if user_join_check || office_join_check
+  def personal_join_check(current_user)
+    matter_joins.where(user_id: current_user.id).exists?
   end
 
-  def personal_matter_join_check(current_user)
-    user_join_check = matter_joins.where(user_id: current_user).exists?
-    return true if user_join_check || office_join_check
-  end
-
-  def client_join_check(current_user)
-    user_join_check = self.client.client_joins.where(
-      user_id: current_user).exists?
-    office_join_check = self.client.client_joins.where(
-      office_id: current_user.belonging_office).exists? if current_user.belonging_office
-    return true if user_join_check || office_join_check
-  end
-
-  def personal_client_join_check(current_user)
-    user_join_check = self.client.client_joins.where(user_id: current_user).exists?
-    return true if user_join_check
+  def office_join_check(current_user)
+    matter_joins.where(
+      office_id: current_user.belonging_office.id).exists? if current_user.belonging_office
   end
 
   def assigning_check(assign_user)

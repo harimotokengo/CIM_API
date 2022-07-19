@@ -15,7 +15,9 @@ RSpec.describe "Clients", type: :request do
   let!(:other2_user) { create(:user, office_id: other2_office.id) }
   let!(:injoin_user) { create(:user) }
 
+  let!(:matter_category_join) { create(:matter_category_join, matter: matter, matter_category: matter_category) }
   let!(:matter_category) { create(:matter_category) }
+  let!(:matter_category) { create(:matter_category, name: '離婚', ancestry: nil) }
 
   let!(:client) { create(:client) }
   let!(:other_client) { create(:client) }

@@ -144,7 +144,7 @@ module Api
         if action_name == 'create'
           return true if @client.join_check(current_user)
         elsif action_name == 'show'
-          return true if @matter.join_check(current_user)
+          return true if @matter.join_check(current_user) || @client.join_check(current_user)
         else
           if @client.admin_check(current_user) || @matter.admin_check(current_user)
             return true if current_user.admin_check
