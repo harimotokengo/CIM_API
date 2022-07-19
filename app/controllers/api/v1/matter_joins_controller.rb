@@ -37,6 +37,7 @@ module Api
       # 案件参加画面のsubmitボタン
       def create
         @matter = Matter.active.find(params[:matter_id])
+        return response_forbidden unless correct_user
         @invite_url = InviteUrl.find(params[:invite_url_id])
         @invite_url.update(join: true)
         @matter_join = @matter.matter_joins.new(
