@@ -76,24 +76,9 @@ class Client < ApplicationRecord
         birth_date client_type_id archive]
   end
 
-  # # 消す
-  # def join_check(current_user)
-  #   return true if client_join_check(current_user) || matter_join_check(current_user)
-  # end
-
-  # これをpersonalとofficeに分けて
   def join_check(current_user)
     return true if personal_join_check(current_user) || office_join_check(current_user)
   end
-
-  # たぶんいらない
-  # def matters_join_check(current_user)
-  #   personal_join_check = matters.joins(:matter_joins).where(
-  #     matter_joins: {user_id: current_user}).exists?
-  #   office_join_check = matters.joins(:matter_joins).where(
-  #     matter_joins: {office_id: current_user.belonging_office}).exists? if current_user.belonging_office
-  #   return true if personal_join_check || office_join_check
-  # end
 
   def admin_check(current_user)
     user_admin_check = client_joins.where(admin: true, user_id: current_user).exists?
@@ -127,13 +112,6 @@ class Client < ApplicationRecord
   end
 
   private
-  # # 消す
-  # def client_join_check(current_user)
-  #   user_join_check = client_joins.where(user_id: current_user).exists?
-  #   office_join_check = client_joins.where(
-  #     office_id: current_user.belonging_office).exists? if current_user.belonging_office
-  #   return true if user_join_check || office_join_check
-  # end
 
   # これを正とする
   def personal_join_check(current_user)
@@ -143,16 +121,6 @@ class Client < ApplicationRecord
   # これを正とする
   def office_join_check(current_user)
     client_joins.where(office_id: current_user.belonging_office).exists?  if current_user.belonging_office
-  end
-
-
-  # 消す
-  def matter_join_check(current_user)
-    user_join_check = matters.joins(:matter_joins).where(
-      matter_joins: {user_id: current_user}).exists?
-    office_join_check = matters.joins(:matter_joins).where(
-      matter_joins: {office_id: current_user.belonging_office}).exists? if current_user.belonging_office
-    return true if user_join_check || office_join_check
   end
 
   ransacker :client_full_name do

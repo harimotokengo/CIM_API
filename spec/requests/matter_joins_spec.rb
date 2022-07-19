@@ -28,7 +28,7 @@ RSpec.describe 'matter_joins_requests', type: :request do
   let!(:matter_join_office_other_belonging_info) { create(:belonging_info, user: matter_join_office_other, office: matter_join_office) }
   let!(:matter_admin_office_user_belonging_info) { create(:belonging_info, user: matter_join_office_user, office:matter_join_office) }
   let!(:matter_admin_office_admin_belonging_info) { create(:belonging_info, user: matter_admin_office_admin, office: matter_admin_office, admin: true) }
-  let!(:injoin_belonging_info) { create(:belonging_info, user: injoin_user, office: injoin_office) }
+  let!(:injoin_belonging_info) { create(:belonging_info, user: injoin_office_user, office: injoin_office, admin: true) }
 
   let!(:matter_category) { create(:matter_category) }
   let!(:pension_matter_category) { create(:matter_category, ancestry: '1', name: '年金') }
@@ -49,20 +49,57 @@ RSpec.describe 'matter_joins_requests', type: :request do
   describe 'GET #index' do
     context '正常系' do
       context '案件参加事務所ユーザーでログイン' do
+        it 'リクエストが成功すること' do
+          login_user(matter_join_office_user, 'Test-1234', api_v1_login_path)
+          get api_v1_matter_matter_joins_path(matter)
+          expect(response).to have_http_status 200
+        end
       end
       context '案件参加ユーザーでログイン' do
+        it 'リクエストが成功すること' do
+          login_user(matter_join_user, 'Test-1234', api_v1_login_path)
+          get api_v1_matter_matter_joins_path(matter)
+          expect(response).to have_http_status 200
+        end
       end
       context 'クラアント参加事務所ユーザーでログイン' do
+        it 'リクエストが成功すること' do
+          login_user(client_join_office_user, 'Test-1234', api_v1_login_path)
+          get api_v1_matter_matter_joins_path(matter)
+          expect(response).to have_http_status 200
+        end
       end
       context 'クライアントユーザーでログイン' do
+        it 'リクエストが成功すること' do
+          login_user(matter_join_user, 'Test-1234', api_v1_login_path)
+          get api_v1_matter_matter_joins_path(matter)
+          expect(response).to have_http_status 200
+        end
       end
     end
     context '準正常系' do
       context '未ログイン' do
+        it '401エラーが返ってくること' do
+          get api_v1_matter_matter_joins_path(matter)
+          expect(response).to have_http_status 401
+          expect(JSON.parse(response.body)['message']).to eq "Unauthorized"
+        end
       end
       context '不参加ユーザーでログイン' do
+        it '403エラーが返ってくること' do
+          login_user(injoin_user, 'Test-1234', api_v1_login_path)
+          get api_v1_matter_matter_joins_path(matter)
+          expect(response).to have_http_status 403
+          expect(JSON.parse(response.body)['message']).to eq "Forbidden"
+        end
       end
-      context '不参加事務所管理者でログイン' do
+      context '不参加事務所ユーザーでログイン' do
+        it '403エラーが返ってくること' do
+          login_user(injoin_office_user, 'Test-1234', api_v1_login_path)
+          get api_v1_matter_matter_joins_path(matter)
+          expect(response).to have_http_status 403
+          expect(JSON.parse(response.body)['message']).to eq "Forbidden"
+        end
       end
     end
   end
@@ -70,32 +107,154 @@ RSpec.describe 'matter_joins_requests', type: :request do
   describe 'POST #create_token' do
     context '正常系' do
       context '案件管理事務所管理者でログイン' do
+        it 'リクエストが成功すること' do
+          login_user(matter_admin_office_admin, 'Test-1234', api_v1_login_path)
+          post create_token_api_v1_matter_matter_joins_path(matter), params: { admin: false }
+          expect(response).to have_http_status 200
+        end
+        it '登録されること' do
+          login_user(matter_admin_office_admin, 'Test-1234', api_v1_login_path)
+          expect do
+            post create_token_api_v1_matter_matter_joins_path(matter), params: { admin: false }
+          end.to change(InviteUrl, :count).by(1)
+        end    
       end
       context '案件管理個人ユーザーでログイン' do
+        it 'リクエストが成功すること' do
+          login_user(matter_admin_user, 'Test-1234', api_v1_login_path)
+          post create_token_api_v1_matter_matter_joins_path(matter), params: { admin: false }
+          expect(response).to have_http_status 200
+        end
+        it '登録されること' do
+          login_user(matter_admin_user, 'Test-1234', api_v1_login_path)
+          expect do
+            post create_token_api_v1_matter_matter_joins_path(matter), params: { admin: false }
+          end.to change(InviteUrl, :count).by(1)
+        end  
       end
-      context 'クライアント管理事務所ユーザーでログイン' do
+      context 'クライアント管理事務所管理者でログイン' do
+        it 'リクエストが成功すること' do
+          login_user(client_admin_office_admin, 'Test-1234', api_v1_login_path)
+          post create_token_api_v1_matter_matter_joins_path(matter), params: { admin: false }
+          expect(response).to have_http_status 200
+        end
+        it '登録されること' do
+          login_user(client_admin_office_admin, 'Test-1234', api_v1_login_path)
+          expect do
+            post create_token_api_v1_matter_matter_joins_path(matter), params: { admin: false }
+          end.to change(InviteUrl, :count).by(1)
+        end  
       end
       context 'クライアント管理個人ユーザーでログイン' do
+        it 'リクエストが成功すること' do
+          login_user(client_admin_user, 'Test-1234', api_v1_login_path)
+          post create_token_api_v1_matter_matter_joins_path(matter), params: { admin: false }
+          expect(response).to have_http_status 200
+        end
+        it '登録されること' do
+          login_user(client_admin_user, 'Test-1234', api_v1_login_path)
+          expect do
+            post create_token_api_v1_matter_matter_joins_path(matter), params: { admin: false }
+          end.to change(InviteUrl, :count).by(1)
+        end 
       end
     end
     context '準正常系' do
       context '未ログイン' do
+        it '401エラーが返ってくること' do
+          post create_token_api_v1_matter_matter_joins_path(matter), params: { admin: false }
+          expect(response).to have_http_status 401
+          expect(JSON.parse(response.body)['message']).to eq "Unauthorized"
+        end
+        it '登録されないこと' do
+          expect do
+            post create_token_api_v1_matter_matter_joins_path(matter), params: { admin: false }
+          end.to_not change(InviteUrl, :count)
+        end 
       end
       context '不参加ユーザーでログイン' do
+        it '403エラーが返ってくること' do
+          login_user(injoin_user, 'Test-1234', api_v1_login_path)
+          post create_token_api_v1_matter_matter_joins_path(matter), params: { admin: false }
+          expect(response).to have_http_status 403
+          expect(JSON.parse(response.body)['message']).to eq "Forbidden"
+        end
+        it '登録されないこと' do
+          login_user(injoin_user, 'Test-1234', api_v1_login_path)
+          expect do
+            post create_token_api_v1_matter_matter_joins_path(matter), params: { admin: false }
+          end.to_not change(InviteUrl, :count)
+        end 
       end
       context '不参加事務所管理者でログイン' do
+        it '403エラーが返ってくること' do
+          login_user(injoin_office_user, 'Test-1234', api_v1_login_path)
+          post create_token_api_v1_matter_matter_joins_path(matter), params: { admin: false }
+          expect(response).to have_http_status 403
+          expect(JSON.parse(response.body)['message']).to eq "Forbidden"
+        end
+        it '登録されないこと' do
+          login_user(injoin_office_user, 'Test-1234', api_v1_login_path)
+          expect do
+            post create_token_api_v1_matter_matter_joins_path(matter), params: { admin: false }
+          end.to_not change(InviteUrl, :count)
+        end 
       end
       context '案件参加事務所ユーザーでログイン' do
+        it '403エラーが返ってくること' do
+          login_user(matter_join_office_user, 'Test-1234', api_v1_login_path)
+          post create_token_api_v1_matter_matter_joins_path(matter), params: { admin: false }
+          expect(response).to have_http_status 403
+          expect(JSON.parse(response.body)['message']).to eq "Forbidden"
+        end
+        it '登録されないこと' do
+          login_user(matter_join_office_user, 'Test-1234', api_v1_login_path)
+          expect do
+            post create_token_api_v1_matter_matter_joins_path(matter), params: { admin: false }
+          end.to_not change(InviteUrl, :count)
+        end 
       end
       context '案件参加ユーザーでログイン' do
+        it '403エラーが返ってくること' do
+          login_user(matter_join_user, 'Test-1234', api_v1_login_path)
+          post create_token_api_v1_matter_matter_joins_path(matter), params: { admin: false }
+          expect(response).to have_http_status 403
+          expect(JSON.parse(response.body)['message']).to eq "Forbidden"
+        end
+        it '登録されないこと' do
+          login_user(matter_join_user, 'Test-1234', api_v1_login_path)
+          expect do
+            post create_token_api_v1_matter_matter_joins_path(matter), params: { admin: false }
+          end.to_not change(InviteUrl, :count)
+        end 
       end
       context 'クライアント参加事務所ユーザーでログイン' do
+        it '403エラーが返ってくること' do
+          login_user(client_join_office_user, 'Test-1234', api_v1_login_path)
+          post create_token_api_v1_matter_matter_joins_path(matter), params: { admin: false }
+          expect(response).to have_http_status 403
+          expect(JSON.parse(response.body)['message']).to eq "Forbidden"
+        end
+        it '登録されないこと' do
+          login_user(client_join_office_user, 'Test-1234', api_v1_login_path)
+          expect do
+            post create_token_api_v1_matter_matter_joins_path(matter), params: { admin: false }
+          end.to_not change(InviteUrl, :count)
+        end 
       end
       context 'クライアント参加ユーザーでログイン' do
-      end
-      context '案件管理事務所管理者でログイン' do
-        context 'パラメータが不正' do
+        it '403エラーが返ってくること' do
+          login_user(client_join_user, 'Test-1234', api_v1_login_path)
+          post create_token_api_v1_matter_matter_joins_path(matter), params: { admin: false }
+          expect(response).to have_http_status 403
+          expect(JSON.parse(response.body)['message']).to eq "Forbidden"
         end
+        it '登録されないこと' do
+          login_user(client_join_user, 'Test-1234', api_v1_login_path)
+          expect do
+            post create_token_api_v1_matter_matter_joins_path(matter), params: { admin: false }
+          end.to_not change(InviteUrl, :count)
+        end 
       end
     end
   end

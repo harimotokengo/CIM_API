@@ -154,8 +154,8 @@ class Matter < ApplicationRecord
   # matter_joinしてるofficeとuserの一覧表示用データ取得
   def index_matter_join_data
     data = []
-    matter_joins = self.matter_joins.eager_load(matter_joins: :office)
-                      .eager_load(matter_joins: :user)
+    matter_joins = self.matter_joins.eager_load(:office)
+                      .eager_load(:user)
     matter_joins.each do |matter_join|
       if matter_join.belong_side_id == '組織'
         data << matter_join.office

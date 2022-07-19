@@ -15,7 +15,7 @@ module Api
       def create_token
         @matter = Matter.active.find(params[:matter_id])
         return response_forbidden unless correct_user
-        @invite_url = @matter.invite_urls.create(
+        @invite_url = @matter.invite_urls.new(
           admin: params[:admin],
           user_id: current_user.id,
           token: SecureRandom.urlsafe_base64(16),
@@ -85,7 +85,7 @@ module Api
         elsif  action_name == 'create'
           return true if @matter.joinable_check(current_user, @matter_join)
         else
-          if @client.admin_check(current_user) || @matter.admin_check(current_user)
+          if @matter.client.admin_check(current_user) || @matter.admin_check(current_user)
             return true if current_user.admin_check
           end
         end
