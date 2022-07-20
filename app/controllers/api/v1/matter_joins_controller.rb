@@ -47,7 +47,7 @@ module Api
           admin: @invite_url.admin)
         return response_forbidden unless correct_user
         return response_bad_request unless @invite_url.deadline_check && @invite_url.accessed_check
-        @matter_join.set_parent(current_user)
+        @matter_join.set_joiner(current_user)
         @invite_url.update(join: true)
         
         if @matter_join.save

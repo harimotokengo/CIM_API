@@ -119,6 +119,31 @@ class Client < ApplicationRecord
     client_joins.where(office_id: current_user.belonging_office).exists?  if current_user.belonging_office
   end
 
+  def minimum_required_administrator_check(client_join)
+    if client_joins.where(admin: true).count == 1 && client_join.admin?
+      errors.add(:base, '管理者は最低1人以上必要です。')
+      return false
+    else
+      return true
+    end
+  end
+
+  # matter_joinしてるofficeとuserの一覧表示用データ取得
+  def index_client_join_data
+    data = []
+    client_joins = self.client_joins.eager_load(:office)
+                      .eager_load(:user)
+    client_joins.each do |client_join|
+      if client_join.belong_side_id == '組織'
+        data << client_join.office
+      else
+        data << client_join.user
+      end
+      data << client_join.admin
+    end
+    return data
+  end
+
   private
 
   ransacker :client_full_name do

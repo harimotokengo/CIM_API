@@ -47,7 +47,7 @@ module Api
           admin: @invite_url.admin)
         return response_forbidden unless correct_user
         return response_bad_request unless @invite_url.deadline_check && @invite_url.accessed_check
-        @client_join.set_parent(current_user)
+        @client_join.set_joiner(current_user)
         @invite_url.update(join: true)
         
         if @client_join.save
@@ -91,7 +91,7 @@ module Api
         elsif  action_name == 'create'
           return true if @client_join.joining_check(current_user)
         else
-          return true if  @client.admin_check(current_user) && current_user.admin_check
+          return true if @client.admin_check(current_user) && current_user.admin_check
         end
       end
     end

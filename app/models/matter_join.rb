@@ -25,7 +25,7 @@ class MatterJoin < ApplicationRecord
   end
 
   # 組織と個人でmatter_joinの親を分岐してセット
-  def set_parent(current_user)
+  def set_joiner(current_user)
     if  self.belong_side_id == '組織'
       self.office_id = current_user.belonging_office.id
     else
