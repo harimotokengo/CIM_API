@@ -9,7 +9,6 @@ class CreateMatters < ActiveRecord::Migration[7.0]
       t.date :finish_date
       t.integer :matter_status_id, null: false
       t.boolean :archive, default: true, null: false
-      t.string :status_memo
       t.timestamps
     end
   end

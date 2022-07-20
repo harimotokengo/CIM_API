@@ -4,7 +4,8 @@ class Client < ApplicationRecord
   has_many :contact_emails, dependent: :destroy
   has_many :contact_phone_numbers, dependent: :destroy
   has_many :client_joins, dependent: :destroy
-  has_many :join_users, through: :client_joins #activeがtrueのscope経由にあとで直す
+  
+  scope :active_client, -> { where(archive: true) }
 
   accepts_nested_attributes_for :client_joins, reject_if: :all_blank, allow_destroy: true
   accepts_nested_attributes_for :matters, reject_if: :all_blank, allow_destroy: true
@@ -31,10 +32,7 @@ class Client < ApplicationRecord
     super(value)
   end
 
-  def name_kana=(value)
-    value.tr!('０-９ａ-ｚＡ-Ｚ', '0-9a-zA-Z') if value.is_a?(String)
-    super(value)
-  end
+
 
   def first_name=(value)
     value.tr!('０-９ａ-ｚＡ-Ｚ', '0-9a-zA-Z') if value.is_a?(String)
@@ -72,22 +70,6 @@ class Client < ApplicationRecord
     end
   end
 
-  def full_name
-    if client_type_id == 1
-      name
-    else
-      name + first_name
-    end
-  end
-
-  def full_name_kana
-    if client_type_id == 1
-      name_kana
-    else
-      name_kana + first_name_kana
-    end
-  end
-
   # 更新を許可するカラムを定義
   def self.updatable_client_attributes
     %w[name first_name name_kana first_name_kana profile indentification_number
@@ -95,10 +77,8 @@ class Client < ApplicationRecord
   end
 
   def join_check(current_user)
-    return true if client_join_check(current_user) || matter_join_check(current_user)
+    return true if personal_join_check(current_user) || office_join_check(current_user)
   end
-
-  
 
   def admin_check(current_user)
     user_admin_check = client_joins.where(admin: true, user_id: current_user).exists?
@@ -109,13 +89,6 @@ class Client < ApplicationRecord
 
   def destroy_update
     update(
-      name: '削除済',
-      first_name: '削除済',
-      name_kana: 'さくじょずみ',
-      first_name_kana: 'さくじょずみ',
-      maiden_name: '削除済',
-      maiden_name_kana: 'さくじょずみ',
-      birth_date: nil,
       archive: false
     )
     matters.each do ||matter|
@@ -123,20 +96,36 @@ class Client < ApplicationRecord
     end
   end
 
-  private
-
-  def client_join_check(current_user)
-    user_join_check = client_joins.where(user_id: current_user).exists?
-    office_join_check = client_joins.where(
-      office_id: current_user.belonging_office).exists? if current_user.belonging_office
-    return true if user_join_check || office_join_check
+  def index_data(clients)
+    data = []
+    clients.each do |client|
+      data << client
+      matter_data = []
+      client.matters.each do |matter|
+        matter_data << matter.categories.first.parent
+        matter_data << matter.categories.first
+        matter_data << matter.tags
+      end
+      data << matter_data
+    end
+    return data
   end
 
-  def matter_join_check(current_user)
-    user_join_check = matters.joins(:matter_joins).where(
-      matter_joins: {user_id: current_user}).exists?
-    office_join_check = matters.joins(:matter_joins).where(
-      matter_joins: {office_id: current_user.belonging_office}).exists? if current_user.belonging_office
-    return true if user_join_check || office_join_check
+  def personal_join_check(current_user)
+    client_joins.where(user_id: current_user).exists?
+  end
+
+  def office_join_check(current_user)
+    client_joins.where(office_id: current_user.belonging_office).exists?  if current_user.belonging_office
+  end
+
+  private
+
+  ransacker :client_full_name do
+    Arel.sql("CONCAT(clients.name, clients.first_name)")
+  end
+
+  ransacker :client_full_name_kana do
+    Arel.sql("CONCAT(clients.name_kana, clients.first_name_kana)")
   end
 end

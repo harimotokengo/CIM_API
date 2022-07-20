@@ -6,13 +6,13 @@ module Api
       # before_action :response_forbidden, only: %i[show update destroy], unless: :correct_user
 
       def index
-        # 検索メソッドに処理をまとめる
-        user_client_matters = current_user.join_clients.joins(:matters).where(client_joins: {user_id: current_user}).to_a
-        office_client_matters = current_user.join_clients.joins(:matters).where(client_joins: {office_id: current_user.belonging_office}).to_a.compact
-        matters = (user_client_matters+office_client_matters).uniq
-        render json: { status: 200, data: clients}
+        clients = search_client
+        client_data = Client.new()
+        data = client_data.index_data(clients)
+        render json: { status: 200, data: data.uniq }
       end
 
+      
       def show
         @client = Client.find(params[:id])
         return response_forbidden unless correct_user
@@ -20,25 +20,21 @@ module Api
       end
 
       def matters
-        @client = Client.find(params[:id])
+        @client = Client.active.find(params[:id])
         # pageとかsortとかは必要であれば追加
-        matters = @client.active_matters
-        # matter_list = matters.each |matter| do
-        #                 matter.full_name
-        #                 matter.matter_category.name
-        #                 matter.assign_users
-        #                 matter.matter_status_id
-        #               end
+        matters = @client.matters
         render json: { status: 200, data: matters}
       end
 
-      def get_matter_category
+      def get_category_parents
         matter_category_parents = MatterCategory.where(ancestry: nil)
-        matter_category_children = MatterCategory.find(params[:category_parent_id]).children
-        render json: {matter_categories: category_parents,
-          matter_category_children: matter_category_children}
+        render json: {data: category_parents}
       end
 
+      def get_category_children
+        matter_category_children = MatterCategory.find(params[:category_parent_id]).children
+        render json: { data: matter_category_children}
+      end
       # client登録
       #   client_joinとか
       #   matter
@@ -119,6 +115,11 @@ module Api
         render json: {status: 200, message: '削除しました'}
       end
 
+      def get_join_users
+        join_users = current_user.belonging_office.belonging_users
+        render json: {status: 200, data: join_users}
+      end
+
       private
 
       def client_params
@@ -159,6 +160,9 @@ module Api
               id belong_side_id admin office_id
               user_id _destroy
             ],
+            matter_assigns_attributes: %i[
+
+            ],
             # folder_urls_attributes: %i[
             #   id name url _destroy
             # ],
@@ -196,6 +200,31 @@ module Api
         else
           return true if @client.admin_check(current_user) && current_user.admin_check
         end
+      end
+
+      def search_client
+        if params[:q].present?
+          @clients_key_words = params[:q][:matters_description_or_matters_matter_category_joins_matter_category_name_or_matters_tags_tag_name_or_client_full_name_or_client_full_name_kana_or_maiden_name_or_maiden_name_kana_or_profile_or_indentification_number_or_matters_opponents_opponent_full_name_or_matters_opponents_opponent_full_name_kana_or_matters_opponents_maiden_name_or_matters_opponents_maiden_name_kana_or_matters_opponents_profile_or_contact_phone_numbers_phone_number_or_contact_emails_email_or_matters_opponents_contact_phone_numbers_phone_number_or_matters_opponents_contact_emails_email_cont_any]
+          # スペースが入力された場合分割
+          key_words = @clients_key_words.split(/[[:blank:]]+/)
+          # 分割したものをhash化
+          grouping_hash = key_words.reduce({}) do |hash, word|
+            hash.merge(word => { matters_description_or_matters_matter_category_joins_matter_category_name_or_matters_tags_tag_name_or_client_full_name_or_client_full_name_kana_or_maiden_name_or_maiden_name_kana_or_profile_or_indentification_number_or_matters_opponents_opponent_full_name_or_matters_opponents_opponent_full_name_kana_or_matters_opponents_maiden_name_or_matters_opponents_maiden_name_kana_or_matters_opponents_profile_or_contact_phone_numbers_phone_number_or_contact_emails_email_or_matters_opponents_contact_phone_numbers_phone_number_or_matters_opponents_contact_emails_email_cont_any: word })
+          end
+        end
+
+        client_search = Client.joins(matters: :matter_joins)
+                              .joins(:client_joins)
+                              .where(['clients.archive = ?', true])
+                              .where(['matters.archive = ?', true])
+                              .where(['client_joins.user_id = ? or matter_joins.office_id = ? or client_joins.office_id = ? or matter_joins.user_id = ?', current_user.belonging_office, current_user, current_user.belonging_office, current_user])
+                              .eager_load(matters: :tags) #dataに案件タグを入れる際にN+1が起きるのでキャッシュする
+                              .eager_load(matters: :categories) #dataに案件カテゴリーを入れる際にN+1が起きるのでキャッシュする
+                              
+        clients = client_search.ransack({combinator: 'and', groupings: grouping_hash})
+                              .result(distinct: true)
+                              .paginate(page: params[:page], per_page: 25)
+                              .order(created_at: :desc)
       end
     end
   end

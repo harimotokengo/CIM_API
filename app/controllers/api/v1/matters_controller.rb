@@ -4,8 +4,6 @@ module Api
       before_action :response_unauthorized, unless: :logged_in?
 
       def index
-        # とりあえずリクエストテスト用
-        # apiモードでの検索機能は別ブランチ
         user_client_matters = current_user.join_clients.joins(:matters).where(client_joins: {user_id: current_user}).to_a
         office_client_matters = current_user.join_clients.joins(:matters).where(client_joins: {office_id: current_user.belonging_office}).to_a.compact
         user_matters = current_user.join_matters.to_a
@@ -39,14 +37,14 @@ module Api
       end
 
       def show
-        @matter = Matter.active_matters.find(params[:id])
+        @matter = Matter.active.find(params[:id])
         @client = @matter.client
         return response_forbidden unless correct_user
         render json: { status: 200, data: @matter}
       end
 
       def update
-        @matter = Matter.active_matters.find(params[:id])
+        @matter = Matter.active.find(params[:id])
         @client = @matter.client
         return response_forbidden unless correct_user
         tag_list = params[:matter][:tag_name].split(',') unless params[:matter][:tag_name].nil?
@@ -74,11 +72,28 @@ module Api
       # 関係者の個人情報を空白にしてmatter.archiveをfalseにする
       # レコードは全部残す
       def destroy
-        @matter = Matter.active_matters.find(params[:id])
+        @matter = Matter.active.find(params[:id])
         @client = @matter.client
         return response_forbidden unless correct_user
         @matter.destroy_update
         render json: {status: 200, message: '削除しました'}
+      end
+
+      def get_join_users
+        if params[:client_id].blank? && params[:id]
+          @matter = Matter.active.find(params[:id])
+          @client = @matter.client.active
+        else
+          @client = Client.active.find(params[:client_id])
+          @matter = nil
+        end
+        join_users = []
+        join_users << User.joins(:matter_joins).joins(:client_joins)
+                          .where('matter_joins.matter_id = ? or client_joins.client_id = ?', @matter, @client).distinct
+
+        join_users << User.joins(belonging_office: :matter_joins).joins(belonging_office: :client_joins)
+                            .where('matter_joins.matter_id = ? or client_joins.client_id = ?', @matter, @client).distinct
+        render json: {status: 200, data: join_users.uniq}
       end
 
       private
@@ -118,19 +133,18 @@ module Api
           matter_category_joins_attributes: %i[
             id matter_id matter_category_id
             _destroy
+          ],
+          matter_assigns_attributes: %i[
+            id user_id _destroy
           ]
         )
-      end
-
-      def matter_search_params
-
       end
 
       def correct_user
         if action_name == 'create'
           return true if @client.join_check(current_user)
         elsif action_name == 'show'
-          return true if @matter.join_check(current_user)
+          return true if @matter.join_check(current_user) || @client.join_check(current_user)
         else
           if @client.admin_check(current_user) || @matter.admin_check(current_user)
             return true if current_user.admin_check
