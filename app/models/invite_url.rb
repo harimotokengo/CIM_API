@@ -66,10 +66,10 @@ class InviteUrl < ApplicationRecord
   end
 
   def set_token_url
-    if Rails.env.development?
-      return "http://localhost:3000/invite_urls/#{@invite_url.id}?tk=" + @invite_url.token
+    if Rails.env.development? || Rails.env.test?
+      return "http://localhost:3000/invite_urls/#{self.id}?tk=#{self.token}"
     else
-      return "https://www.mrcim.com/invite_urls/#{@invite_url.id}?tk=" + @invite_url.token
+      return "https://www.mrcim.com/invite_urls/#{self.id}?tk=#{self.token}"
     end
   end
 

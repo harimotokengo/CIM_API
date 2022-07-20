@@ -13,6 +13,7 @@ class User < ApplicationRecord
   has_many :client_joins, dependent: :destroy
   has_many :join_matters, through: :matter_joins, source: :matter
   has_many :join_clients, through: :client_joins, source: :client
+  has_many :invite_urls, dependent: :destroy
 
   has_one_attached :avatar
 
@@ -92,10 +93,9 @@ class User < ApplicationRecord
   end
 
   def belonging_check
-    if current_belonging
+    if self.current_belonging
       return true
     else
-      add.errors(base: '組織に所属していません')
       return false
     end
   end

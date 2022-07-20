@@ -126,23 +126,7 @@ class Matter < ApplicationRecord
     end
   end
 
-  def joinable_check(current_user, matter_join)
-    if !join_check(current_user) && !client.joincheck(current_user)
-      return true
-    elsif matter_join.belong_side_id = '組織'
-      if !office_join_check(current_user) || matter_join.deadline_check || matter_join.accessed_check
-        return true
-      else
-        return false
-      end
-    else
-      if !personal_join_check(current_user) || matter_join.deadline_check || matter_join.accessed_check
-        return true
-      else
-        return false
-      end
-    end
-  end
+  
 
   def minimum_required_administrator_check(matter_join)
     if matter_joins.where(admin: true).count == 1 && matter_join.admin?
@@ -167,8 +151,6 @@ class Matter < ApplicationRecord
     return data
   end
 
-  private
-
   def personal_join_check(current_user)
     matter_joins.where(user_id: current_user.id).exists?
   end
@@ -177,6 +159,8 @@ class Matter < ApplicationRecord
     matter_joins.where(
       office_id: current_user.belonging_office.id).exists? if current_user.belonging_office
   end
+
+  private
 
   def assigning_check(assign_user)
     MatterAssign.where(matter_id: id, user_id: assign_user).exists?

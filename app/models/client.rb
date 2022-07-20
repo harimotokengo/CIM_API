@@ -111,17 +111,15 @@ class Client < ApplicationRecord
     return data
   end
 
-  private
-
-  # これを正とする
   def personal_join_check(current_user)
     client_joins.where(user_id: current_user).exists?
   end
 
-  # これを正とする
   def office_join_check(current_user)
     client_joins.where(office_id: current_user.belonging_office).exists?  if current_user.belonging_office
   end
+
+  private
 
   ransacker :client_full_name do
     Arel.sql("CONCAT(clients.name, clients.first_name)")

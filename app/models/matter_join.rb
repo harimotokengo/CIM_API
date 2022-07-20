@@ -25,12 +25,32 @@ class MatterJoin < ApplicationRecord
   end
 
   # 組織と個人でmatter_joinの親を分岐してセット
-  def set_parent
-    if  @matter_join.belon_side_id == '組織'
-      current_user.belonging_check
-      @matter_join.office_id = current_user.belonging_office.id
+  def set_parent(current_user)
+    if  self.belong_side_id == '組織'
+      self.office_id = current_user.belonging_office.id
     else
-      @matter_join.user_id = current_user.id
+      self.user_id = current_user.id
+    end
+  end
+
+  def joining_check(current_user)
+    if self.belong_side_id == '組織'
+      if !current_user.belonging_check
+        errors.add(:base, '無所属ユーザーは組織で参加できません')
+        return false
+      elsif !self.matter.office_join_check(current_user) && !self.matter.client.office_join_check(current_user)
+        return true
+      else
+        errors.add(:base, '参加済みです')
+        return false
+      end
+    else
+      if !self.matter.personal_join_check(current_user) && !self.matter.client.personal_join_check(current_user)
+        return true
+      else
+        errors.add(:base, '参加済みです')
+        return false
+      end
     end
   end
 end
