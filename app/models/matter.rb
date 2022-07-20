@@ -125,13 +125,14 @@ class Matter < ApplicationRecord
       return true if assigning_check(user)
     end
   end
-
   
 
   def minimum_required_administrator_check(matter_join)
-    if matter_joins.where(admin: true).count == 1 && matter_join.admin?
+    if matter_joins.where(admin: true).count == 1 && matter_join.admin? && client.client_joins.where(admin: true).blank?
       errors.add(:base, '管理者は最低1人以上必要です。')
       return false
+    else
+      return true
     end
   end
 

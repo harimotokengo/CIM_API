@@ -62,8 +62,8 @@ module Api
         @matter = Matter.active.find(params[:matter_id])
         @matter_join = MatterJoin.find(params[:id])
         return response_forbidden unless correct_user
-        if params[:matter_join][:admin] == false
-          return response_bad_request if minimum_required_administrator_check(@matter_join)
+        if params[:matter_join][:admin] == 'false'
+          return response_bad_request unless @matter.minimum_required_administrator_check(@matter_join)
         end
         
         if @matter_join.update(admin: params[:matter_join][:admin])
@@ -78,7 +78,7 @@ module Api
         @matter = Matter.active.find(params[:matter_id])
         @matter_join = MatterJoin.find(params[:id])
         return response_forbidden unless correct_user
-        return response_bad_request if minimum_required_administrator_check(@matter_join)
+        return response_bad_request unless @matter.minimum_required_administrator_check(@matter_join)
         @matter_join.destroy
         render json: { status: 200, message: "削除しました"}
       end

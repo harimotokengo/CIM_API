@@ -681,76 +681,303 @@ RSpec.describe 'matter_joins_requests', type: :request do
   describe 'PUT #update' do
     context '正常系' do
       context '案件管理事務所管理者でログイン' do
-        context '案件参加ユーザーを更新' do
+        context '案件個人参加を更新' do
+          it 'リクエストが成功すること' do
+            matter_join_params = attributes_for(:matter_join, belong_side_id: '個人', admin: true)
+            login_user(matter_admin_office_admin, 'Test-1234', api_v1_login_path)
+            put api_v1_matter_matter_join_path(matter, user_matter_join.id), params: { matter_join: matter_join_params }
+            expect(response).to have_http_status 200
+          end
+          it '更新されること' do
+            matter_join_params = attributes_for(:matter_join, belong_side_id: '個人', admin: true)
+            login_user(matter_admin_office_admin, 'Test-1234', api_v1_login_path)
+            expect do
+              put api_v1_matter_matter_join_path(matter, user_matter_join.id), params: { matter_join: matter_join_params }
+            end.to change { MatterJoin.find(user_matter_join.id).admin }.from(false).to(true)
+          end
         end
-        context '案件管理ユーザーを更新' do
+        context '案件管理ユーザー参加を更新' do
+          it 'リクエストが成功すること' do
+            matter_join_params = attributes_for(:matter_join, belong_side_id: '個人', admin: false)
+            login_user(matter_admin_office_admin, 'Test-1234', api_v1_login_path)
+            put api_v1_matter_matter_join_path(matter, admin_user_matter_join.id), params: { matter_join: matter_join_params }
+            expect(response).to have_http_status 200
+          end
+          it '更新されること' do
+            matter_join_params = attributes_for(:matter_join, belong_side_id: '個人', admin: false)
+            login_user(matter_admin_office_admin, 'Test-1234', api_v1_login_path)
+            expect do
+              put api_v1_matter_matter_join_path(matter, admin_user_matter_join.id), params: { matter_join: matter_join_params }
+            end.to change { MatterJoin.find(admin_user_matter_join.id).admin }.from(true).to(false)
+          end
         end
-        context '案件参加事務所ユーザーを更新' do
+        context '案件事務所参加を更新' do
+          it 'リクエストが成功すること' do
+            matter_join_params = attributes_for(:matter_join, belong_side_id: '組織', admin: true)
+            login_user(matter_admin_office_admin, 'Test-1234', api_v1_login_path)
+            put api_v1_matter_matter_join_path(matter,office_matter_join.id), params: { matter_join: matter_join_params }
+            expect(response).to have_http_status 200
+          end
+          it '更新されること' do
+            matter_join_params = attributes_for(:matter_join, belong_side_id: '組織', admin: true)
+            login_user(matter_admin_office_admin, 'Test-1234', api_v1_login_path)
+            expect do
+              put api_v1_matter_matter_join_path(matter, office_matter_join.id), params: { matter_join: matter_join_params }
+            end.to change { MatterJoin.find(office_matter_join.id).admin }.from(false).to(true)
+          end
         end
-        context '案件管理事務所ユーザーを更新' do
-        end
-        context 'クライアント参加ユーザーを更新' do
-        end
-        context 'クライアント管理ユーザーを更新' do
-        end
-        context 'クライアント参加事務所ユーザーを更新' do
-        end
-        context 'クライアント管理事務所管理者を更新' do
+        context '案件管理事務所を更新' do
+          it 'リクエストが成功すること' do
+            matter_join_params = attributes_for(:matter_join, belong_side_id: '組織', admin: false)
+            login_user(matter_admin_office_admin, 'Test-1234', api_v1_login_path)
+            put api_v1_matter_matter_join_path(matter,admin_office_matter_join.id), params: { matter_join: matter_join_params }
+            expect(response).to have_http_status 200
+          end
+          it '更新されること' do
+            matter_join_params = attributes_for(:matter_join, belong_side_id: '組織', admin: false)
+            login_user(matter_admin_office_admin, 'Test-1234', api_v1_login_path)
+            expect do
+              put api_v1_matter_matter_join_path(matter, admin_office_matter_join.id), params: { matter_join: matter_join_params }
+            end.to change { MatterJoin.find(admin_office_matter_join.id).admin }.from(true).to(false)
+          end
         end
       end
-      context '案件管理個人ユーザーでログイン' do
-        context '案件参加ユーザーを更新' do
+      context '案件管理ユーザーでログイン' do
+        context '案件ユーザー参加を更新' do
+          it 'リクエストが成功すること' do
+            matter_join_params = attributes_for(:matter_join, belong_side_id: '個人', admin: true)
+            login_user(matter_admin_user, 'Test-1234', api_v1_login_path)
+            put api_v1_matter_matter_join_path(matter, user_matter_join.id), params: { matter_join: matter_join_params }
+            expect(response).to have_http_status 200
+          end
+          it '更新されること' do
+            matter_join_params = attributes_for(:matter_join, belong_side_id: '個人', admin: true)
+            login_user(matter_admin_user, 'Test-1234', api_v1_login_path)
+            expect do
+              put api_v1_matter_matter_join_path(matter, user_matter_join.id), params: { matter_join: matter_join_params }
+            end.to change { MatterJoin.find(user_matter_join.id).admin }.from(false).to(true)
+          end
         end
       end
-      context 'クライアント管理事務所ユーザーでログイン' do
-        context '案件参加ユーザーを更新' do
+      context 'クライアント管理事務所管理者でログイン' do
+        context '案件ユーザー参加を更新' do
+          it 'リクエストが成功すること' do
+            matter_join_params = attributes_for(:matter_join, belong_side_id: '個人', admin: true)
+            login_user(client_admin_office_admin, 'Test-1234', api_v1_login_path)
+            put api_v1_matter_matter_join_path(matter, user_matter_join.id), params: { matter_join: matter_join_params }
+            expect(response).to have_http_status 200
+          end
+          it '更新されること' do
+            matter_join_params = attributes_for(:matter_join, belong_side_id: '個人', admin: true)
+            login_user(client_admin_office_admin, 'Test-1234', api_v1_login_path)
+            expect do
+              put api_v1_matter_matter_join_path(matter, user_matter_join.id), params: { matter_join: matter_join_params }
+            end.to change { MatterJoin.find(user_matter_join.id).admin }.from(false).to(true)
+          end
         end
       end
       context 'クライアント管理個人ユーザーでログイン' do
-        context '案件参加ユーザーを更新' do
+        context '案件ユーザー参加を更新' do
+          it 'リクエストが成功すること' do
+            matter_join_params = attributes_for(:matter_join, belong_side_id: '個人', admin: true)
+            login_user(client_admin_user, 'Test-1234', api_v1_login_path)
+            put api_v1_matter_matter_join_path(matter, user_matter_join.id), params: { matter_join: matter_join_params }
+            expect(response).to have_http_status 200
+          end
+          it '更新されること' do
+            matter_join_params = attributes_for(:matter_join, belong_side_id: '個人', admin: true)
+            login_user(client_admin_user, 'Test-1234', api_v1_login_path)
+            expect do
+              put api_v1_matter_matter_join_path(matter, user_matter_join.id), params: { matter_join: matter_join_params }
+            end.to change { MatterJoin.find(user_matter_join.id).admin }.from(false).to(true)
+          end
         end
       end
     end
     context '準正常系' do
       context '未ログイン' do
-        context '案件参加ユーザーを更新' do
+        context '案件ユーザー参加を更新' do
+          it '401エラーが返ってくること' do
+            matter_join_params = attributes_for(:matter_join, belong_side_id: '個人', admin: true)
+            put api_v1_matter_matter_join_path(matter, user_matter_join.id), params: { matter_join: matter_join_params }
+            expect(response).to have_http_status 401
+          end
+          it '更新されないこと' do
+            matter_join_params = attributes_for(:matter_join, belong_side_id: '個人', admin: true)
+            expect do
+              put api_v1_matter_matter_join_path(matter, user_matter_join.id), params: { matter_join: matter_join_params }
+            end.to_not change { MatterJoin.find(user_matter_join.id).admin }
+          end
         end
       end
       context '案件参加事務所ユーザーでログイン' do
-        context '案件参加ユーザーを更新' do
+        context '案件ユーザー参加を更新' do
+          it '403エラーが返ってくること' do
+            matter_join_params = attributes_for(:matter_join, belong_side_id: '個人', admin: true)
+            login_user(matter_join_office_user, 'Test-1234', api_v1_login_path)
+            put api_v1_matter_matter_join_path(matter, user_matter_join.id), params: { matter_join: matter_join_params }
+            expect(response).to have_http_status 403
+          end
+          it '更新されないこと' do
+            matter_join_params = attributes_for(:matter_join, belong_side_id: '個人', admin: true)
+            login_user(matter_join_office_user, 'Test-1234', api_v1_login_path)
+            expect do
+              put api_v1_matter_matter_join_path(matter, user_matter_join.id), params: { matter_join: matter_join_params }
+            end.to_not change { MatterJoin.find(user_matter_join.id).admin }
+          end
         end
       end
       context '案件管理事務所ユーザーでログイン' do
-        context '案件参加ユーザーを更新' do
+        context '案件ユーザー参加を更新' do
+          it '403エラーが返ってくること' do
+            matter_join_params = attributes_for(:matter_join, belong_side_id: '個人', admin: true)
+            login_user(matter_admin_office_user, 'Test-1234', api_v1_login_path)
+            put api_v1_matter_matter_join_path(matter, user_matter_join.id), params: { matter_join: matter_join_params }
+            expect(response).to have_http_status 403
+          end
+          it '更新されないこと' do
+            matter_join_params = attributes_for(:matter_join, belong_side_id: '個人', admin: true)
+            login_user(matter_admin_office_user, 'Test-1234', api_v1_login_path)
+            expect do
+              put api_v1_matter_matter_join_path(matter, user_matter_join.id), params: { matter_join: matter_join_params }
+            end.to_not change { MatterJoin.find(user_matter_join.id).admin }
+          end
         end
       end
       context '案件参加ユーザーでログイン' do
-        context '案件参加ユーザーを更新' do
+        context '案件ユーザー参加を更新' do
+          it '403エラーが返ってくること' do
+            matter_join_params = attributes_for(:matter_join, belong_side_id: '個人', admin: true)
+            login_user(matter_join_user, 'Test-1234', api_v1_login_path)
+            put api_v1_matter_matter_join_path(matter, user_matter_join.id), params: { matter_join: matter_join_params }
+            expect(response).to have_http_status 403
+          end
+          it '更新されないこと' do
+            matter_join_params = attributes_for(:matter_join, belong_side_id: '個人', admin: true)
+            login_user(matter_join_user, 'Test-1234', api_v1_login_path)
+            expect do
+              put api_v1_matter_matter_join_path(matter, user_matter_join.id), params: { matter_join: matter_join_params }
+            end.to_not change { MatterJoin.find(user_matter_join.id).admin }
+          end
         end
       end
       context 'クライアント参加事務所ユーザーでログイン' do
-        context '案件参加ユーザーを更新' do
+        context '案件ユーザー参加を更新' do
+          it '403エラーが返ってくること' do
+            matter_join_params = attributes_for(:matter_join, belong_side_id: '個人', admin: true)
+            login_user(client_join_office_user, 'Test-1234', api_v1_login_path)
+            put api_v1_matter_matter_join_path(matter, user_matter_join.id), params: { matter_join: matter_join_params }
+            expect(response).to have_http_status 403
+          end
+          it '更新されないこと' do
+            matter_join_params = attributes_for(:matter_join, belong_side_id: '個人', admin: true)
+            login_user(client_join_office_user, 'Test-1234', api_v1_login_path)
+            expect do
+              put api_v1_matter_matter_join_path(matter, user_matter_join.id), params: { matter_join: matter_join_params }
+            end.to_not change { MatterJoin.find(user_matter_join.id).admin }
+          end
         end
       end
       context 'クライアント管理事務所ユーザーでログイン' do
-        context '案件参加ユーザーを更新' do
+        context '案件ユーザー参加を更新' do
+          it '403エラーが返ってくること' do
+            matter_join_params = attributes_for(:matter_join, belong_side_id: '個人', admin: true)
+            login_user(client_admin_office_user, 'Test-1234', api_v1_login_path)
+            put api_v1_matter_matter_join_path(matter, user_matter_join.id), params: { matter_join: matter_join_params }
+            expect(response).to have_http_status 403
+          end
+          it '更新されないこと' do
+            matter_join_params = attributes_for(:matter_join, belong_side_id: '個人', admin: true)
+            login_user(client_admin_office_user, 'Test-1234', api_v1_login_path)
+            expect do
+              put api_v1_matter_matter_join_path(matter, user_matter_join.id), params: { matter_join: matter_join_params }
+            end.to_not change { MatterJoin.find(user_matter_join.id).admin }
+          end
         end
       end
       context 'クライアント参加ユーザーでログイン' do
-        context '案件参加ユーザーを更新' do
+        context '案件ユーザー参加を更新' do
+          it '403エラーが返ってくること' do
+            matter_join_params = attributes_for(:matter_join, belong_side_id: '個人', admin: true)
+            login_user(client_join_user, 'Test-1234', api_v1_login_path)
+            put api_v1_matter_matter_join_path(matter, user_matter_join.id), params: { matter_join: matter_join_params }
+            expect(response).to have_http_status 403
+          end
+          it '更新されないこと' do
+            matter_join_params = attributes_for(:matter_join, belong_side_id: '個人', admin: true)
+            login_user(client_join_user, 'Test-1234', api_v1_login_path)
+            expect do
+              put api_v1_matter_matter_join_path(matter, user_matter_join.id), params: { matter_join: matter_join_params }
+            end.to_not change { MatterJoin.find(user_matter_join.id).admin }
+          end
         end
       end
-
+      context '案件不参加ユーザーでログイン' do
+        context '案件ユーザー参加を更新' do
+          it '403エラーが返ってくること' do
+            matter_join_params = attributes_for(:matter_join, belong_side_id: '個人', admin: true)
+            login_user(injoin_user, 'Test-1234', api_v1_login_path)
+            put api_v1_matter_matter_join_path(matter, user_matter_join.id), params: { matter_join: matter_join_params }
+            expect(response).to have_http_status 403
+          end
+          it '更新されないこと' do
+            matter_join_params = attributes_for(:matter_join, belong_side_id: '個人', admin: true)
+            login_user(injoin_user, 'Test-1234', api_v1_login_path)
+            expect do
+              put api_v1_matter_matter_join_path(matter, user_matter_join.id), params: { matter_join: matter_join_params }
+            end.to_not change { MatterJoin.find(user_matter_join.id).admin }
+          end
+        end
+      end
+      context '案件不参加事務所ユーザーでログイン' do
+        context '案件ユーザー参加を更新' do
+          it '403エラーが返ってくること' do
+            matter_join_params = attributes_for(:matter_join, belong_side_id: '個人', admin: true)
+            login_user(injoin_office_user, 'Test-1234', api_v1_login_path)
+            put api_v1_matter_matter_join_path(matter, user_matter_join.id), params: { matter_join: matter_join_params }
+            expect(response).to have_http_status 403
+          end
+          it '更新されないこと' do
+            matter_join_params = attributes_for(:matter_join, belong_side_id: '個人', admin: true)
+            login_user(injoin_office_user, 'Test-1234', api_v1_login_path)
+            expect do
+              put api_v1_matter_matter_join_path(matter, user_matter_join.id), params: { matter_join: matter_join_params }
+            end.to_not change { MatterJoin.find(user_matter_join.id).admin }
+          end
+        end
+      end
       context '案件管理事務所管理者でログイン' do
         context '案件管理事務所管理者を更新' do
           context '管理者数が1の状態でadmin権限を解除' do
+            before{
+              MatterJoin.destroy_all
+              ClientJoin.destroy_all
+            }
+            it '400エラーが返ってくること' do
+              matter_join = create(:matter_join, matter: matter, office: matter_admin_office, user: nil, belong_side_id: '組織', admin: true)
+              matter_join_params = attributes_for(:matter_join, belong_side_id: '組織', admin: false)
+              login_user(matter_admin_office_admin, 'Test-1234', api_v1_login_path)
+              put api_v1_matter_matter_join_path(matter, matter_join.id), params: { matter_join: matter_join_params }
+              expect(response).to have_http_status 400
+            end
+            it '更新されないこと' do
+              matter_join = create(:matter_join, matter: matter, office: matter_admin_office, user: nil, belong_side_id: '組織', admin: true)
+              matter_join_params = attributes_for(:matter_join, belong_side_id: '組織', admin: false)
+              login_user(matter_admin_office_admin, 'Test-1234', api_v1_login_path)
+              expect do
+                put api_v1_matter_matter_join_path(matter, matter_join.id), params: { matter_join: matter_join_params }
+              end.to_not change { MatterJoin.find(matter_join.id).admin }
+            end
           end
-          context 'パラメータが不正' do
+          context '個人参加に変更' do
+            it '更新されないこと' do
+              matter_join_params = attributes_for(:matter_join, belong_side_id: '個人', admin: true)
+              login_user(matter_admin_office_admin, 'Test-1234', api_v1_login_path)
+              expect do
+                put api_v1_matter_matter_join_path(matter, admin_office_matter_join.id), params: { matter_join: matter_join_params }
+              end.to_not change { MatterJoin.find(admin_office_matter_join.id).belong_side_id }
+            end
           end
-        end
-        context '案件不参加ユーザーを更新' do
-        end
-        context '案件不参加事務所ユーザーを更新' do
         end
       end
     end
@@ -759,74 +986,261 @@ RSpec.describe 'matter_joins_requests', type: :request do
   describe 'DELET #destroy' do
     context '正常系' do
       context '案件管理事務所管理者でログイン' do
-        context '案件参加ユーザーを削除' do
+        context '案件ユーザー参加を削除' do
+          it 'リクエストが成功すること' do
+            login_user(matter_admin_office_admin, 'Test-1234', api_v1_login_path)
+            delete api_v1_matter_matter_join_path(matter, user_matter_join.id)
+            expect(response).to have_http_status 200
+          end
+          it '削除されること' do
+            login_user(matter_admin_office_admin, 'Test-1234', api_v1_login_path)
+            expect do
+              delete api_v1_matter_matter_join_path(matter, user_matter_join.id)
+            end.to change(MatterJoin, :count).by(-1)
+          end
         end
-        context '案件管理ユーザーを削除' do
+        context '案件管理ユーザー参加を削除' do
+          it 'リクエストが成功すること' do
+            login_user(matter_admin_office_admin, 'Test-1234', api_v1_login_path)
+            delete api_v1_matter_matter_join_path(matter, admin_user_matter_join.id)
+            expect(response).to have_http_status 200
+          end
+          it '削除されること' do
+            login_user(matter_admin_office_admin, 'Test-1234', api_v1_login_path)
+            expect do
+              delete api_v1_matter_matter_join_path(matter, admin_user_matter_join.id)
+            end.to change(MatterJoin, :count).by(-1)
+          end
         end
-        context '案件参加事務所ユーザーを削除' do
+        context '案件事務所参加を削除' do
+          it 'リクエストが成功すること' do
+            login_user(matter_admin_office_admin, 'Test-1234', api_v1_login_path)
+            delete api_v1_matter_matter_join_path(matter, office_matter_join.id)
+            expect(response).to have_http_status 200
+          end
+          it '削除されること' do
+            login_user(matter_admin_office_admin, 'Test-1234', api_v1_login_path)
+            expect do
+              delete api_v1_matter_matter_join_path(matter, office_matter_join.id)
+            end.to change(MatterJoin, :count).by(-1)
+          end
         end
-        context '案件管理事務所ユーザーを削除' do
-        end
-        context 'クライアント参加ユーザーを削除' do
-        end
-        context 'クライアント管理ユーザーを削除' do
-        end
-        context 'クライアント参加事務所ユーザーを削除' do
-        end
-        context 'クライアント管理事務所管理者を削除' do
+        context '案件管理事務所参加を削除' do
+          it 'リクエストが成功すること' do
+            login_user(matter_admin_office_admin, 'Test-1234', api_v1_login_path)
+            delete api_v1_matter_matter_join_path(matter, admin_office_matter_join.id)
+            expect(response).to have_http_status 200
+          end
+          it '削除されること' do
+            login_user(matter_admin_office_admin, 'Test-1234', api_v1_login_path)
+            expect do
+              delete api_v1_matter_matter_join_path(matter, admin_office_matter_join.id)
+            end.to change(MatterJoin, :count).by(-1)
+          end
         end
       end
       context '案件管理個人ユーザーでログイン' do
-        context '案件参加ユーザーを削除' do
+        context '案件ユーザー参加を削除' do
+          it 'リクエストが成功すること' do
+            login_user(matter_admin_user, 'Test-1234', api_v1_login_path)
+            delete api_v1_matter_matter_join_path(matter, user_matter_join.id)
+            expect(response).to have_http_status 200
+          end
+          it '削除されること' do
+            login_user(matter_admin_user, 'Test-1234', api_v1_login_path)
+            expect do
+              delete api_v1_matter_matter_join_path(matter, user_matter_join.id)
+            end.to change(MatterJoin, :count).by(-1)
+          end
         end
       end
-      context 'クライアント管理事務所ユーザーでログイン' do
-        context '案件参加ユーザーを削除' do
+      context 'クライアント管理事務所管理者でログイン' do
+        context '案件ユーザー参加を削除' do
+          it 'リクエストが成功すること' do
+            login_user(client_admin_office_admin, 'Test-1234', api_v1_login_path)
+            delete api_v1_matter_matter_join_path(matter, user_matter_join.id)
+            expect(response).to have_http_status 200
+          end
+          it '削除されること' do
+            login_user(client_admin_office_admin, 'Test-1234', api_v1_login_path)
+            expect do
+              delete api_v1_matter_matter_join_path(matter, user_matter_join.id)
+            end.to change(MatterJoin, :count).by(-1)
+          end
         end
       end
       context 'クライアント管理個人ユーザーでログイン' do
-        context '案件参加ユーザーを削除' do
+        context '案件ユーザー参加を削除' do
+          it 'リクエストが成功すること' do
+            login_user(client_admin_user, 'Test-1234', api_v1_login_path)
+            delete api_v1_matter_matter_join_path(matter, user_matter_join.id)
+            expect(response).to have_http_status 200
+          end
+          it '削除されること' do
+            login_user(client_admin_user, 'Test-1234', api_v1_login_path)
+            expect do
+              delete api_v1_matter_matter_join_path(matter, user_matter_join.id)
+            end.to change(MatterJoin, :count).by(-1)
+          end
         end
       end
     end
     context '準正常系' do
       context '未ログイン' do
-        context '案件参加ユーザーを削除' do
+        context '案件ユーザー参加を削除' do
+          it '401エラーが返ってくること' do
+            delete api_v1_matter_matter_join_path(matter, user_matter_join.id)
+            expect(response).to have_http_status 401
+          end
+          it '削除されないこと' do
+            expect do
+              delete api_v1_matter_matter_join_path(matter, user_matter_join.id)
+            end.to_not change(MatterJoin, :count)
+          end
         end
       end
       context '案件参加事務所ユーザーでログイン' do
-        context '案件参加ユーザーを削除' do
+        context '案件ユーザー参加を削除' do
+          it '403エラーが返ってくること' do
+            login_user(matter_join_office_user, 'Test-1234', api_v1_login_path)
+            delete api_v1_matter_matter_join_path(matter, user_matter_join.id)
+            expect(response).to have_http_status 403
+          end
+          it '削除されないこと' do
+            login_user(matter_join_office_user, 'Test-1234', api_v1_login_path)
+            expect do
+              delete api_v1_matter_matter_join_path(matter, user_matter_join.id)
+            end.to_not change(MatterJoin, :count)
+          end
         end
       end
       context '案件管理事務所ユーザーでログイン' do
-        context '案件参加ユーザーを削除' do
+        context '案件ユーザー参加を削除' do
+          it '403エラーが返ってくること' do
+            login_user(matter_admin_office_user, 'Test-1234', api_v1_login_path)
+            delete api_v1_matter_matter_join_path(matter, user_matter_join.id)
+            expect(response).to have_http_status 403
+          end
+          it '削除されないこと' do
+            login_user(matter_admin_office_user, 'Test-1234', api_v1_login_path)
+            expect do
+              delete api_v1_matter_matter_join_path(matter, user_matter_join.id)
+            end.to_not change(MatterJoin, :count)
+          end
         end
       end
       context '案件参加ユーザーでログイン' do
-        context '案件参加ユーザーを削除' do
+        context '案件ユーザー参加を削除' do
+          it '403エラーが返ってくること' do
+            login_user(matter_join_user, 'Test-1234', api_v1_login_path)
+            delete api_v1_matter_matter_join_path(matter, user_matter_join.id)
+            expect(response).to have_http_status 403
+          end
+          it '削除されないこと' do
+            login_user(matter_join_user, 'Test-1234', api_v1_login_path)
+            expect do
+              delete api_v1_matter_matter_join_path(matter, user_matter_join.id)
+            end.to_not change(MatterJoin, :count)
+          end
         end
       end
       context 'クライアント参加事務所ユーザーでログイン' do
-        context '案件参加ユーザーを削除' do
+        context '案件ユーザー参加を削除' do
+          it '403エラーが返ってくること' do
+            login_user(client_join_office_user, 'Test-1234', api_v1_login_path)
+            delete api_v1_matter_matter_join_path(matter, user_matter_join.id)
+            expect(response).to have_http_status 403
+          end
+          it '削除されないこと' do
+            login_user(client_join_office_user, 'Test-1234', api_v1_login_path)
+            expect do
+              delete api_v1_matter_matter_join_path(matter, user_matter_join.id)
+            end.to_not change(MatterJoin, :count)
+          end
         end
       end
       context 'クライアント管理事務所ユーザーでログイン' do
-        context '案件参加ユーザーを削除' do
+        context '案件ユーザー参加を削除' do
+          it '403エラーが返ってくること' do
+            login_user(client_admin_office_user, 'Test-1234', api_v1_login_path)
+            delete api_v1_matter_matter_join_path(matter, user_matter_join.id)
+            expect(response).to have_http_status 403
+          end
+          it '削除されないこと' do
+            login_user(client_admin_office_user, 'Test-1234', api_v1_login_path)
+            expect do
+              delete api_v1_matter_matter_join_path(matter, user_matter_join.id)
+            end.to_not change(MatterJoin, :count)
+          end
         end
       end
       context 'クライアント参加ユーザーでログイン' do
-        context '案件参加ユーザーを削除' do
+        context '案件ユーザー参加を削除' do
+          it '403エラーが返ってくること' do
+            login_user(client_join_user, 'Test-1234', api_v1_login_path)
+            delete api_v1_matter_matter_join_path(matter, user_matter_join.id)
+            expect(response).to have_http_status 403
+          end
+          it '削除されないこと' do
+            login_user(client_join_user, 'Test-1234', api_v1_login_path)
+            expect do
+              delete api_v1_matter_matter_join_path(matter, user_matter_join.id)
+            end.to_not change(MatterJoin, :count)
+          end
         end
       end
 
       context '案件管理事務所管理者でログイン' do
         context '案件管理事務所管理者を削除' do
           context '管理者数が１の状態' do
+            before{
+              MatterJoin.destroy_all
+              ClientJoin.destroy_all
+            }
+            it '400エラーが返ってくること' do
+              matter_join = create(:matter_join, matter: matter, office: matter_admin_office, user: nil, belong_side_id: '組織', admin: true)
+              login_user(matter_admin_office_admin, 'Test-1234', api_v1_login_path)
+              delete api_v1_matter_matter_join_path(matter, matter_join.id)
+              expect(response).to have_http_status 400
+            end
+            it '削除されないこと' do
+              matter_join = create(:matter_join, matter: matter, office: matter_admin_office, user: nil, belong_side_id: '組織', admin: true)
+              login_user(matter_admin_office_admin, 'Test-1234', api_v1_login_path)
+              expect do
+                delete api_v1_matter_matter_join_path(matter, matter_join.id)
+              end.to_not change(MatterJoin, :count)
+            end
           end
         end
-        context '案件不参加ユーザーを削除' do
+      end
+      context '案件不ユーザー参加を削除' do
+        context '案件ユーザー参加を削除' do
+          it '403エラーが返ってくること' do
+            login_user(injoin_user, 'Test-1234', api_v1_login_path)
+            delete api_v1_matter_matter_join_path(matter, user_matter_join.id)
+            expect(response).to have_http_status 403
+          end
+          it '削除されないこと' do
+            login_user(injoin_user, 'Test-1234', api_v1_login_path)
+            expect do
+              delete api_v1_matter_matter_join_path(matter, user_matter_join.id)
+            end.to_not change(MatterJoin, :count)
+          end
         end
-        context '案件不参加事務所ユーザーを削除' do
+      end
+      context '案件不参加事務所ユーザーを削除' do
+        context '案件ユーザー参加を削除' do
+          it '403エラーが返ってくること' do
+            login_user(injoin_office_user, 'Test-1234', api_v1_login_path)
+            delete api_v1_matter_matter_join_path(matter, user_matter_join.id)
+            expect(response).to have_http_status 403
+          end
+          it '削除されないこと' do
+            login_user(injoin_office_user, 'Test-1234', api_v1_login_path)
+            expect do
+              delete api_v1_matter_matter_join_path(matter, user_matter_join.id)
+            end.to_not change(MatterJoin, :count)
+          end
         end
       end
     end
