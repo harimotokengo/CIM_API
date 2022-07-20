@@ -13,6 +13,7 @@ class User < ApplicationRecord
   has_many :client_joins, dependent: :destroy
   has_many :join_matters, through: :matter_joins, source: :matter
   has_many :join_clients, through: :client_joins, source: :client
+  has_many :invite_urls, dependent: :destroy
 
   has_one_attached :avatar
 
@@ -88,6 +89,14 @@ class User < ApplicationRecord
   def admin_check
     if current_belonging.blank? || current_belonging.admin?
       return true
+    end
+  end
+
+  def belonging_check
+    if self.current_belonging
+      return true
+    else
+      return false
     end
   end
 

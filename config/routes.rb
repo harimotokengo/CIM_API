@@ -14,6 +14,11 @@ Rails.application.routes.draw do
         end
       end
       resources :clients, only: [:index, :create, :show, :update, :destroy ] do
+        resources :matters, only: :create do
+          collection do
+            get 'get_join_users'
+          end
+        end
         collection do
           get 'conflict_check'
           get 'get_category_parents'
@@ -23,18 +28,21 @@ Rails.application.routes.draw do
         member do
           get 'get_matters'
         end
-        resources :matters, only: :create do
-          collection do
-            get 'get_join_users'
-          end
-        end
+        
       end
       resources :matters, only: [:index, :show, :update, :destroy] do
+        resources :matter_assigns, only: [:create, :destroy]
+        resources :matter_joins, only: [:index, :create, :update, :destroy] do
+          collection do
+            post 'create_token'
+            get 'get_invite_url'
+          end
+        end
         member do
           get 'get_join_users'
         end
-        resources :matter_assigns, only: [:create, :destroy]
       end
+      resources :invite_urls, only: :show
     end
   end
 end

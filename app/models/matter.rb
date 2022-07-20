@@ -12,8 +12,12 @@ class Matter < ApplicationRecord
   has_many :folder_urls, dependent: :destroy
   has_many :matter_tags, dependent: :destroy
   has_many :tags, through: :matter_tags
-  # has_many :invite_urls, dependent: :destroy
+  has_many :invite_urls, dependent: :destroy
   has_many :matter_joins, dependent: :destroy
+  has_many :user_matter_joins, -> { user_join }, class_name: 'MatterJoin'
+  has_many :matter_join_users, through: :user_matter_joins, source: :user
+  has_many :user_matter_joins, -> { office_join }, class_name: 'MatterJoin'
+  has_many :matter_join_offices, through: :user_matter_joins, source: :user
   
   has_many :assigned_users, through: :matter_assigns, source: :user
   # has_many :notifications, dependent: :destroy
@@ -68,11 +72,6 @@ class Matter < ApplicationRecord
       end
     end
   end
-  
-  # scope作って消す
-  def self.active_matters
-    where(archive: true)
-  end
 
   # feeモデルにscopeを作って消す
   def fix_fees
@@ -100,7 +99,7 @@ class Matter < ApplicationRecord
   end
 
   def join_check(current_user)
-    return true if client_join_check(current_user) || matter_join_check(current_user)
+    return true if personal_join_check(current_user) || office_join_check(current_user)
   end
 
   def admin_check(current_user)
@@ -112,45 +111,57 @@ class Matter < ApplicationRecord
 
   def destroy_update
     update(archive: false)
-    # あとでopponentモデルに処理を書いて整理
-    # opponents.each do |opponent|
-    #   opponent.update(
-    #     name: '削除済',
-    #     name_kana: 'さくじょずみ',
-    #     first_name: '削除済',
-    #     first_name_kana: 'さくじょずみ',
-    #     maiden_name: '削除済',
-    #     maiden_name_kana: 'さくじょずみ',
-    #     birth_date: nil
-    #   )
-    # end
   end
 
   def assignable_check(user_id)
     assign_user = User.find(user_id)
-    return true if join_check(assign_user) && !assigning_check(assign_user)
+    if join_check(assign_user) || self.client.join_check(assign_user)
+      return true if !assigning_check(assign_user)
+    end
   end
 
   def assign_deletable_check(user)
-    return true if join_check(user) && assigning_check(user)
+    if join_check(user) || self.client.join_check(user)
+      return true if assigning_check(user)
+    end
+  end
+  
+
+  def minimum_required_administrator_check(matter_join)
+    if matter_joins.where(admin: true).count == 1 && matter_join.admin? && client.client_joins.where(admin: true).blank?
+      errors.add(:base, '管理者は最低1人以上必要です。')
+      return false
+    else
+      return true
+    end
+  end
+
+  # matter_joinしてるofficeとuserの一覧表示用データ取得
+  def index_matter_join_data
+    data = []
+    matter_joins = self.matter_joins.eager_load(:office)
+                      .eager_load(:user)
+    matter_joins.each do |matter_join|
+      if matter_join.belong_side_id == '組織'
+        data << matter_join.office
+      else
+        data << matter_join.user
+      end
+      data << matter_join.admin
+    end
+    return data
+  end
+
+  def personal_join_check(current_user)
+    matter_joins.where(user_id: current_user.id).exists?
+  end
+
+  def office_join_check(current_user)
+    matter_joins.where(
+      office_id: current_user.belonging_office.id).exists? if current_user.belonging_office
   end
 
   private
-
-  def matter_join_check(current_user)
-    user_join_check = matter_joins.where(user_id: current_user).exists?
-    office_join_check = matter_joins.where(
-      office_id: current_user.belonging_office).exists? if current_user.belonging_office
-    return true if user_join_check || office_join_check
-  end
-
-  def client_join_check(current_user)
-    user_join_check = client.client_joins.where(
-      user_id: current_user).exists?
-    office_join_check = client.client_joins.where(
-      office_id: current_user.belonging_office).exists? if current_user.belonging_office
-    return true if user_join_check || office_join_check
-  end
 
   def assigning_check(assign_user)
     MatterAssign.where(matter_id: id, user_id: assign_user).exists?
