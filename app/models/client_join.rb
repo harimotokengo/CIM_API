@@ -23,4 +23,34 @@ class ClientJoin < ApplicationRecord
   def user_id_blank
     user_id.blank?
   end
+
+  # 組織と個人でmatter_joinの親を分岐してセット
+  def set_joiner(current_user)
+    if  self.belong_side_id == '組織'
+      self.office_id = current_user.belonging_office.id
+    else
+      self.user_id = current_user.id
+    end
+  end
+
+  def joining_check(current_user)
+    if self.belong_side_id == '組織'
+      if !current_user.belonging_check
+        errors.add(:base, '無所属ユーザーは組織で参加できません')
+        return false
+      elsif !self.client.office_join_check(current_user)
+        return true
+      else
+        errors.add(:base, '参加済みです')
+        return false
+      end
+    else
+      if !self.client.personal_join_check(current_user)
+        return true
+      else
+        errors.add(:base, '参加済みです')
+        return false
+      end
+    end
+  end
 end

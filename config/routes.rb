@@ -14,6 +14,12 @@ Rails.application.routes.draw do
         end
       end
       resources :clients, only: [:index, :create, :show, :update, :destroy ] do
+        resources :client_joins, only: [:index, :create, :update, :destroy] do
+          collection do
+            post 'create_token'
+            get 'get_invite_url'
+          end
+        end
         resources :matters, only: :create do
           collection do
             get 'get_join_users'
