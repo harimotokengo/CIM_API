@@ -4,6 +4,7 @@ class Client < ApplicationRecord
   has_many :contact_emails, dependent: :destroy
   has_many :contact_phone_numbers, dependent: :destroy
   has_many :client_joins, dependent: :destroy
+  has_many :invite_urls, dependent: :destroy
   
   scope :active, -> { where(archive: true) }
 
