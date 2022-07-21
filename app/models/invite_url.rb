@@ -40,23 +40,22 @@ class InviteUrl < ApplicationRecord
   end
 
   def get_invite_data
-    inviter = @invite_url.sender.full_name
-    limit_date = @invite_url.limit_date
-    invited_destination_name = @invite_url.get_invited_destination_name
-    data = [inviter: inviter, 
+    inviter = self.user.full_name
+    limit_date = self.limit_date
+    invited_destination_name = self.set_invited_destination_name
+    data = {
+      inviter: inviter, 
       limit_date: limit_date, 
-      invited_destination_name: invited_destination_name]
+      invited_destination_name: invited_destination_name}
     return data
   end
 
   # parent毎にinvited_destination_nameを取得
-  def get_invited_destination_name
+  def set_invited_destination_name
     if self.matter_id
-      @matter = self.matter
-      return @matter.client.full_name + ',' + @matter.categories.first
+      return self.matter.client.full_name + ',' + self.matter.categories.first.name
     elsif self.client_id
-      @matter = self.client
-      return @matter.client.full_name + ',' + '全案件'
+      return self.client.full_name + ',' + '全案件'
     end
   end
 

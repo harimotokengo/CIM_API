@@ -52,93 +52,149 @@ RSpec.describe 'invite_urls_requests', type: :request do
       context '案件参加' do
         context '不参加ユーザーでログイン' do
           it 'リクエストが成功すること' do
-            login_user(belonging_info.user, 'Test-1234', login_path)
-            get invite_url_path(invite_url, tk: '0123456789abcdef')
+            invite_url = create(:invite_url, token: '0123456789abcdef', matter: matter, user: matter_admin_office_admin, join: false, client: nil)
+            login_user(injoin_user, 'Test-1234', api_v1_login_path)
+            get api_v1_invite_url_path(invite_url, tk: invite_url.token)
             expect(response).to have_http_status 200
           end
-          it '参加画面情報' do
-
-        end
-        context '不参加事務所ユーザーでログイン' do
-        end
-        context '案件参加事務所ユーザーでログイン' do
+          it '参加画面に表示するデータが取得できること' do
+            invite_url = create(:invite_url, token: '0123456789abcdef', matter: matter, user: matter_admin_office_admin, join: false, client: nil)
+            login_user(injoin_user, 'Test-1234', api_v1_login_path)
+            get api_v1_invite_url_path(invite_url, tk: invite_url.token)
+            expect(JSON.parse(response.body)['data']['inviter']).to eq invite_url.user.full_name
+            # expect(JSON.parse(response.body)['data']['limit_date']).to eq invite_url.limit_date.to_json
+            expect(JSON.parse(response.body)['data']['invited_destination_name']).to eq invite_url.set_invited_destination_name
+          end
         end
         context '案件参加ユーザーでログイン' do
-        end
-        context 'クライアント参加事務所ユーザーでログイン' do
+          it 'リクエストが成功すること' do
+            invite_url = create(:invite_url, token: '0123456789abcdef', matter: matter, user: matter_admin_office_admin, join: false, client: nil)
+            login_user(matter_join_user, 'Test-1234', api_v1_login_path)
+            get api_v1_invite_url_path(invite_url, tk: invite_url.token)
+            expect(response).to have_http_status 200
+          end
+          it '参加画面に表示するデータが取得できること' do
+            invite_url = create(:invite_url, token: '0123456789abcdef', matter: matter, user: matter_admin_office_admin, join: false, client: nil)
+            login_user(matter_join_user, 'Test-1234', api_v1_login_path)
+            get api_v1_invite_url_path(invite_url, tk: invite_url.token)
+            expect(JSON.parse(response.body)['data']['inviter']).to eq invite_url.user.full_name
+            # expect(JSON.parse(response.body)['data']['limit_date']).to eq invite_url.limit_date.to_json
+            expect(JSON.parse(response.body)['data']['invited_destination_name']).to eq invite_url.set_invited_destination_name
+          end
         end
         context 'クライアント参加ユーザーでログイン' do
+          it 'リクエストが成功すること' do
+            invite_url = create(:invite_url, token: '0123456789abcdef', matter: matter, user: matter_admin_office_admin, join: false, client: nil)
+            login_user(client_join_user, 'Test-1234', api_v1_login_path)
+            get api_v1_invite_url_path(invite_url, tk: invite_url.token)
+            expect(response).to have_http_status 200
+          end
+          it '参加画面に表示するデータが取得できること' do
+            invite_url = create(:invite_url, token: '0123456789abcdef', matter: matter, user: matter_admin_office_admin, join: false, client: nil)
+            login_user(client_join_user, 'Test-1234', api_v1_login_path)
+            get api_v1_invite_url_path(invite_url, tk: invite_url.token)
+            expect(JSON.parse(response.body)['data']['inviter']).to eq invite_url.user.full_name
+            # expect(JSON.parse(response.body)['data']['limit_date']).to eq invite_url.limit_date.to_json
+            expect(JSON.parse(response.body)['data']['invited_destination_name']).to eq invite_url.set_invited_destination_name
+          end
         end
       end
       context 'クライアント参加' do
         context '不参加ユーザーでログイン' do
-        end
-        context '不参加事務所ユーザーでログイン' do
-        end
-        context 'クライアント参加事務所ユーザーでログイン' do
+          it 'リクエストが成功すること' do
+            invite_url = create(:invite_url, token: '0123456789abcdef', matter: nil, user: matter_admin_office_admin, join: false, client: client)
+            login_user(client_join_user, 'Test-1234', api_v1_login_path)
+            get api_v1_invite_url_path(invite_url, tk: invite_url.token)
+            expect(response).to have_http_status 200
+          end
+          it '参加画面に表示するデータが取得できること' do
+            invite_url = create(:invite_url, token: '0123456789abcdef', matter: nil, user: matter_admin_office_admin, join: false, client: client)
+            login_user(injoin_user, 'Test-1234', api_v1_login_path)
+            get api_v1_invite_url_path(invite_url, tk: invite_url.token)
+            expect(JSON.parse(response.body)['data']['inviter']).to eq invite_url.user.full_name
+            # expect(JSON.parse(response.body)['data']['limit_date']).to eq invite_url.limit_date.to_json
+            expect(JSON.parse(response.body)['data']['invited_destination_name']).to eq invite_url.set_invited_destination_name
+          end
         end
         context 'クライアント参加ユーザーでログイン' do
+          it 'リクエストが成功すること' do
+            invite_url = create(:invite_url, token: '0123456789abcdef', matter: nil, user: matter_admin_office_admin, join: false, client: client)
+            login_user(client_join_user, 'Test-1234', api_v1_login_path)
+            get api_v1_invite_url_path(invite_url, tk: invite_url.token)
+            expect(response).to have_http_status 200
+          end
+          it '参加画面に表示するデータが取得できること' do
+            invite_url = create(:invite_url, token: '0123456789abcdef', matter: nil, user: matter_admin_office_admin, join: false, client: client)
+            login_user(injoin_user, 'Test-1234', api_v1_login_path)
+            get api_v1_invite_url_path(invite_url, tk: invite_url.token)
+            expect(JSON.parse(response.body)['data']['inviter']).to eq invite_url.user.full_name
+            # expect(JSON.parse(response.body)['data']['limit_date']).to eq invite_url.limit_date.to_json
+            expect(JSON.parse(response.body)['data']['invited_destination_name']).to eq invite_url.set_invited_destination_name
+          end
         end
       end
-
-      # it 'ログイン状態でのリクエストが成功すること' do
-      #   login_user(belonging_info.user, 'Test-1234', login_path)
-      #   get invite_url_path(invite_url, tk: '0123456789abcdef')
-      #   expect(response).to have_http_status 200
-      # end
-      # it '同じ事務所のuserのログイン状態でのリクエストが成功すること' do
-      #   login_user(belonging_info2.user, 'Test-1234', login_path)
-      #   get invite_url_path(invite_url, tk: '0123456789abcdef')
-      #   expect(response).to have_http_status 200
-      # end
-      # it '他事務所でも参加済みの人がログイン状態の場合リクエストが成功すること' do
-      #   login_user(other_belonging_info.user, 'Test-1234', login_path)
-      #   get invite_url_path(invite_url, tk: '0123456789abcdef')
-      #   expect(response.status).to eq 200
-      # end
-      # it '参加がない状態でもリクエストが成功すること' do
-      #   login_user(other_belonging_info2.user, 'Test-1234', login_path)
-      #   get invite_url_path(invite_url, tk: '0123456789abcdef')
-      #   expect(response.status).to eq 200
-      # end
     end
     context '準正常系' do
       context '未ログイン' do
+        it '401エラーが返ってくること' do
+          invite_url = create(:invite_url, token: '0123456789abcdef', matter: matter, user: matter_admin_office_admin, join: false, client: nil)
+          get api_v1_invite_url_path(invite_url, tk: invite_url.token)
+          expect(response).to have_http_status 401
+        end
+        it '参加画面に表示するデータが取得できないこと' do
+          invite_url = create(:invite_url, token: '0123456789abcdef', matter: matter, user: matter_admin_office_admin, join: false, client: nil)
+          get api_v1_invite_url_path(invite_url, tk: invite_url.token)
+          expect(JSON.parse(response.body)['data']).to eq nil
+        end
       end
       context '不参加ユーザーでログイン' do
         context '招待URLが不正' do
+          it '400エラーが返ってくること' do
+            invite_url = create(:invite_url, token: '0123456789abcdef', matter: matter, user: matter_admin_office_admin, join: false, client: nil)
+            login_user(injoin_user, 'Test-1234', api_v1_login_path)
+            get api_v1_invite_url_path(invite_url, tk: nil)
+            expect(response).to have_http_status 400
+          end
+          it '参加画面に表示するデータが取得できないこと' do
+            invite_url = create(:invite_url, token: '0123456789abcdef', matter: matter, user: matter_admin_office_admin, join: false, client: nil)
+            login_user(injoin_user, 'Test-1234', api_v1_login_path)
+            get api_v1_invite_url_path(invite_url, tk: nil)
+            expect(JSON.parse(response.body)['data']).to eq nil
+          end
         end
         context 'tokenが期限切れ' do
+          it '400エラーが返ってくること' do
+            invite_url = create(:invite_url, token: '0123456789abcdef', matter: matter, user: matter_admin_office_admin, join: false, client: nil, limit_date: 10.minutes.ago)
+            login_user(injoin_user, 'Test-1234', api_v1_login_path)
+            get api_v1_invite_url_path(invite_url, tk: invite_url.token)
+            expect(response).to have_http_status 400
+          end
+          it '参加画面に表示するデータが取得できないこと' do
+            invite_url = create(:invite_url, token: '0123456789abcdef', matter: matter, user: matter_admin_office_admin, join: false, client: nil, limit_date: 10.minutes.ago)
+            login_user(injoin_user, 'Test-1234', api_v1_login_path)
+            get api_v1_invite_url_path(invite_url, tk: invite_url.token)
+            expect(JSON.parse(response.body)['data']).to eq nil
+          end
         end
         context 'tokenがアクセス済み' do
+          it '400エラーが返ってくること' do
+            invite_url = create(:invite_url, token: '0123456789abcdef', matter: matter, user: matter_admin_office_admin, join: false, client: nil)
+            invite_url.join = true
+            invite_url.save
+            login_user(injoin_user, 'Test-1234', api_v1_login_path)
+            get api_v1_invite_url_path(invite_url, tk: invite_url.token)
+            expect(response).to have_http_status 400
+          end
+          it '参加画面に表示するデータが取得できないこと' do
+            invite_url = create(:invite_url, token: '0123456789abcdef', matter: matter, user: matter_admin_office_admin, join: false, client: nil)
+            invite_url.join = true
+            invite_url.save
+            login_user(injoin_user, 'Test-1234', api_v1_login_path)
+            get api_v1_invite_url_path(invite_url, tk: invite_url.token)
+            expect(JSON.parse(response.body)['data']).to eq nil
+          end
         end
       end
-
-
-
-      # it 'ログアウト状態だとログインページにリダイレクトされること' do
-      #   get invite_url_path(invite_url, tk: '0123456789abcdef')
-      #   expect(response).to have_http_status 302
-      #   expect(response).to redirect_to login_path
-      # end
-      # xit 'officeの登録がない場合、〇〇にリダイレクトされること' do
-      #   # login_user(belonging_info.user, 'Test-1234', login_path)
-      #   get invite_url_path(invite_url, tk: '0123456789abcdef')
-      #   expect(response).to have_http_status 302
-      #   # expect(response).to redirect_to login_path
-      # end
-      # it 'トークンが一致しないとuser/showにリダイレクトされること' do
-      #   login_user(other_belonging_info2.user, 'Test-1234', login_path)
-      #   get invite_url_path(invite_url, tk: '01234567d9abcdef')
-      #   expect(response).to have_http_status 302
-      #   expect(response).to redirect_to user_path(other_user2)
-      # end
-      # it '期限切れの場合user/showにリダイレクトされること（2日前）' do
-      #   login_user(other_belonging_info2.user, 'Test-1234', login_path)
-      #   get invite_url_path(invite_url2, tk: '0123456789abcdef')
-      #   expect(response).to have_http_status 302
-      #   expect(response).to redirect_to user_path(other_user2)
-      # end
     end
   end
 end
