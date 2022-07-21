@@ -91,10 +91,9 @@ module Api
         elsif  action_name == 'create'
           return true if @client_join.joining_check(current_user)
         else
-          return true if @client.admin_check(current_user) && current_user.admin_check
+          return true if  @client.admin_check(current_user) && current_user.admin_check
         end
       end
-    end
     end
   end
 end

@@ -5,7 +5,7 @@ class Client < ApplicationRecord
   has_many :contact_phone_numbers, dependent: :destroy
   has_many :client_joins, dependent: :destroy
   
-  scope :active_client, -> { where(archive: true) }
+  scope :active, -> { where(archive: true) }
 
   accepts_nested_attributes_for :client_joins, reject_if: :all_blank, allow_destroy: true
   accepts_nested_attributes_for :matters, reject_if: :all_blank, allow_destroy: true
