@@ -71,7 +71,7 @@ RSpec.describe 'matter_joins_requests', type: :request do
       end
       context 'クライアントユーザーでログイン' do
         it 'リクエストが成功すること' do
-          login_user(matter_join_user, 'Test-1234', api_v1_login_path)
+          login_user(client_join_user, 'Test-1234', api_v1_login_path)
           get api_v1_matter_matter_joins_path(matter)
           expect(response).to have_http_status 200
         end

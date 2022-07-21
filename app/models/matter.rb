@@ -14,11 +14,10 @@ class Matter < ApplicationRecord
   has_many :tags, through: :matter_tags
   has_many :invite_urls, dependent: :destroy
   has_many :matter_joins, dependent: :destroy
-  has_many :user_matter_joins, -> { user_join }, class_name: 'MatterJoin'
-  has_many :matter_join_users, through: :user_matter_joins, source: :user
-  has_many :user_matter_joins, -> { office_join }, class_name: 'MatterJoin'
-  has_many :matter_join_offices, through: :user_matter_joins, source: :user
-  
+  # has_many :user_matter_joins, -> { user_join }, class_name: 'MatterJoin'
+  # has_many :matter_join_users, through: :user_matter_joins, source: :user
+  # has_many :user_matter_joins, -> { office_join }, class_name: 'MatterJoin'
+  # has_many :matter_join_offices, through: :user_matter_joins, source: :user
   has_many :assigned_users, through: :matter_assigns, source: :user
   # has_many :notifications, dependent: :destroy
   # has_many :edit_logs, dependent: :destroy

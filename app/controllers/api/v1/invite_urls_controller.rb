@@ -8,7 +8,7 @@ module Api
         @invite_url = InviteUrl.find(params[:id])
         params_token = params[:tk]
         return response_bad_request unless @invite_url.invite_url_check(params_token)
-        data = @ivite_url.get_invite_data
+        data = @invite_url.get_invite_data
         render json: {status: 200, data: data}
       end
     end
