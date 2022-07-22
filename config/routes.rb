@@ -37,6 +37,7 @@ Rails.application.routes.draw do
         
       end
       resources :matters, only: [:index, :show, :update, :destroy] do
+        resources :charges, only: [:create, :destroy]
         resources :matter_assigns, only: [:create, :destroy]
         resources :matter_joins, only: [:index, :create, :update, :destroy] do
           collection do
