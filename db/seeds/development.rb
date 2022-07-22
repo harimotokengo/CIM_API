@@ -389,7 +389,41 @@ Matter.count.times do |n|
   )
 end
 
+# matter_assign
+2.times do |n|
+  id = n + 1
+  matters = Matter.joins(:matter_joins)
+                  .joins(client: :client_joins)
+                  .where(["matter_joins.office_id = ? or client_joins.office_id = ?", id, id])
+  matters.each do |matter|
+    2.times do |n|
+      if n == 0
+        user = User.where(office_id: id).sample
+      else
+        user = User.where.not(id: user).where(office_id: id).sample
+      end
+      matter.matter_assigns.create(user: user)
+    end
+  end
+end
 
+# # charge
+2.times do |n|
+  id = n + 1
+  matters = Matter.joins(:matter_joins)
+                  .joins(client: :client_joins)
+                  .where(["matter_joins.office_id = ? or client_joins.office_id = ?", id, id])
+  matters.each do |matter|
+    2.times do |n|
+      if n == 0
+        user = User.where(office_id: id).sample
+      else
+        user = User.where.not(id: user).where(office_id: id).sample
+      end
+      matter.charges.create(user: user)
+    end
+  end
+end
 
 
 # # # task
@@ -881,3 +915,7 @@ end
     ],
   )
 end
+
+# ===========================================
+# クライアント検索用
+# ===========================================
