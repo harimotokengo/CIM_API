@@ -499,91 +499,91 @@ RSpec.describe 'matters_requests', type: :request do
       end
     end
   end
-  # describe 'PUT #show' do
-  #   context '正常系' do
-  #     # 案件参加ユーザー
-  #     # クライアント参加ユーザー
-  #     # 案件参加事務所ユーザー
-  #     # クライアント参加事務所ユーザー
-  #     context 'クライアント参加事務所ユーザーでログイン' do
-  #       before{
-  #         login_user(client_join_office_user, 'Test-1234', api_v1_login_path)
-  #         @matter_params = attributes_for(:matter, matter_status_id: '終了')
-  #       }
-  #       it 'リクエストが成功すること' do
-  #         get api_v1_matter_path(matter), params: { matter: @matter_params }
-  #         expect(response.status).to eq 200
-  #         expect(JSON.parse(response.body)['data']['id']).to eq matter.id
-  #       end
-  #     end
-  #     context '案件参加事務所ユーザーでログイン' do
-  #       before{
-  #         login_user(matter_join_office_user, 'Test-1234', api_v1_login_path)
-  #         @matter_params = attributes_for(:matter, matter_status_id: '終了')
-  #       }
-  #       it 'リクエストが成功すること' do
-  #         get api_v1_matter_path(matter), params: { matter: @matter_params }
-  #         expect(response.status).to eq 200
-  #         expect(JSON.parse(response.body)['data']['id']).to eq matter.id
-  #       end
-  #     end
-  #   end
-  #   context '準正常系' do
-  #     context '未ログイン' do
-  #       before{
-  #         @matter_params = attributes_for(:matter, matter_status_id: '終了')
-  #       }
-  #       it '401エラーが返ってくること' do
-  #         get api_v1_matter_path(matter), params: { matter: @matter_params }
-  #         expect(response.status).to eq 401
-  #         expect(JSON.parse(response.body)['message']).to eq "Unauthorized"
-  #         expect(JSON.parse(response.body)['data']).to be nil
-  #       end
-  #     end
-  #     context '不参加ユーザーでログイン' do
-  #       before{
-  #         login_user(injoin_user, 'Test-1234', api_v1_login_path)
-  #         @matter_params = attributes_for(:matter, matter_status_id: '終了')
-  #       }
-  #       it '403エラーが返ってくること' do
-  #         get api_v1_matter_path(matter), params: { matter: @matter_params }
-  #         expect(response.status).to eq 403
-  #         expect(JSON.parse(response.body)['message']).to eq "Forbidden"
-  #         expect(JSON.parse(response.body)['data']).to be nil
-  #       end
-  #     end
-  #     context '不参加事務所ユーザーでログイン' do
-  #       before{
-  #         login_user(injoin_office_user, 'Test-1234', api_v1_login_path)
-  #         @matter_params = attributes_for(:matter, matter_status_id: '終了')
-  #       }
-  #       it '403エラーが返ってくること' do
-  #         get api_v1_matter_path(matter), params: { matter: @matter_params }
-  #         expect(response.status).to eq 403
-  #         expect(JSON.parse(response.body)['message']).to eq "Forbidden"
-  #         expect(JSON.parse(response.body)['data']).to be nil
-  #       end
-  #     end
-  #   end
-  # end
+  describe 'PUT #show' do
+    context '正常系' do
+      # 案件参加ユーザー
+      # クライアント参加ユーザー
+      # 案件参加事務所ユーザー
+      # クライアント参加事務所ユーザー
+      context 'クライアント参加事務所ユーザーでログイン' do
+        before{
+          login_user(client_join_office_user, 'Test-1234', api_v1_login_path)
+          @matter_params = attributes_for(:matter, matter_status_id: '終了')
+        }
+        it 'リクエストが成功すること' do
+          get api_v1_matter_path(matter), params: { matter: @matter_params }
+          expect(response.status).to eq 200
+          expect(JSON.parse(response.body)['data']['id']).to eq matter.id
+        end
+      end
+      context '案件参加事務所ユーザーでログイン' do
+        before{
+          login_user(matter_join_office_user, 'Test-1234', api_v1_login_path)
+          @matter_params = attributes_for(:matter, matter_status_id: '終了')
+        }
+        it 'リクエストが成功すること' do
+          get api_v1_matter_path(matter), params: { matter: @matter_params }
+          expect(response.status).to eq 200
+          expect(JSON.parse(response.body)['data']['id']).to eq matter.id
+        end
+      end
+    end
+    context '準正常系' do
+      context '未ログイン' do
+        before{
+          @matter_params = attributes_for(:matter, matter_status_id: '終了')
+        }
+        it '401エラーが返ってくること' do
+          get api_v1_matter_path(matter), params: { matter: @matter_params }
+          expect(response.status).to eq 401
+          expect(JSON.parse(response.body)['message']).to eq "Unauthorized"
+          expect(JSON.parse(response.body)['data']).to be nil
+        end
+      end
+      context '不参加ユーザーでログイン' do
+        before{
+          login_user(injoin_user, 'Test-1234', api_v1_login_path)
+          @matter_params = attributes_for(:matter, matter_status_id: '終了')
+        }
+        it '403エラーが返ってくること' do
+          get api_v1_matter_path(matter), params: { matter: @matter_params }
+          expect(response.status).to eq 403
+          expect(JSON.parse(response.body)['message']).to eq "Forbidden"
+          expect(JSON.parse(response.body)['data']).to be nil
+        end
+      end
+      context '不参加事務所ユーザーでログイン' do
+        before{
+          login_user(injoin_office_user, 'Test-1234', api_v1_login_path)
+          @matter_params = attributes_for(:matter, matter_status_id: '終了')
+        }
+        it '403エラーが返ってくること' do
+          get api_v1_matter_path(matter), params: { matter: @matter_params }
+          expect(response.status).to eq 403
+          expect(JSON.parse(response.body)['message']).to eq "Forbidden"
+          expect(JSON.parse(response.body)['data']).to be nil
+        end
+      end
+    end
+  end
 
-  # describe 'DELETE #destroy' do
-  #   context '正常系' do
-  #     context '案件管理ユーザーでログイン' do
-  #       it 'リクエストが成功すること' do
-  #         login_user(matter_admin_user, 'Test-1234', api_v1_login_path)
-  #         delete api_v1_matter_path(matter)
-  #         expect(response.status).to eq 200
-  #       end
-  #       it '更新されること' do
-  #         login_user(matter_admin_user, 'Test-1234', api_v1_login_path)
-  #         expect do
-  #           delete api_v1_matter_path(matter)
-  #         end.to change { Matter.find(matter.id).archive }.from(true).to(false) and change {
-  #           Matter.find(matter.id).opponents.first.name }.from('テスト姓').to('削除済み')
-  #       end
-  #     end
-  #   end
-  # end
+  describe 'DELETE #destroy' do
+    context '正常系' do
+      context '案件管理ユーザーでログイン' do
+        it 'リクエストが成功すること' do
+          login_user(matter_admin_user, 'Test-1234', api_v1_login_path)
+          delete api_v1_matter_path(matter)
+          expect(response.status).to eq 200
+        end
+        it '更新されること' do
+          login_user(matter_admin_user, 'Test-1234', api_v1_login_path)
+          expect do
+            delete api_v1_matter_path(matter)
+          end.to change { Matter.find(matter.id).archive }.from(true).to(false) and change {
+            Matter.find(matter.id).opponents.first.name }.from('テスト姓').to('削除済み')
+        end
+      end
+    end
+  end
   # conflict
 end
