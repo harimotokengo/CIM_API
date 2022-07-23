@@ -1,6 +1,7 @@
 class Matter < ApplicationRecord
   belongs_to :user, optional: true
   belongs_to :client
+  belongs_to :task_template_group
   has_many :opponents, dependent: :destroy
   has_many :occurrences, dependent: :destroy
   has_many :tasks, dependent: :destroy

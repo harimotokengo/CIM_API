@@ -24,11 +24,12 @@ module Api
           @matter.matter_joins[0].user_id = current_user.id
         end
         @matter.matter_joins[0].admin = true
-        @matter.client_id = @client.id
         @matter.start_date = Time.now if @matter.matter_status_id == 1 && @matter.start_date.blank?
         tag_list = params[:matter][:tag_name].split(',') unless params[:matter][:tag_name].nil?
+        template_group_id = params[:matter][:task_template_group_id]
         if @matter.save
           @matter.save_matter_tags(tag_list) unless params[:matter][:tag_name].nil?
+          @matter.task_template_group.save_matter_tasks
           # @matter.create_matter_log(current_user)
           render json: { status: 200, message: "登録しました"}
         else
@@ -103,7 +104,7 @@ module Api
           :matter_genre_id, :service_price,
           :description, :matter_status_id,
           :start_date, :finish_date,
-          # :task_group_template_id, 
+          :task_template_group_id, 
           :archive,
           opponents_attributes: [
             :id, :name, :name_kana,
