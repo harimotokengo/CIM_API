@@ -35,7 +35,7 @@ class Matter < ApplicationRecord
   accepts_nested_attributes_for :matter_assigns , reject_if: :all_blank, allow_destroy: true
 
   with_options presence: true do
-    validates :user_id,:matter_status_id
+    validates :user_id,:matter_status_id, :task_template_group_id
   end
 
   enum matter_status_id: {

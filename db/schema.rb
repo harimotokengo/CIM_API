@@ -293,10 +293,12 @@ ActiveRecord::Schema[7.0].define(version: 2022_07_23_013623) do
     t.boolean "archive", default: true, null: false
     t.bigint "user_id", null: false
     t.bigint "matter_id"
+    t.bigint "work_stage_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["matter_id"], name: "index_tasks_on_matter_id"
     t.index ["user_id"], name: "index_tasks_on_user_id"
+    t.index ["work_stage_id"], name: "index_tasks_on_work_stage_id"
   end
 
   create_table "user_invites", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
@@ -335,9 +337,13 @@ ActiveRecord::Schema[7.0].define(version: 2022_07_23_013623) do
   end
 
   create_table "work_stages", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
+    t.bigint "user_id"
+    t.bigint "matter_category_id", null: false
     t.string "name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["matter_category_id"], name: "index_work_stages_on_matter_category_id"
+    t.index ["user_id"], name: "index_work_stages_on_user_id"
   end
 
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
@@ -378,4 +384,7 @@ ActiveRecord::Schema[7.0].define(version: 2022_07_23_013623) do
   add_foreign_key "task_templates", "work_stages"
   add_foreign_key "tasks", "matters"
   add_foreign_key "tasks", "users"
+  add_foreign_key "tasks", "work_stages"
+  add_foreign_key "work_stages", "matter_categories"
+  add_foreign_key "work_stages", "users"
 end
