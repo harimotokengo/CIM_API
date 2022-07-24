@@ -1,7 +1,11 @@
 class TaskTemplateGroup < ApplicationRecord
   belongs_to :office, optional: true
   belongs_to :user, optional: true
+  belongs_to :matter_category
 
+  validates :name, presence: true,
+                   length: { maximum: 100 }
+  validates :description, length: { maximum: 5000 }
   # with_options presence: true do
   #   validates :office_id, if: :user_id_blank
   #   validates :user_id, if: :office_id_blank

@@ -33,7 +33,7 @@ RSpec.describe 'Task', type: :model do
       task.valid?
       expect(task.errors[:finish_datetime]).to include 'は開始日時以降を選択してください'
     end
-    it 'descriptionが1000文字の場合は登録できること' do
+    it 'descriptionが5000文字の場合は登録できること' do
       task.description = 'a' * 5000
       expect(task).to be_valid
     end
