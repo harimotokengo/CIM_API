@@ -5,7 +5,7 @@ FactoryBot.define do
     start_datetime { '2029-12-20T17:30:00+09:00' }
     description { 'テストタスク詳細' }
     task_status { '未稼働' }
-    priority { '低' }
+    priority { '低い' }
     complete { false }
     archive { true }
     association :user

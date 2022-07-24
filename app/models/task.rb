@@ -27,11 +27,19 @@ class Task < ApplicationRecord
   }
 
   enum priority: {
-    低: 1, 中: 2, 高: 3
+    低い: 1, 中: 2, 高い: 3
   }
 
   def datetime_before_start
     errors.add(:finish_datetime, 'は開始日時以降を選択してください') if start_datetime.present? && finish_datetime.present? && finish_datetime < start_datetime
+  end
+
+  def starttime_check
+    if self.start_datetime >= Ti.now
+      return true
+    else
+      return false
+    end
   end
 
   def already_task_assigned?(user)

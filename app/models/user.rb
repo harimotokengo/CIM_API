@@ -18,6 +18,8 @@ class User < ApplicationRecord
 
   has_one_attached :avatar
 
+  scope :active, -> { where(archive: true) }
+
   VALID_EMAIL_REGEX = /\A[\w+\-.]+@[a-z\d\-.]+\.[a-z]+\z/i.freeze
 
   # 8文字大文字小文字英数混在　記号を含む場合は(?=.*?[\W_])を追加
