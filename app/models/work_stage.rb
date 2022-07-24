@@ -7,7 +7,8 @@ class WorkStage < ApplicationRecord
 
   scope :active, -> { where(archive: true) }
 
-  validates :name, presence: true
+  validates :name, presence: true,
+                   length: { maximum: 100 }
 
   # task_templateとtaskのどっちも所持してないwork_stageは
   # 誰でも使用可能
