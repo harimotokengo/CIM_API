@@ -12,7 +12,6 @@ RSpec.describe TaskTemplateGroup, type: :model do
     it 'matter_categoryがない場合登録出来ないこと' do
       task_template_group.matter_category_id = nil
       task_template_group.valid?
-      binding.pry
       expect(task_template_group.errors).to be_added(:matter_category, :blank)
     end
     it 'nameがないの場合は登録できないこと' do
