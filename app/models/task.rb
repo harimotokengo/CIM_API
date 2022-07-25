@@ -20,7 +20,7 @@ class Task < ApplicationRecord
   validates :description, length: { maximum: 5000 }
   validates :user_id, presence: true
   validates :work_stage_id, presence: true
-  validate :datetime_before_start
+  validate :deadline_check
 
   enum task_status: {
     未稼働: 1, 対応予定: 2, 稼働中: 3, 終了: 4
@@ -30,15 +30,13 @@ class Task < ApplicationRecord
     低い: 1, 中: 2, 高い: 3
   }
 
-  def datetime_before_start
-    errors.add(:finish_datetime, 'は開始日時以降を選択してください') if start_datetime.present? && finish_datetime.present? && finish_datetime < start_datetime
-  end
+  # def datetime_before_start
+  #   errors.add(:finish_datetime, 'は開始日時以降を選択してください') if start_datetime.present? && finish_datetime.present? && finish_datetime < start_datetime
+  # end
 
-  def starttime_check
-    if self.start_datetime >= Ti.now
-      return true
-    else
-      return false
+  def deadline_check
+    if self.dead_line > Time.now
+      errors.add(:deadline, 'は作成日時以降を選択してください')
     end
   end
 
