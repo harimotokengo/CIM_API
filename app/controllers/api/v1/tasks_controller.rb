@@ -33,7 +33,7 @@ module Api
         @matter = @task.matter if @task.matter
         return response_forbidden unless correct_user
         @task.deadline_check
-        if @task.update(task_params)
+        if @task.update!(task_params)
           # @task.update_task_log(current_user)
           # アサイン通知
           # タスク終了通知
@@ -83,7 +83,7 @@ module Api
           if @matter
             return true if @matter.join_check(current_user) || @matter.client.join_check(current_user)
           else
-            return true if @task.identify_office_check(current_user)
+            return true if @task.user.identify_office_check(current_user) || @task.user.identify_check(current_user)
           end
         else
           if @matter

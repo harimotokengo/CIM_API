@@ -50,7 +50,7 @@ Rails.application.routes.draw do
         end
       end
       resources :invite_urls, only: :show
-      resources :tasks, only: [:index, :create, :update]
+      resources :tasks, only: [:index, :create, :update, :destroy]
     end
   end
 end

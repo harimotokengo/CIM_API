@@ -97,7 +97,7 @@ class User < ApplicationRecord
   end
 
   # 本人確認
-  def identify_checl(current_user)
+  def identify_check(current_user)
     return true if self == current_user
   end
 
@@ -112,8 +112,10 @@ class User < ApplicationRecord
   end
 
   def identify_office_check(current_user)
-    if self.belongign_check && current_user.belonging_check
+    if self.belonging_check && current_user.belonging_check
       return true if self.belonging_office == current_user.belonging_office
+    else
+      return false
     end
   end
 
