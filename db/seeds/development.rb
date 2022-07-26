@@ -170,7 +170,7 @@ end
     matters_attributes: [
       {
         user_id: rand(1..2),
-        matter_status_id: rand(1..5),
+        matter_status_id: rand(1..3),
         archive: true,
         opponents_attributes: [
           {
@@ -261,7 +261,7 @@ end
     matters_attributes: [
       {
         user_id: rand(1..2),
-        matter_status_id: rand(1..5),
+        matter_status_id: rand(1..3),
         archive: true,
         opponents_attributes: [
           {
@@ -303,7 +303,7 @@ end
 end
 
 
-matter_status_arr = ['受任', '先方検討中', '当方準備中', '相談のみ', '終了']
+matter_status_arr = ['受任', '終了', 'その他']
 
 # office_matter
 50.times do |n|
@@ -875,7 +875,7 @@ end
     matters_attributes: [
       {
         user_id: rand(1..2),
-        matter_status_id: rand(1..5),
+        matter_status_id: rand(1..3),
         archive: true,
         opponents_attributes: [
           {

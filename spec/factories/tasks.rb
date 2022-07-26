@@ -1,8 +1,7 @@
 FactoryBot.define do
   factory :task do
     sequence(:name) { |n| "テストタスク#{n}" }
-    finish_datetime { '2030-01-01T17:30:00+09:00' }
-    start_datetime { '2029-12-20T17:30:00+09:00' }
+    deadline { '2030-01-01T17:30:00+09:00' }
     description { 'テストタスク詳細' }
     task_status { '未稼働' }
     priority { '低い' }

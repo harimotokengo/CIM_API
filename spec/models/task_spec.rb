@@ -28,11 +28,6 @@ RSpec.describe 'Task', type: :model do
       task.valid?
       expect(task.errors).to be_added(:name, :too_long, count: 100)
     end
-    it 'finish_dateが過去の日付の場合、登録できないこと' do
-      task.finish_datetime = '2020-01-01'
-      task.valid?
-      expect(task.errors[:finish_datetime]).to include 'は開始日時以降を選択してください'
-    end
     it 'descriptionが5000文字の場合は登録できること' do
       task.description = 'a' * 5000
       expect(task).to be_valid

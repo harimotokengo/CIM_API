@@ -4,7 +4,7 @@ class Task < ApplicationRecord
   belongs_to :work_stage
 
   has_many :task_assigns, dependent: :destroy
-  has_many :task_assigned_users, through: :task_assigns, source: :user
+  has_many :assigned_users, through: :task_assigns, source: :user
   has_many :work_logs
   has_many :fees, dependent: :destroy
   has_many :notifications, dependent: :destroy
@@ -12,7 +12,7 @@ class Task < ApplicationRecord
 
   scope :active, -> { where(archive: true) }
 
-  # accepts_nested_attributes_for :task_assigns, reject_if: :all_blank, allow_destroy: true
+  accepts_nested_attributes_for :task_assigns, reject_if: :all_blank, allow_destroy: true
   # accepts_nested_attributes_for :fees, reject_if: :all_blank, allow_destroy: true
 
   validates :name, presence: true,
@@ -35,8 +35,11 @@ class Task < ApplicationRecord
   # end
 
   def deadline_check
-    if self.dead_line > Time.now
-      errors.add(:deadline, 'は作成日時以降を選択してください')
+    if self.deadline > Time.now
+      return true
+    else
+      errors.add(:deadline, 'は当日時以降を選択してください')
+      return false
     end
   end
 

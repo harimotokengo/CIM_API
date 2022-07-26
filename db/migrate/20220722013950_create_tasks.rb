@@ -2,8 +2,7 @@ class CreateTasks < ActiveRecord::Migration[7.0]
   def change
     create_table :tasks do |t|
       t.string :name, null: false
-      t.datetime :start_datetime
-      t.datetime :finish_datetime
+      t.datetime :deadline
       t.integer :task_status, null: false
       t.integer :priority, null: false
       t.text :description

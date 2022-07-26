@@ -10,11 +10,11 @@ module Api
 
       def create
         @task = current_user.tasks.new(task_params)
-        @task.set_matter if params[:matter_id].present?
+        @matter = Matter.find(params[:task][:matter_id]) if params[:task][:matter_id].present?
         return response_forbidden unless correct_user
+        @task.deadline_check
         # check_task_fee if @matter.present? || @task.matter.present?
-        @task.start_time_check if @task.start_datetime
-        if @task.save
+        if @task.save!
           # @task.create_task_log(current_user)
           # if params[:task][:task_assigns_attributes].present?
           #   @task.task_assigns.each do |task_assign|
@@ -32,6 +32,7 @@ module Api
         @task = Task.find(params[:id])
         @matter = @task.matter if @task.matter
         return response_forbidden unless correct_user
+        @task.deadline_check
         if @task.update(task_params)
           # @task.update_task_log(current_user)
           # アサイン通知
@@ -44,6 +45,7 @@ module Api
 
       def destroy
         @task = Task.find(params[:id])
+        @matter = @task.matter if @task.matter
         return response_forbidden unless correct_user
         @task.update(archive: false)
         render json: {status: 200, message: '削除しました'}
@@ -56,7 +58,7 @@ module Api
           :name, :description, :priority,
           :task_status, 
           :matter_id,  :archive, :complete,
-          :deadline
+          :deadline, :work_stage_id,
           # task_fee_relations_attributes: [
           #   :id, :fee_id, :_destroy
           # ],
@@ -72,10 +74,27 @@ module Api
 
       def correct_user
         if action_name == 'create'
-          matterがある場合
-          if 
-          return true if @matter.join_check(current_user) || @matter.client.join_check(current_user)
-          ない場合
+          if @matter
+            return true if @matter.join_check(current_user) || @matter.client.join_check(current_user)
+          else
+            return true
+          end
+        elsif action_name == 'update'
+          if @matter
+            return true if @matter.join_check(current_user) || @matter.client.join_check(current_user)
+          else
+            return true if @task.identify_office_check(current_user)
+          end
+        else
+          if @matter
+            if @task.matter.admin_check(current_user) || @task.matter.client.admin_check(current_user)
+              return true if current_user.admin_check
+            elsif @task.user.identify_office_check(current_user)
+              return true 
+            end
+          else
+            return true if @task.user.identify_check(current_user) || @task.user.admin_check
+          end
         end
       end
     end

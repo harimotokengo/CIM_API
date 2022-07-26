@@ -293,8 +293,7 @@ ActiveRecord::Schema[7.0].define(version: 2022_07_24_162946) do
 
   create_table "tasks", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.string "name", null: false
-    t.datetime "start_datetime"
-    t.datetime "finish_datetime"
+    t.datetime "deadline"
     t.integer "task_status", null: false
     t.integer "priority", null: false
     t.text "description"
