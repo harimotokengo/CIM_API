@@ -7,6 +7,7 @@ class CreateTaskTemplateGroups < ActiveRecord::Migration[7.0]
       t.string :name, nul: false
       t.text :description
       t.boolean :public_flg, default: false, null: false
+      t.boolean :archive, default: true, null: false
       t.timestamps
     end
   end

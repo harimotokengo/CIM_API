@@ -31,14 +31,12 @@ RSpec.describe TaskTemplateGroup, type: :model do
       expect(task_template_group.errors).to be_added(:name, :too_long, count: 100)
     end
 
-    it 'user_idがなくても登録出来ること' do
+    it 'user_idもoffice_idも両方存在しない場合登録できないこと' do
       task_template_group.user_id = nil
-      expect(task_template_group).to be_valid
-    end
-
-    it 'office_idがなくても登録出来ること' do
       task_template_group.office_id = nil
-      expect(task_template_group).to be_valid
+      task_template_group.valid?
+      expect(task_template_group.errors).to be_added(:user_id, :blank)
+      expect(task_template_group.errors).to be_added(:office_id, :blank)
     end
 
     it 'user_idとoffice_idが両方存在しても登録できること' do

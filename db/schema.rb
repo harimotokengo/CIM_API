@@ -274,6 +274,7 @@ ActiveRecord::Schema[7.0].define(version: 2022_07_24_162946) do
     t.string "name"
     t.text "description"
     t.boolean "public_flg", default: false, null: false
+    t.boolean "archive", default: true, null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["matter_category_id"], name: "index_task_template_groups_on_matter_category_id"

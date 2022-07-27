@@ -8,6 +8,7 @@ class User < ApplicationRecord
   has_many :matter_joins, dependent: :destroy
   has_many :charges, dependent: :destroy
   has_many :tasks, dependent: :destroy
+  has_many :task_template_groups
   # has_many :office_matter_joins,  -> { office_join }, class_name: 'MatterJoin'
   # has_many :user_matter_joins,  -> { user_join }, class_name: 'MatterJoin'
   # has_many :office_client_joins,  -> { office_join }, class_name: 'ClientJoin'
