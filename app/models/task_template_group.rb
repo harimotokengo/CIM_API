@@ -5,6 +5,8 @@ class TaskTemplateGroup < ApplicationRecord
 
   has_many :task_templates, dependent: :destroy
 
+  scope :active, -> { where(archive: true) }
+
   accepts_nested_attributes_for :task_templates, reject_if: :all_blank, allow_destroy: true
 
   validates :name, presence: true,
@@ -37,13 +39,4 @@ class TaskTemplateGroup < ApplicationRecord
     end
   end
 
-  # ==========
-  # テンプレ作成メモ
-  # ==========
-  # テンプレグループ名入力
-  # matter_categoryを選ぶ ancestryはnil
-  #   作業段階を選択
-  #   作業段階がなければ作成して選択
-  #     タスク名を入力
-  
 end

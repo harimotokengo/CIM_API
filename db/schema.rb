@@ -347,12 +347,14 @@ ActiveRecord::Schema[7.0].define(version: 2022_07_24_162946) do
 
   create_table "work_stages", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.bigint "user_id"
+    t.bigint "office_id"
     t.bigint "matter_category_id", null: false
     t.string "name"
     t.boolean "archive", default: true, null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["matter_category_id"], name: "index_work_stages_on_matter_category_id"
+    t.index ["office_id"], name: "index_work_stages_on_office_id"
     t.index ["user_id"], name: "index_work_stages_on_user_id"
   end
 
@@ -398,5 +400,6 @@ ActiveRecord::Schema[7.0].define(version: 2022_07_24_162946) do
   add_foreign_key "tasks", "users"
   add_foreign_key "tasks", "work_stages"
   add_foreign_key "work_stages", "matter_categories"
+  add_foreign_key "work_stages", "offices"
   add_foreign_key "work_stages", "users"
 end

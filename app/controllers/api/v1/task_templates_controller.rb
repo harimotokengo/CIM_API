@@ -13,7 +13,7 @@ module Api
       end
 
       def update
-        @task_template_group = TaskTemplateGroup.find(params[:id])
+        @task_template_group = TaskTemplateGroup.active.find(params[:id])
         return response_forbidden unless correct_user
         if @task_template_group.update(task_template_params)
           render json: { status: 200, message: "更新しました"}
@@ -23,7 +23,7 @@ module Api
       end
 
       def destroy
-        @task_template_group = TaskTemplateGroup.find(params[:id])
+        @task_template_group = TaskTemplateGroup.active.find(params[:id])
         return response_forbidden unless correct_user
         @task_template_group.update(archive: false)
         render json: { status: 200, message: "削除しました"}

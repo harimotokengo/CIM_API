@@ -4,7 +4,7 @@ RSpec.describe TaskAssign, type: :model do
   let!(:user) { create(:user) }
   let!(:belonging_info) { create(:belonging_info, status_id: 1, user: user) }
   let!(:task) { create(:task, user: user, matter_id: '') }
-  let!(:task_assign) { create(:task_assign, user: user, task: task) }
+  let!(:task_assign) { build(:task_assign, user: user, task: task) }
 
   describe 'validates' do
     it '有効なファクトリを持つこと' do
