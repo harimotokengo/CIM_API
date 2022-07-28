@@ -52,6 +52,7 @@ Rails.application.routes.draw do
       resources :invite_urls, only: :show
       resources :tasks, only: [:index, :create, :update, :destroy]
       resources :task_templates, only: [:create, :update, :destroy]
+      resources :work_stages, only: [:create, :update, :destroy]
     end
   end
 end

@@ -28,18 +28,18 @@ module Api
         @work_stage.update(archive: false)
         render json: { status: 200, message: "削除しました"}
       end
-    end
 
-    private
+      private
 
-    def work_stage_params
-      params.require(:work_stage).permit(
-        :name, :matter_category_id, :archive, :public_flg
-      )
-    end
+      def work_stage_params
+        params.require(:work_stage).permit(
+          :name, :matter_category_id, :archive, :public_flg
+        )
+      end
 
-    def correct_user
-      return true if @work_stage.user.identify_check(current_user) || @work_stage.user.admin_check
+      def correct_user
+        return true if @work_stage.user.identify_check(current_user) || @work_stage.user.admin_check
+      end
     end
   end
 end
