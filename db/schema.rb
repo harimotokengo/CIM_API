@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2022_07_17_080633) do
+ActiveRecord::Schema[7.0].define(version: 2022_07_24_162946) do
   create_table "active_storage_attachments", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.string "name", null: false
     t.string "record_type", null: false
@@ -258,6 +258,58 @@ ActiveRecord::Schema[7.0].define(version: 2022_07_17_080633) do
     t.datetime "updated_at", null: false
   end
 
+  create_table "task_assigns", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.bigint "task_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["task_id"], name: "index_task_assigns_on_task_id"
+    t.index ["user_id"], name: "index_task_assigns_on_user_id"
+  end
+
+  create_table "task_template_groups", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
+    t.bigint "user_id"
+    t.bigint "office_id"
+    t.bigint "matter_category_id", null: false
+    t.string "name"
+    t.text "description"
+    t.boolean "public_flg", default: false, null: false
+    t.boolean "archive", default: true, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["matter_category_id"], name: "index_task_template_groups_on_matter_category_id"
+    t.index ["office_id"], name: "index_task_template_groups_on_office_id"
+    t.index ["user_id"], name: "index_task_template_groups_on_user_id"
+  end
+
+  create_table "task_templates", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
+    t.bigint "work_stage_id", null: false
+    t.bigint "task_template_group_id", null: false
+    t.string "name", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["task_template_group_id"], name: "index_task_templates_on_task_template_group_id"
+    t.index ["work_stage_id"], name: "index_task_templates_on_work_stage_id"
+  end
+
+  create_table "tasks", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
+    t.string "name", null: false
+    t.datetime "deadline"
+    t.integer "task_status", null: false
+    t.integer "priority", null: false
+    t.text "description"
+    t.boolean "complete", default: false, null: false
+    t.boolean "archive", default: true, null: false
+    t.bigint "user_id", null: false
+    t.bigint "matter_id"
+    t.bigint "work_stage_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["matter_id"], name: "index_tasks_on_matter_id"
+    t.index ["user_id"], name: "index_tasks_on_user_id"
+    t.index ["work_stage_id"], name: "index_tasks_on_work_stage_id"
+  end
+
   create_table "user_invites", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.integer "sender_id", null: false
     t.string "token", null: false
@@ -293,6 +345,19 @@ ActiveRecord::Schema[7.0].define(version: 2022_07_17_080633) do
     t.index ["unlock_token"], name: "index_users_on_unlock_token"
   end
 
+  create_table "work_stages", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
+    t.bigint "user_id"
+    t.bigint "office_id"
+    t.bigint "matter_category_id", null: false
+    t.string "name"
+    t.boolean "archive", default: true, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["matter_category_id"], name: "index_work_stages_on_matter_category_id"
+    t.index ["office_id"], name: "index_work_stages_on_office_id"
+    t.index ["user_id"], name: "index_work_stages_on_user_id"
+  end
+
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
   add_foreign_key "belonging_infos", "offices"
@@ -324,4 +389,17 @@ ActiveRecord::Schema[7.0].define(version: 2022_07_17_080633) do
   add_foreign_key "matters", "clients"
   add_foreign_key "matters", "users"
   add_foreign_key "opponents", "matters"
+  add_foreign_key "task_assigns", "tasks"
+  add_foreign_key "task_assigns", "users"
+  add_foreign_key "task_template_groups", "matter_categories"
+  add_foreign_key "task_template_groups", "offices"
+  add_foreign_key "task_template_groups", "users"
+  add_foreign_key "task_templates", "task_template_groups"
+  add_foreign_key "task_templates", "work_stages"
+  add_foreign_key "tasks", "matters"
+  add_foreign_key "tasks", "users"
+  add_foreign_key "tasks", "work_stages"
+  add_foreign_key "work_stages", "matter_categories"
+  add_foreign_key "work_stages", "offices"
+  add_foreign_key "work_stages", "users"
 end

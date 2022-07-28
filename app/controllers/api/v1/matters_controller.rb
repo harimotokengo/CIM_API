@@ -15,7 +15,9 @@ module Api
 
       def create
         @client = Client.find(params[:client_id])
+        template_group_id = params[:matter][:task_template_group_id]
         return response_forbidden unless correct_user
+        return response_bad_request unless template_group_id
         @matter = current_user.matters.new(matter_params)
         case @matter.matter_joins[0].belong_side_id
         when '組織'
@@ -24,15 +26,15 @@ module Api
           @matter.matter_joins[0].user_id = current_user.id
         end
         @matter.matter_joins[0].admin = true
-        @matter.client_id = @client.id
         @matter.start_date = Time.now if @matter.matter_status_id == 1 && @matter.start_date.blank?
         tag_list = params[:matter][:tag_name].split(',') unless params[:matter][:tag_name].nil?
         if @matter.save
           @matter.save_matter_tags(tag_list) unless params[:matter][:tag_name].nil?
+          TaskTemplateGroup.find(template_group_id).save_matter_tasks(@matter, current_user)
           # @matter.create_matter_log(current_user)
           render json: { status: 200, message: "登録しました"}
         else
-          render status: 400, json: { status: 400, message: '登録出来ません。入力必須項目を確認してください', errors: @matter.errors }
+          render json: { status: 400, message: '登録出来ません。入力必須項目を確認してください', errors: @matter.errors }
         end
       end
 
@@ -103,7 +105,6 @@ module Api
           :matter_genre_id, :service_price,
           :description, :matter_status_id,
           :start_date, :finish_date,
-          # :task_group_template_id, 
           :archive,
           opponents_attributes: [
             :id, :name, :name_kana,

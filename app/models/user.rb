@@ -7,6 +7,9 @@ class User < ApplicationRecord
   has_many :matters, dependent: :destroy
   has_many :matter_joins, dependent: :destroy
   has_many :charges, dependent: :destroy
+  has_many :tasks, dependent: :destroy
+  has_many :task_template_groups
+  has_many :work_stages
   # has_many :office_matter_joins,  -> { office_join }, class_name: 'MatterJoin'
   # has_many :user_matter_joins,  -> { user_join }, class_name: 'MatterJoin'
   # has_many :office_client_joins,  -> { office_join }, class_name: 'ClientJoin'
@@ -17,6 +20,8 @@ class User < ApplicationRecord
   has_many :invite_urls, dependent: :destroy
 
   has_one_attached :avatar
+
+  scope :active, -> { where(archive: true) }
 
   VALID_EMAIL_REGEX = /\A[\w+\-.]+@[a-z\d\-.]+\.[a-z]+\z/i.freeze
 
@@ -93,9 +98,24 @@ class User < ApplicationRecord
     end
   end
 
+  # 本人確認
+  def identify_check(current_user)
+    return true if self == current_user
+  end
+
+
+
   def belonging_check
     if self.current_belonging
       return true
+    else
+      return false
+    end
+  end
+
+  def identify_office_check(current_user)
+    if self.belonging_check && current_user.belonging_check
+      return true if self.belonging_office == current_user.belonging_office
     else
       return false
     end

@@ -1,6 +1,7 @@
 class Matter < ApplicationRecord
   belongs_to :user, optional: true
   belongs_to :client
+
   has_many :opponents, dependent: :destroy
   has_many :occurrences, dependent: :destroy
   has_many :tasks, dependent: :destroy
@@ -38,8 +39,7 @@ class Matter < ApplicationRecord
   end
 
   enum matter_status_id: {
-    受任: 1, 先方検討中: 2, 当方準備中: 3,
-    相談のみ: 4, 終了: 5
+    受任: 1, 終了: 2, その他: 3
   }
 
   validates_inclusion_of :matter_status_id, in: ->(inst) { inst.class.matter_status_ids.keys }
@@ -158,6 +158,16 @@ class Matter < ApplicationRecord
   def office_join_check(current_user)
     matter_joins.where(
       office_id: current_user.belonging_office.id).exists? if current_user.belonging_office
+  end
+
+  # task_template_group_idが入力されているか確認
+  def task_template_group_selected?(template_group_id)
+    if template_group_id
+      return true
+    else
+      errors.add(base: 'タスクテンプレートが選択されていません')
+      return false
+    end
   end
 
   private
