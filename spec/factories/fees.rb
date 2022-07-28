@@ -12,6 +12,7 @@ FactoryBot.define do
     paid_amount { 1_000_000 }
     pay_off { false }
     association :matter
+    association :task
   end
 
   trait :fees do

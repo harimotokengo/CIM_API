@@ -8,7 +8,7 @@ class Matter < ApplicationRecord
   has_many :fees, dependent: :destroy
   has_many :charges, dependent: :destroy
   has_many :matter_assigns, dependent: :destroy
-  # has_many :work_logs, dependent: :destroy
+  has_many :work_logs, dependent: :destroy
   has_many :work_details, dependent: :destroy
   has_many :folder_urls, dependent: :destroy
   has_many :matter_tags, dependent: :destroy
