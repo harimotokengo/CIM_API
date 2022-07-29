@@ -2,7 +2,6 @@ class Fee < ApplicationRecord
   belongs_to :matter
   belongs_to :task
 
-  has_many :work_logs, dependent: :destroy
   # has_many :edit_logs, dependent: :destroy
 
   extend ActiveHash::Associations::ActiveRecordExtensions

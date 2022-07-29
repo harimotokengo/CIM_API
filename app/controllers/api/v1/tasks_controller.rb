@@ -89,8 +89,6 @@ module Api
           if @matter
             if @task.matter.admin_check(current_user) || @task.matter.client.admin_check(current_user)
               return true if current_user.admin_check
-            elsif @task.user.identify_office_check(current_user)
-              return true 
             end
           else
             return true if @task.user.identify_check(current_user) || @task.user.admin_check
