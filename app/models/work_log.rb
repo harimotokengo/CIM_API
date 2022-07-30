@@ -28,4 +28,20 @@ class WorkLog < ApplicationRecord
   def task_id_blank
     self.task_id.blank?
   end
+
+  def set_parent(matter_id = 'blank', task_id = 'blank')
+    if !task_id == 'blank'
+      self.task = Task.find(task_id)
+    elsif !matter_id == 'blank'
+      self.matter = Matter.find(matter_id)
+    end
+  end
+
+  def set_matter
+    if self.matter
+      @matter = self.matter
+    elsif self.task.matter
+      @matter = self.task.matter
+    end
+  end
 end
