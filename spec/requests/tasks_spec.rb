@@ -57,7 +57,6 @@ RSpec.describe 'tasks_requests', type: :request do
       context '案件参加ユーザーでログイン' do
         context '案件タスクを作成' do
           it 'リクエストが成功すること' do
-            binding.pry
             task_params = attributes_for(:task, matter_id: matter.id, work_stage_id: work_stage.id)
             login_user(matter_join_user, 'Test-1234', api_v1_login_path)
             post api_v1_tasks_path, params: { task: task_params}

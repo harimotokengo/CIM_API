@@ -34,7 +34,9 @@ class TaskTemplateGroup < ApplicationRecord
         name: task_template.name,
         user_id: current_user.id,
         matter_id: matter.id,
-        work_status_id: task_template.work_status_id
+        task_status: '未稼働',
+        priority: '中',
+        work_stage_id: task_template.work_stage_id
       )
     end
   end
