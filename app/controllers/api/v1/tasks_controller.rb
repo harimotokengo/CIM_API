@@ -14,7 +14,7 @@ module Api
         return response_forbidden unless correct_user
         @task.deadline_check
         # check_task_fee if @matter.present? || @task.matter.present?
-        if @task.save!
+        if @task.save
           # @task.create_task_log(current_user)
           # if params[:task][:task_assigns_attributes].present?
           #   @task.task_assigns.each do |task_assign|
@@ -89,6 +89,8 @@ module Api
           if @matter
             if @task.matter.admin_check(current_user) || @task.matter.client.admin_check(current_user)
               return true if current_user.admin_check
+            else
+              return true if @task.user.identify_check(current_user) || @task.user.admin_check
             end
           else
             return true if @task.user.identify_check(current_user) || @task.user.admin_check

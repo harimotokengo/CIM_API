@@ -1,12 +1,12 @@
 module Api
   module V1
-    class WorkLogController < Api::V1::Base
+    class WorkLogsController < Api::V1::Base
       before_action :response_unauthorized, unless: :logged_in?
 
       def create
         @work_log = current_user.work_logs.new(work_log_params)
-        @work_log.set_parent(params[:task_id], params[:matter_id])
-        @work_log.set_matter
+        @work_log.set_parent(params[:matter_id], params[:task_id])
+        @matter = @work_log.set_matter
         return response_forbidden unless correct_user
         if @work_log.save
           render json: {status: 200, message: '登録しました'}
@@ -17,7 +17,7 @@ module Api
 
       def update
         @work_log = WorkLog.find(params[:id])
-        @work_log.set_matter
+        @matter = @work_log.set_matter
         return response_forbidden unless correct_user
         if @work_log.update(work_log_params)
           render json: {status: 200, message: '更新しました'}
@@ -28,9 +28,9 @@ module Api
 
       def destroy
         @work_log = WorkLog.find(params[:id])
-        @work_log.set_matter
+        @matter = @work_log.set_matter
         return response_forbidden unless correct_user
-        @work_log.update(archive: false)
+        @work_log.delete
         render json: {status: 200, message: '削除しました'}
       end
 
@@ -47,8 +47,8 @@ module Api
         if action_name == 'create'
           if @matter
             return true if @matter.join_check(current_user) || @matter.client.join_check(current_user)
-          else
-            return true if @work_log.user.identify_office_check(current_user) || @work_log.user.identify_check(current_user)
+          elsif @work_log.task
+            return true if @work_log.task.user.identify_office_check(current_user) || @work_log.task.user.identify_check(current_user)
           end
         elsif action_name == 'update'
           if @matter 
@@ -60,6 +60,8 @@ module Api
           if @matter
             if @matter.admin_check(current_user) || @matter.client.admin_check(current_user)
               return true if current_user.admin_check
+            else
+              return true if @work_log.user.identify_check(current_user) || @work_log.user.admin_check
             end
           else
             return true if @work_log.user.identify_check(current_user) || @work_log.user.admin_check

@@ -5,5 +5,7 @@ FactoryBot.define do
     detail_reflection { true }
     content { 'テストコメント' }
     association :user
+    # association :matter
+    # association :task
   end
 end
