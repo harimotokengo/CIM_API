@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2022_07_24_162946) do
+ActiveRecord::Schema[7.0].define(version: 2022_07_28_105340) do
   create_table "active_storage_attachments", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.string "name", null: false
     t.string "record_type", null: false
@@ -142,10 +142,12 @@ ActiveRecord::Schema[7.0].define(version: 2022_07_24_162946) do
     t.integer "paid_amount"
     t.boolean "pay_off", default: false, null: false
     t.boolean "archive", default: true, null: false
-    t.bigint "matter_id"
+    t.bigint "matter_id", null: false
+    t.bigint "task_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["matter_id"], name: "index_fees_on_matter_id"
+    t.index ["task_id"], name: "index_fees_on_task_id"
   end
 
   create_table "invite_urls", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
@@ -345,6 +347,23 @@ ActiveRecord::Schema[7.0].define(version: 2022_07_24_162946) do
     t.index ["unlock_token"], name: "index_users_on_unlock_token"
   end
 
+  create_table "work_logs", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
+    t.integer "working_time"
+    t.text "content", null: false
+    t.date "worked_date", null: false
+    t.boolean "detail_reflection", default: true, null: false
+    t.bigint "user_id", null: false
+    t.bigint "matter_id"
+    t.bigint "task_id"
+    t.bigint "fee_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["fee_id"], name: "index_work_logs_on_fee_id"
+    t.index ["matter_id"], name: "index_work_logs_on_matter_id"
+    t.index ["task_id"], name: "index_work_logs_on_task_id"
+    t.index ["user_id"], name: "index_work_logs_on_user_id"
+  end
+
   create_table "work_stages", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.bigint "user_id"
     t.bigint "office_id"
@@ -374,6 +393,7 @@ ActiveRecord::Schema[7.0].define(version: 2022_07_24_162946) do
   add_foreign_key "contact_phone_numbers", "clients"
   add_foreign_key "contact_phone_numbers", "opponents"
   add_foreign_key "fees", "matters"
+  add_foreign_key "fees", "tasks"
   add_foreign_key "invite_urls", "clients"
   add_foreign_key "invite_urls", "matters"
   add_foreign_key "invite_urls", "users"
@@ -399,6 +419,10 @@ ActiveRecord::Schema[7.0].define(version: 2022_07_24_162946) do
   add_foreign_key "tasks", "matters"
   add_foreign_key "tasks", "users"
   add_foreign_key "tasks", "work_stages"
+  add_foreign_key "work_logs", "fees"
+  add_foreign_key "work_logs", "matters"
+  add_foreign_key "work_logs", "tasks"
+  add_foreign_key "work_logs", "users"
   add_foreign_key "work_stages", "matter_categories"
   add_foreign_key "work_stages", "offices"
   add_foreign_key "work_stages", "users"

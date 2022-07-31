@@ -13,7 +13,8 @@ class CreateFees < ActiveRecord::Migration[7.0]
       t.integer :paid_amount
       t.boolean :pay_off, default: false, null: false
       t.boolean :archive, default: true, null: false
-      t.references :matter, foreign_key: true
+      t.references :matter, foreign_key: true, null: false
+      t.references :task, foreign_key: true, null: false
       t.timestamps
     end
   end

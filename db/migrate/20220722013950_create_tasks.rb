@@ -11,7 +11,6 @@ class CreateTasks < ActiveRecord::Migration[7.0]
       t.references :user, null: false, foreign_key: true
       t.references :matter, foreign_key: true
       t.references :work_stage, null: false, foreign_key: true
-      # t.references :fee, foreign_key: true
       t.timestamps
     end
   end

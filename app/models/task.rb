@@ -13,7 +13,7 @@ class Task < ApplicationRecord
   scope :active, -> { where(archive: true) }
 
   accepts_nested_attributes_for :task_assigns, reject_if: :all_blank, allow_destroy: true
-  # accepts_nested_attributes_for :fees, reject_if: :all_blank, allow_destroy: true
+  accepts_nested_attributes_for :fees, reject_if: :all_blank, allow_destroy: true
 
   validates :name, presence: true,
                    length: { maximum: 100 }

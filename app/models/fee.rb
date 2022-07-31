@@ -1,10 +1,8 @@
 class Fee < ApplicationRecord
-  # has_many :task_fee_relations, dependent: :destroy
-  # has_many :fee_tasks, through: :task_fee_relations, source: :task
-  # has_many :work_logs, dependent: :destroy
-  # has_many :edit_logs, dependent: :destroy
-
   belongs_to :matter
+  belongs_to :task
+
+  # has_many :edit_logs, dependent: :destroy
 
   extend ActiveHash::Associations::ActiveRecordExtensions
   belongs_to_active_hash :monthly_date
