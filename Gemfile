@@ -52,6 +52,10 @@ group :development do
   # gem "spring"
 end
 
+group :test do
+  gem 'rspec-openapi'
+end
+
 gem 'active_hash'
 gem 'ancestry'
 gem 'aws-sdk-s3', require: false
