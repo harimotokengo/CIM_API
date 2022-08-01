@@ -82,12 +82,18 @@ module Api
         @full_name = @name + @first_name
         @harf_space_fullname = @name + ' ' + @first_name
         @hull_space_fullname = @name + '　' + @first_name
-        @clients = Client.joins(matters: :matter_joins).where(['matters.archive = ?', true]).where(['matter_joins.office_id = ? OR matter_joins.user_id = ?', @office.id, current_user.id])
-                         .where(['name = ? AND first_name = ?', @name, @first_name]).distinct
-        # ============追加====client_joinしてるclientにもコンフリがないか確認
-        @opponents = Opponent.joins(matter: :matter_joins).where(['matters.archive = ?', true]).where(['matter_joins.office_id = ? OR matter_joins.user_id = ?', @office.id, current_user.id])
-                             .where(['name = ? OR name = ? OR name = ?', @full_name, @harf_space_fullname, @hull_space_fullname]).distinct
-        # ＝＝＝＝＝＝＝追加＝＝＝client_joinしてるmatterのopponentにコンフリが発生してるかも確認
+        @clients = Client.joins(matters: :matter_joins)
+                          .joins(:client_joins)
+                          .where(['clients.archive = ?', true])
+                          .where(['matters.archive = ?', true])
+                          .where(['client_joins.user_id = ? or matter_joins.office_id = ? or client_joins.office_id = ? or matter_joins.user_id = ?', current_user.belonging_office, current_user, current_user.belonging_office, current_user])
+                          .where(['name = ? AND first_name = ?', @name, @first_name]).distinct
+        @opponents = Opponent.joins(matter: :matter_joins)
+                              .joins(matter: {client: :client_joins})
+                              .where(['clients.archive = ?', true])
+                              .where(['matters.archive = ?', true])
+                              .where(['client_joins.user_id = ? or matter_joins.office_id = ? or client_joins.office_id = ? or matter_joins.user_id = ?', current_user.belonging_office, current_user, current_user.belonging_office, current_user])
+                              .where(['name = ? OR name = ? OR name = ?', @full_name, @harf_space_fullname, @hull_space_fullname]).distinct
         if !@clients && !@opponents
           render json: { status: 200, message: 'OK' }
         # elsif @clients
@@ -144,7 +150,6 @@ module Api
             :id, :user_id, :service_price,
             :folder_url, :description, :matter_status_id,
             :start_date, :finish_date, 
-            # :task_group_template_id, 
             :_destroy,
             matter_category_joins_attributes: [
               :id, :matter_id, :matter_category_id,
@@ -157,9 +162,9 @@ module Api
             matter_assigns_attributes: %i[
 
             ],
-            # folder_urls_attributes: %i[
-            #   id name url _destroy
-            # ],
+            folder_urls_attributes: %i[
+              id name url _destroy
+            ],
             fees_attributes: %i[
               id fee_type_id price price_type
               monthly_date_id pay_times _destroy
@@ -223,12 +228,3 @@ module Api
     end
   end
 end
-
-
-# matter.tasksからtemplate_groupおよびテンプレート作成
-# matter = Matter.find(params[:id])
-# tasks = matter.tasks
-# task_template_group = TaskTemplateGroup.create(name: params[:task_template_group][:name])
-# tasks.each do |task|
-#   TaskTemplate.create(name: task.name, template_group_id: task_template_group.id)
-# end
