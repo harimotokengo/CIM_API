@@ -1,0 +1,3872 @@
+---
+openapi: 3.0.3
+info:
+  title: cim
+  version: 0.5.0
+servers: []
+paths:
+  "/api/v1/matters/{matter_id}/charges":
+    post:
+      summary: create
+      tags:
+      - Api::V1::Charge
+      parameters:
+      - name: matter_id
+        in: path
+        required: true
+        schema:
+          type: integer
+        example: 4185
+      responses:
+        '200':
+          description: 登録されること
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                  message:
+                    type: string
+              example:
+                status: 200
+                message: ピン止めしました
+        '401':
+          description: 登録されないこと
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                  message:
+                    type: string
+              example:
+                status: 401
+                message: Unauthorized
+        '403':
+          description: 登録されないこと
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                  message:
+                    type: string
+              example:
+                status: 403
+                message: Forbidden
+  "/api/v1/matters/{matter_id}/charges/{id}":
+    delete:
+      summary: destroy
+      tags:
+      - Api::V1::Charge
+      parameters:
+      - name: matter_id
+        in: path
+        required: true
+        schema:
+          type: integer
+        example: 4201
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+        example: 113
+      responses:
+        '200':
+          description: 削除されること
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                  message:
+                    type: string
+              example:
+                status: 200
+                message: ピン止めを解除しました
+        '401':
+          description: 削除されること
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                  message:
+                    type: string
+              example:
+                status: 401
+                message: Unauthorized
+        '403':
+          description: 削除されないこと
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                  message:
+                    type: string
+              example:
+                status: 403
+                message: Forbidden
+  "/api/v1/clients/{client_id}/client_joins":
+    get:
+      summary: index
+      tags:
+      - Api::V1::ClientJoin
+      parameters:
+      - name: client_id
+        in: path
+        required: true
+        schema:
+          type: integer
+        example: 4682
+      responses:
+        '200':
+          description: リクエストが成功すること
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                        name:
+                          type: string
+                        phone_number:
+                          type: string
+                        post_code:
+                          type: string
+                        prefecture:
+                          type: string
+                        address:
+                          type: string
+                        archive:
+                          type: boolean
+                        created_at:
+                          type: string
+                        updated_at:
+                          type: string
+              example:
+                status: 200
+                data:
+                - id: 17865
+                  name: テスト事務所
+                  phone_number: '09012345678'
+                  post_code: 110-0001
+                  prefecture: 東京都
+                  address: ''
+                  archive: true
+                  created_at: '2022-08-01T14:33:13.791+09:00'
+                  updated_at: '2022-08-01T14:33:13.791+09:00'
+                - false
+                - id: 17866
+                  name: テスト事務所
+                  phone_number: '09012345678'
+                  post_code: 110-0001
+                  prefecture: 東京都
+                  address: ''
+                  archive: true
+                  created_at: '2022-08-01T14:33:13.794+09:00'
+                  updated_at: '2022-08-01T14:33:13.794+09:00'
+                - true
+                - id: 54054
+                  email: test491@example.com
+                  crypted_password: "$2a$04$fwVGCzWAMQgStZhBYZuvoecFlelzd5jMVkIAmXdyfGGO67HGyCkwG"
+                  reset_password_token: 
+                  reset_password_token_expires_at: 
+                  reset_password_email_sent_at: 
+                  access_count_to_reset_password_page: 0
+                  failed_logins_count: 0
+                  lock_expires_at: 
+                  unlock_token: 
+                  salt: 7mpPymznGzDbgaqz2Jy5
+                  last_name: テスト
+                  first_name: ユーザー
+                  last_name_kana: てすと
+                  first_name_kana: ゆーざー
+                  membership_number: 11111
+                  user_job_id: 1
+                  office_id: 
+                  archive: true
+                  created_at: '2022-08-01T14:33:13.802+09:00'
+                  updated_at: '2022-08-01T14:33:13.802+09:00'
+                - false
+                - id: 54055
+                  email: test492@example.com
+                  crypted_password: "$2a$04$kiJdV2Y42NtIDGE0kylNgOCg3JRQ0Ujz0hTnr8STkF31fwQd76wj6"
+                  reset_password_token: 
+                  reset_password_token_expires_at: 
+                  reset_password_email_sent_at: 
+                  access_count_to_reset_password_page: 0
+                  failed_logins_count: 0
+                  lock_expires_at: 
+                  unlock_token: 
+                  salt: BfDMQ4NPxnZnwTo88yxk
+                  last_name: テスト
+                  first_name: ユーザー
+                  last_name_kana: てすと
+                  first_name_kana: ゆーざー
+                  membership_number: 11111
+                  user_job_id: 1
+                  office_id: 
+                  archive: true
+                  created_at: '2022-08-01T14:33:13.807+09:00'
+                  updated_at: '2022-08-01T14:33:13.807+09:00'
+                - true
+        '401':
+          description: 401エラーが返ってくること
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                  message:
+                    type: string
+              example:
+                status: 401
+                message: Unauthorized
+        '403':
+          description: 403エラーが返ってくること
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                  message:
+                    type: string
+              example:
+                status: 403
+                message: Forbidden
+    post:
+      summary: create
+      tags:
+      - Api::V1::ClientJoin
+      parameters:
+      - name: client_id
+        in: path
+        required: true
+        schema:
+          type: integer
+        example: 4743
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                belong_side_id:
+                  type: string
+                  nullable: true
+                invite_url_id:
+                  type: string
+            example:
+              belong_side_id: 組織
+              invite_url_id: '563'
+      responses:
+        '200':
+          description: 登録されること
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                  message:
+                    type: string
+              example:
+                status: 200
+                message: 参加しました
+        '401':
+          description: 登録されないこと
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                  message:
+                    type: string
+              example:
+                status: 401
+                message: Unauthorized
+        '403':
+          description: 登録されないこと
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                  message:
+                    type: string
+              example:
+                status: 403
+                message: Forbidden
+        '400':
+          description: 登録されないこと
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                  message:
+                    type: string
+                  errors:
+                    type: object
+                    properties:
+                      belong_side_id:
+                        type: array
+                        items:
+                          type: string
+              example:
+                status: 400
+                message: Bad Request
+                errors:
+                  belong_side_id:
+                  - を入力してください
+  "/api/v1/clients/{client_id}/client_joins/create_token":
+    post:
+      summary: create_token
+      tags:
+      - Api::V1::ClientJoin
+      parameters:
+      - name: client_id
+        in: path
+        required: true
+        schema:
+          type: integer
+        example: 4696
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                admin:
+                  type: string
+            example:
+              admin: 'false'
+      responses:
+        '200':
+          description: 登録されること
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                  message:
+                    type: string
+              example:
+                status: 200
+                message: 招待URLを発行しました
+        '401':
+          description: 登録されないこと
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                  message:
+                    type: string
+              example:
+                status: 401
+                message: Unauthorized
+        '403':
+          description: 登録されないこと
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                  message:
+                    type: string
+              example:
+                status: 403
+                message: Forbidden
+  "/api/v1/clients/{client_id}/client_joins/{id}":
+    put:
+      summary: update
+      tags:
+      - Api::V1::ClientJoin
+      parameters:
+      - name: client_id
+        in: path
+        required: true
+        schema:
+          type: integer
+        example: 4769
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+        example: 12960
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                client_join:
+                  type: object
+                  properties:
+                    belong_side_id:
+                      type: string
+                    admin:
+                      type: string
+            example:
+              client_join:
+                belong_side_id: 個人
+                admin: 'true'
+      responses:
+        '200':
+          description: 更新されないこと
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                  message:
+                    type: string
+              example:
+                status: 200
+                message: 更新しました
+        '401':
+          description: 更新されないこと
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                  message:
+                    type: string
+              example:
+                status: 401
+                message: Unauthorized
+        '403':
+          description: 更新されないこと
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                  message:
+                    type: string
+              example:
+                status: 403
+                message: Forbidden
+        '400':
+          description: 更新されないこと
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                  message:
+                    type: string
+              example:
+                status: 400
+                message: Bad Request
+    delete:
+      summary: destroy
+      tags:
+      - Api::V1::ClientJoin
+      parameters:
+      - name: client_id
+        in: path
+        required: true
+        schema:
+          type: integer
+        example: 4799
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+        example: 13083
+      responses:
+        '200':
+          description: 削除されること
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                  message:
+                    type: string
+              example:
+                status: 200
+                message: 削除しました
+        '401':
+          description: 削除されないこと
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                  message:
+                    type: string
+              example:
+                status: 401
+                message: Unauthorized
+        '403':
+          description: 削除されないこと
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                  message:
+                    type: string
+              example:
+                status: 403
+                message: Forbidden
+        '400':
+          description: 削除されないこと
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                  message:
+                    type: string
+              example:
+                status: 400
+                message: Bad Request
+  "/api/v1/clients":
+    get:
+      summary: index
+      tags:
+      - Api::V1::Client
+      responses:
+        '200':
+          description: リクエストが成功すること
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                        name:
+                          type: string
+                        first_name:
+                          type: string
+                        name_kana:
+                          type: string
+                        first_name_kana:
+                          type: string
+                        maiden_name:
+                          nullable: true
+                        maiden_name_kana:
+                          nullable: true
+                        profile:
+                          type: string
+                        indentification_number:
+                          type: string
+                        birth_date:
+                          type: string
+                        client_type_id:
+                          type: string
+                        archive:
+                          type: boolean
+                        created_at:
+                          type: string
+                        updated_at:
+                          type: string
+              example:
+                status: 200
+                data:
+                - id: 4800
+                  name: テスト姓
+                  first_name: テスト名
+                  name_kana: てすとせい
+                  first_name_kana: てすとめい
+                  maiden_name: 
+                  maiden_name_kana: 
+                  profile: テストプロフィール
+                  indentification_number: '452333443'
+                  birth_date: '2000-01-01'
+                  client_type_id: 法人
+                  archive: true
+                  created_at: '2022-08-01T14:33:24.214+09:00'
+                  updated_at: '2022-08-01T14:33:24.214+09:00'
+                - - 
+                  - id: 13800
+                    name: 離婚
+                    ancestry: 
+                    created_at: '2022-08-01T14:33:24.219+09:00'
+                    updated_at: '2022-08-01T14:33:24.219+09:00'
+                  - []
+        '401':
+          description: 401エラーが返ってくること
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                  message:
+                    type: string
+              example:
+                status: 401
+                message: Unauthorized
+    post:
+      summary: create
+      tags:
+      - Api::V1::Client
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                client:
+                  type: object
+                  properties:
+                    name:
+                      type: string
+                    name_kana:
+                      type: string
+                    first_name:
+                      type: string
+                    first_name_kana:
+                      type: string
+                    profile:
+                      type: string
+                    indentification_number:
+                      type: string
+                    birth_date:
+                      type: string
+                    client_type_id:
+                      type: string
+                    archive:
+                      type: string
+                    matters_attributes:
+                      type: object
+                      properties:
+                        '0':
+                          type: object
+                          properties:
+                            matter_status_id:
+                              type: string
+                            service_price:
+                              type: string
+                            description:
+                              type: string
+                            archive:
+                              type: string
+                            task_template_group_id:
+                              type: string
+                            user_id:
+                              type: string
+                            opponents_attributes:
+                              type: object
+                              properties:
+                                '0':
+                                  type: object
+                                  properties:
+                                    name:
+                                      type: string
+                                    name_kana:
+                                      type: string
+                                    first_name:
+                                      type: string
+                                    first_name_kana:
+                                      type: string
+                                    profile:
+                                      type: string
+                                    birth_date:
+                                      type: string
+                                    opponent_relation_type:
+                                      type: string
+                            matter_joins_attributes:
+                              type: object
+                              properties:
+                                '0':
+                                  type: object
+                                  properties:
+                                    belong_side_id:
+                                      type: string
+                                    admin:
+                                      type: string
+                    client_joins_attributes:
+                      type: object
+                      properties:
+                        '0':
+                          type: object
+                          properties:
+                            belong_side_id:
+                              type: string
+                            admin:
+                              type: string
+                    contact_phone_numbers_attributes:
+                      type: object
+                      properties:
+                        '0':
+                          type: object
+                          properties:
+                            category:
+                              type: string
+                            phone_number:
+                              type: string
+                    contact_emails_attributes:
+                      type: object
+                      properties:
+                        '0':
+                          type: object
+                          properties:
+                            category:
+                              type: string
+                            email:
+                              type: string
+                    contact_addresss_attributes:
+                      type: object
+                      properties:
+                        '0':
+                          type: object
+                          properties:
+                            category:
+                              type: string
+                            post_code:
+                              type: string
+                            prefecture:
+                              type: string
+                            address:
+                              type: string
+                            send_by_personal:
+                              type: string
+            example:
+              client:
+                name: テスト姓
+                name_kana: てすとせい
+                first_name: テスト名
+                first_name_kana: てすとめい
+                profile: テストプロフィール
+                indentification_number: '452333443'
+                birth_date: '2000-01-01'
+                client_type_id: 法人
+                archive: 'true'
+                matters_attributes:
+                  '0':
+                    matter_status_id: 受任
+                    service_price: '12345678'
+                    description: テストマタープロフィール
+                    archive: 'true'
+                    task_template_group_id: '1161'
+                    user_id: '55217'
+                    opponents_attributes:
+                      '0':
+                        name: テスト姓
+                        name_kana: てすとせい
+                        first_name: テスト名
+                        first_name_kana: てすとめい
+                        profile: テストプロフィール
+                        birth_date: '2000-01-01'
+                        opponent_relation_type: 相手方
+                    matter_joins_attributes:
+                      '0':
+                        belong_side_id: 組織
+                        admin: 'true'
+                client_joins_attributes:
+                  '0':
+                    belong_side_id: 組織
+                    admin: 'true'
+                contact_phone_numbers_attributes:
+                  '0':
+                    category: 私用
+                    phone_number: '123456'
+                contact_emails_attributes:
+                  '0':
+                    category: 私用
+                    email: contact-email@example.com
+                contact_addresss_attributes:
+                  '0':
+                    category: 現住所
+                    post_code: '1100001'
+                    prefecture: 東京都
+                    address: 渋谷区
+                    send_by_personal: 'false'
+      responses:
+        '200':
+          description: 相手方の連絡先が同時に登録されること
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                  message:
+                    type: string
+              example:
+                status: 200
+                message: 登録しました
+        '401':
+          description: 登録されない
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                  message:
+                    type: string
+              example:
+                status: 401
+                message: Unauthorized
+        '400':
+          description: 登録されないこと
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                  message:
+                    type: string
+                  errors:
+                    type: object
+                    properties:
+                      name:
+                        type: array
+                        items:
+                          type: string
+                      contact_phone_numbers.phone_number:
+                        type: array
+                        items:
+                          type: string
+              example:
+                status: 400
+                message: 登録出来ません。入力必須項目を確認してください
+                errors:
+                  name:
+                  - を入力してください
+                  contact_phone_numbers.phone_number:
+                  - 半角数字で入力して下さい
+  "/api/v1/clients/{id}":
+    put:
+      summary: update
+      tags:
+      - Api::V1::Client
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+        example: 4852
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                client:
+                  type: object
+                  properties:
+                    name:
+                      type: string
+                    name_kana:
+                      type: string
+                    first_name:
+                      type: string
+                    first_name_kana:
+                      type: string
+                    profile:
+                      type: string
+                    indentification_number:
+                      type: string
+                    birth_date:
+                      type: string
+                    client_type_id:
+                      type: string
+                    archive:
+                      type: string
+                    contact_phone_numbers_attributes:
+                      type: object
+                      properties:
+                        '0':
+                          type: object
+                          properties:
+                            category:
+                              type: string
+                            phone_number:
+                              type: string
+            example:
+              client:
+                name: テスト姓
+                name_kana: てすとせい
+                first_name: テスト名
+                first_name_kana: てすとめい
+                profile: テストプロフィール
+                indentification_number: '452333443'
+                birth_date: '2000-01-01'
+                client_type_id: 法人
+                archive: 'true'
+                contact_phone_numbers_attributes:
+                  '0':
+                    category: 私用
+                    phone_number: '08012345'
+      responses:
+        '200':
+          description: 更新されること
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                  message:
+                    type: string
+              example:
+                status: 200
+                message: 更新しました
+        '401':
+          description: 更新されないこと
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                  message:
+                    type: string
+              example:
+                status: 401
+                message: Unauthorized
+        '400':
+          description: 更新されないこと
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                  message:
+                    type: string
+                  errors:
+                    type: object
+                    properties:
+                      name:
+                        type: array
+                        items:
+                          type: string
+                      contact_phone_numbers.phone_number:
+                        type: array
+                        items:
+                          type: string
+              example:
+                status: 400
+                message: 更新出来ません。入力必須項目を確認してください
+                errors:
+                  name:
+                  - を入力してください
+                  contact_phone_numbers.phone_number:
+                  - 半角数字で入力して下さい
+    get:
+      summary: show
+      tags:
+      - Api::V1::Client
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+        example: 4862
+      responses:
+        '200':
+          description: matterへの参加があるuserがアクセスする場合リクエストが成功すること
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                      name:
+                        type: string
+                      first_name:
+                        type: string
+                      name_kana:
+                        type: string
+                      first_name_kana:
+                        type: string
+                      maiden_name:
+                        nullable: true
+                      maiden_name_kana:
+                        nullable: true
+                      profile:
+                        type: string
+                      indentification_number:
+                        type: string
+                      birth_date:
+                        type: string
+                      client_type_id:
+                        type: string
+                      archive:
+                        type: boolean
+                      created_at:
+                        type: string
+                      updated_at:
+                        type: string
+              example:
+                status: 200
+                data:
+                  id: 4858
+                  name: テスト姓
+                  first_name: テスト名
+                  name_kana: てすとせい
+                  first_name_kana: てすとめい
+                  maiden_name: 
+                  maiden_name_kana: 
+                  profile: テストプロフィール
+                  indentification_number: '452333443'
+                  birth_date: '2000-01-01'
+                  client_type_id: 法人
+                  archive: true
+                  created_at: '2022-08-01T14:33:28.678+09:00'
+                  updated_at: '2022-08-01T14:33:28.678+09:00'
+        '401':
+          description: 401エラーを返すこと
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                  message:
+                    type: string
+              example:
+                status: 401
+                message: Unauthorized
+        '403':
+          description: 403エラーを返すこと
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                  message:
+                    type: string
+              example:
+                status: 403
+                message: Forbidden
+  "/api/v1/invite_urls/{id}":
+    get:
+      summary: show
+      tags:
+      - Api::V1::InviteUrl
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+        example: 581
+      - name: tk
+        in: query
+        schema:
+          type: string
+        example: '0123456789abcdef'
+      responses:
+        '200':
+          description: 参加画面に表示するデータが取得できること
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                  data:
+                    type: object
+                    properties:
+                      inviter:
+                        type: string
+                      limit_date:
+                        type: string
+                      invited_destination_name:
+                        type: string
+              example:
+                status: 200
+                data:
+                  inviter: テストユーザー
+                  limit_date: '2022-08-02T14:33:30.536+09:00'
+                  invited_destination_name: テスト姓テスト名,全案件
+        '401':
+          description: 参加画面に表示するデータが取得できないこと
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                  message:
+                    type: string
+              example:
+                status: 401
+                message: Unauthorized
+        '400':
+          description: 参加画面に表示するデータが取得できないこと
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                  message:
+                    type: string
+              example:
+                status: 400
+                message: Bad Request
+  "/api/v1/matters/{matter_id}/matter_assigns":
+    post:
+      summary: create
+      tags:
+      - Api::V1::MatterAssign
+      parameters:
+      - name: matter_id
+        in: path
+        required: true
+        schema:
+          type: integer
+        example: 4433
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                matter_assign:
+                  type: object
+                  properties:
+                    user_id:
+                      type: string
+            example:
+              matter_assign:
+                user_id: '56154'
+      responses:
+        '200':
+          description: 登録されること
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                  message:
+                    type: string
+              example:
+                status: 200
+                message: 登録しました。
+        '401':
+          description: 登録されないこと
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                  message:
+                    type: string
+              example:
+                status: 401
+                message: Unauthorized
+        '400':
+          description: 登録されないこと
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                  message:
+                    type: string
+              example:
+                status: 400
+                message: Bad Request
+        '403':
+          description: 登録されないこと
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                  message:
+                    type: string
+              example:
+                status: 403
+                message: Forbidden
+  "/api/v1/matters/{matter_id}/matter_assigns/{id}":
+    delete:
+      summary: destroy
+      tags:
+      - Api::V1::MatterAssign
+      parameters:
+      - name: matter_id
+        in: path
+        required: true
+        schema:
+          type: integer
+        example: 4459
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+        example: 317
+      responses:
+        '200':
+          description: 削除されること
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                  message:
+                    type: string
+              example:
+                status: 200
+                message: 担当を削除しました。
+        '401':
+          description: 削除されないこと
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                  message:
+                    type: string
+              example:
+                status: 401
+                message: Unauthorized
+        '400':
+          description: 削除されないこと
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                  message:
+                    type: string
+              example:
+                status: 400
+                message: Bad Request
+        '403':
+          description: 削除されないこと
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                  message:
+                    type: string
+              example:
+                status: 403
+                message: Forbidden
+  "/api/v1/matters/{matter_id}/matter_joins":
+    get:
+      summary: index
+      tags:
+      - Api::V1::MatterJoin
+      parameters:
+      - name: matter_id
+        in: path
+        required: true
+        schema:
+          type: integer
+        example: 4466
+      responses:
+        '200':
+          description: リクエストが成功すること
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                        name:
+                          type: string
+                        phone_number:
+                          type: string
+                        post_code:
+                          type: string
+                        prefecture:
+                          type: string
+                        address:
+                          type: string
+                        archive:
+                          type: boolean
+                        created_at:
+                          type: string
+                        updated_at:
+                          type: string
+              example:
+                status: 200
+                data:
+                - id: 18764
+                  name: テスト事務所
+                  phone_number: '09012345678'
+                  post_code: 110-0001
+                  prefecture: 東京都
+                  address: ''
+                  archive: true
+                  created_at: '2022-08-01T14:33:40.489+09:00'
+                  updated_at: '2022-08-01T14:33:40.489+09:00'
+                - false
+                - id: 18766
+                  name: テスト事務所
+                  phone_number: '09012345678'
+                  post_code: 110-0001
+                  prefecture: 東京都
+                  address: ''
+                  archive: true
+                  created_at: '2022-08-01T14:33:40.494+09:00'
+                  updated_at: '2022-08-01T14:33:40.494+09:00'
+                - true
+                - id: 56632
+                  email: test3069@example.com
+                  crypted_password: "$2a$04$qaG/nd4ejA1WgAVjXVjITu.WNZI0dvk/ysJhddwKpa2KY5c117J9K"
+                  reset_password_token: 
+                  reset_password_token_expires_at: 
+                  reset_password_email_sent_at: 
+                  access_count_to_reset_password_page: 0
+                  failed_logins_count: 0
+                  lock_expires_at: 
+                  unlock_token: 
+                  salt: v4vveMxYFL5yBDwiaiSY
+                  last_name: テスト
+                  first_name: ユーザー
+                  last_name_kana: てすと
+                  first_name_kana: ゆーざー
+                  membership_number: 11111
+                  user_job_id: 1
+                  office_id: 
+                  archive: true
+                  created_at: '2022-08-01T14:33:40.522+09:00'
+                  updated_at: '2022-08-01T14:33:40.522+09:00'
+                - false
+                - id: 56633
+                  email: test3070@example.com
+                  crypted_password: "$2a$04$DkPtGzvvTJHeQl1LLJRKeuScp0.UM.bjgDfoxjKI7Jx0OUq9dAAee"
+                  reset_password_token: 
+                  reset_password_token_expires_at: 
+                  reset_password_email_sent_at: 
+                  access_count_to_reset_password_page: 0
+                  failed_logins_count: 0
+                  lock_expires_at: 
+                  unlock_token: 
+                  salt: e8vWddar-oLthqurssuW
+                  last_name: テスト
+                  first_name: ユーザー
+                  last_name_kana: てすと
+                  first_name_kana: ゆーざー
+                  membership_number: 11111
+                  user_job_id: 1
+                  office_id: 
+                  archive: true
+                  created_at: '2022-08-01T14:33:40.526+09:00'
+                  updated_at: '2022-08-01T14:33:40.526+09:00'
+                - true
+        '401':
+          description: 401エラーが返ってくること
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                  message:
+                    type: string
+              example:
+                status: 401
+                message: Unauthorized
+        '403':
+          description: 403エラーが返ってくること
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                  message:
+                    type: string
+              example:
+                status: 403
+                message: Forbidden
+    post:
+      summary: create
+      tags:
+      - Api::V1::MatterJoin
+      parameters:
+      - name: matter_id
+        in: path
+        required: true
+        schema:
+          type: integer
+        example: 4538
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                belong_side_id:
+                  type: string
+                  nullable: true
+                invite_url_id:
+                  type: string
+            example:
+              belong_side_id: 組織
+              invite_url_id: '639'
+      responses:
+        '200':
+          description: 登録されること
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                  message:
+                    type: string
+              example:
+                status: 200
+                message: 参加しました
+        '401':
+          description: 登録されないこと
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                  message:
+                    type: string
+              example:
+                status: 401
+                message: Unauthorized
+        '403':
+          description: 登録されないこと
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                  message:
+                    type: string
+              example:
+                status: 403
+                message: Forbidden
+        '400':
+          description: 登録されないこと
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                  message:
+                    type: string
+                  errors:
+                    type: object
+                    properties:
+                      belong_side_id:
+                        type: array
+                        items:
+                          type: string
+              example:
+                status: 400
+                message: Bad Request
+                errors:
+                  belong_side_id:
+                  - を入力してください
+  "/api/v1/matters/{matter_id}/matter_joins/create_token":
+    post:
+      summary: create_token
+      tags:
+      - Api::V1::MatterJoin
+      parameters:
+      - name: matter_id
+        in: path
+        required: true
+        schema:
+          type: integer
+        example: 4488
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                admin:
+                  type: string
+            example:
+              admin: 'false'
+      responses:
+        '200':
+          description: 登録されること
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                  message:
+                    type: string
+              example:
+                status: 200
+                message: 招待URLを発行しました
+        '401':
+          description: 登録されないこと
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                  message:
+                    type: string
+              example:
+                status: 401
+                message: Unauthorized
+        '403':
+          description: 登録されないこと
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                  message:
+                    type: string
+              example:
+                status: 403
+                message: Forbidden
+  "/api/v1/matters/{matter_id}/matter_joins/get_invite_url":
+    get:
+      summary: get_invite_url
+      tags:
+      - Api::V1::MatterJoin
+      parameters:
+      - name: matter_id
+        in: path
+        required: true
+        schema:
+          type: integer
+        example: 4506
+      responses:
+        '200':
+          description: 招待URLを取得できること
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                  data:
+                    type: string
+              example:
+                status: 200
+                data: http://localhost:3000/invite_urls/593?tk=0123456789abcdef
+        '401':
+          description: 招待URLを取得できないこと
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                  message:
+                    type: string
+              example:
+                status: 401
+                message: Unauthorized
+        '403':
+          description: 招待URLを取得できないこと
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                  message:
+                    type: string
+              example:
+                status: 403
+                message: Forbidden
+  "/api/v1/matters/{matter_id}/matter_joins/{id}":
+    put:
+      summary: update
+      tags:
+      - Api::V1::MatterJoin
+      parameters:
+      - name: matter_id
+        in: path
+        required: true
+        schema:
+          type: integer
+        example: 4573
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+        example: 13235
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                matter_join:
+                  type: object
+                  properties:
+                    belong_side_id:
+                      type: string
+                    admin:
+                      type: string
+            example:
+              matter_join:
+                belong_side_id: 個人
+                admin: 'true'
+      responses:
+        '200':
+          description: 更新されないこと
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                  message:
+                    type: string
+              example:
+                status: 200
+                message: 更新しました
+        '401':
+          description: 更新されないこと
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                  message:
+                    type: string
+              example:
+                status: 401
+                message: Unauthorized
+        '403':
+          description: 更新されないこと
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                  message:
+                    type: string
+              example:
+                status: 403
+                message: Forbidden
+        '400':
+          description: 更新されないこと
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                  message:
+                    type: string
+              example:
+                status: 400
+                message: Bad Request
+    delete:
+      summary: destroy
+      tags:
+      - Api::V1::MatterJoin
+      parameters:
+      - name: matter_id
+        in: path
+        required: true
+        schema:
+          type: integer
+        example: 4607
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+        example: 13374
+      responses:
+        '200':
+          description: 削除されること
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                  message:
+                    type: string
+              example:
+                status: 200
+                message: 削除しました
+        '401':
+          description: 削除されないこと
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                  message:
+                    type: string
+              example:
+                status: 401
+                message: Unauthorized
+        '403':
+          description: 削除されないこと
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                  message:
+                    type: string
+              example:
+                status: 403
+                message: Forbidden
+        '400':
+          description: 削除されないこと
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                  message:
+                    type: string
+              example:
+                status: 400
+                message: Bad Request
+  "/api/v1/matters":
+    get:
+      summary: index
+      tags:
+      - Api::V1::Matter
+      responses:
+        '200':
+          description: リクエストが成功すること
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                  data:
+                    type: array
+                    items:
+                      nullable: true
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                        name:
+                          type: string
+                        first_name:
+                          type: string
+                        name_kana:
+                          type: string
+                        first_name_kana:
+                          type: string
+                        maiden_name:
+                          nullable: true
+                        maiden_name_kana:
+                          nullable: true
+                        profile:
+                          type: string
+                        indentification_number:
+                          type: string
+                        birth_date:
+                          type: string
+                        client_type_id:
+                          type: string
+                        archive:
+                          type: boolean
+                        created_at:
+                          type: string
+                        updated_at:
+                          type: string
+              example:
+                status: 200
+                data: []
+        '401':
+          description: 401エラーが返ってくること
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                  message:
+                    type: string
+              example:
+                status: 401
+                message: Unauthorized
+  "/api/v1/clients/{client_id}/matters":
+    post:
+      summary: create
+      tags:
+      - Api::V1::Matter
+      parameters:
+      - name: client_id
+        in: path
+        required: true
+        schema:
+          type: integer
+        example: 5158
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                matter:
+                  type: object
+                  properties:
+                    matter_status_id:
+                      type: string
+                    service_price:
+                      type: string
+                    description:
+                      type: string
+                    archive:
+                      type: string
+                    task_template_group_id:
+                      type: string
+                    matter_joins_attributes:
+                      type: object
+                      properties:
+                        '0':
+                          type: object
+                          properties:
+                            belong_side_id:
+                              type: string
+                            admin:
+                              type: string
+                            office_id:
+                              type: string
+                              nullable: true
+                            user_id:
+                              type: string
+                    opponents_attributes:
+                      type: object
+                      properties:
+                        '0':
+                          type: object
+                          properties:
+                            name:
+                              type: string
+                            name_kana:
+                              type: string
+                            first_name:
+                              type: string
+                            first_name_kana:
+                              type: string
+                            profile:
+                              type: string
+                            birth_date:
+                              type: string
+                            opponent_relation_type:
+                              type: string
+                            contact_phone_numbers_attributes:
+                              type: object
+                              properties:
+                                '0':
+                                  type: object
+                                  properties:
+                                    category:
+                                      type: string
+                                    phone_number:
+                                      type: string
+                            contact_emails_attributes:
+                              type: object
+                              properties:
+                                '0':
+                                  type: object
+                                  properties:
+                                    category:
+                                      type: string
+                                    email:
+                                      type: string
+                            contact_addresss_attributes:
+                              type: object
+                              properties:
+                                '0':
+                                  type: object
+                                  properties:
+                                    category:
+                                      type: string
+                                    post_code:
+                                      type: string
+                                    prefecture:
+                                      type: string
+                                    address:
+                                      type: string
+                                    send_by_personal:
+                                      type: string
+                    tag_name:
+                      type: string
+                    matter_category_id:
+                      type: string
+            example:
+              matter:
+                matter_status_id: 受任
+                service_price: '12345678'
+                description: テストマタープロフィール
+                archive: 'true'
+                task_template_group_id: '1201'
+                matter_joins_attributes:
+                  '0':
+                    belong_side_id: 組織
+                    admin: 'true'
+                    office_id: 
+                    user_id: '59331'
+                opponents_attributes:
+                  '0':
+                    name: テスト姓
+                    name_kana: てすとせい
+                    first_name: テスト名
+                    first_name_kana: てすとめい
+                    profile: テストプロフィール
+                    birth_date: '2000-01-01'
+                    opponent_relation_type: 相手方
+                    contact_phone_numbers_attributes:
+                      '0':
+                        category: 私用
+                        phone_number: '09012345678'
+                    contact_emails_attributes:
+                      '0':
+                        category: 私用
+                        email: contact-email@example.com
+                    contact_addresss_attributes:
+                      '0':
+                        category: 現住所
+                        post_code: '1100001'
+                        prefecture: 東京都
+                        address: 渋谷区
+                        send_by_personal: 'false'
+                tag_name: 案件タグ
+                matter_category_id: '14638'
+      responses:
+        '200':
+          description: 登録されること
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                  message:
+                    type: string
+              example:
+                status: 200
+                message: 登録しました
+        '401':
+          description: 登録されない
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                  message:
+                    type: string
+              example:
+                status: 401
+                message: Unauthorized
+        '400':
+          description: 登録されない
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                  message:
+                    type: string
+                  errors:
+                    type: object
+                    properties:
+                      matter_status_id:
+                        type: array
+                        items:
+                          type: string
+              example:
+                status: 400
+                message: 登録出来ません。入力必須項目を確認してください
+                errors:
+                  matter_status_id:
+                  - を入力してください
+                  - は一覧にありません
+        '403':
+          description: 登録されない
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                  message:
+                    type: string
+              example:
+                status: 403
+                message: Forbidden
+  "/api/v1/matters/{id}":
+    put:
+      summary: update
+      tags:
+      - Api::V1::Matter
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+        example: 4668
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                matter:
+                  type: object
+                  properties:
+                    matter_status_id:
+                      type: string
+                      nullable: true
+                    service_price:
+                      type: string
+                    description:
+                      type: string
+                    archive:
+                      type: string
+                    tag_name:
+                      type: string
+            example:
+              matter:
+                matter_status_id: 終了
+                service_price: '12345678'
+                description: テストマタープロフィール
+                archive: 'true'
+                tag_name: タグ追加
+      responses:
+        '200':
+          description: タグが登録されること
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                  message:
+                    type: string
+              example:
+                status: 200
+                message: 更新しました
+        '401':
+          description: 更新されないこと
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                  message:
+                    type: string
+              example:
+                status: 401
+                message: Unauthorized
+        '400':
+          description: 更新されないこと
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                  message:
+                    type: string
+                  errors:
+                    type: object
+                    properties:
+                      matter_status_id:
+                        type: array
+                        items:
+                          type: string
+              example:
+                status: 400
+                message: 更新出来ません。入力必須項目を確認してください
+                errors:
+                  matter_status_id:
+                  - を入力してください
+                  - は一覧にありません
+        '403':
+          description: 更新されないこと
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                  message:
+                    type: string
+              example:
+                status: 403
+                message: Forbidden
+    get:
+      summary: show
+      tags:
+      - Api::V1::Matter
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+        example: 4673
+      - name: matter
+        in: query
+        schema:
+          type: object
+          properties:
+            matter_status_id:
+              type: string
+            service_price:
+              type: string
+            description:
+              type: string
+            archive:
+              type: string
+        example:
+          matter_status_id: 終了
+          service_price: '12345678'
+          description: テストマタープロフィール
+          archive: 'true'
+      responses:
+        '200':
+          description: リクエストが成功すること
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                      user_id:
+                        type: integer
+                      client_id:
+                        type: integer
+                      service_price:
+                        type: integer
+                      description:
+                        type: string
+                      start_date:
+                        nullable: true
+                      finish_date:
+                        nullable: true
+                      matter_status_id:
+                        type: string
+                      archive:
+                        type: boolean
+                      created_at:
+                        type: string
+                      updated_at:
+                        type: string
+              example:
+                status: 200
+                data:
+                  id: 4670
+                  user_id: 59845
+                  client_id: 5186
+                  service_price: 12345678
+                  description: テストマタープロフィール
+                  start_date: 
+                  finish_date: 
+                  matter_status_id: 受任
+                  archive: true
+                  created_at: '2022-08-01T14:34:11.119+09:00'
+                  updated_at: '2022-08-01T14:34:11.119+09:00'
+        '401':
+          description: 401エラーが返ってくること
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                  message:
+                    type: string
+              example:
+                status: 401
+                message: Unauthorized
+        '403':
+          description: 403エラーが返ってくること
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                  message:
+                    type: string
+              example:
+                status: 403
+                message: Forbidden
+    delete:
+      summary: destroy
+      tags:
+      - Api::V1::Matter
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+        example: 4675
+      responses:
+        '200':
+          description: 更新されること
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                  message:
+                    type: string
+              example:
+                status: 200
+                message: 削除しました
+  "/api/v1/offices":
+    post:
+      summary: create
+      tags:
+      - Api::V1::Office
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                office:
+                  type: object
+                  properties:
+                    name:
+                      type: string
+                    phone_number:
+                      type: string
+                    post_code:
+                      type: string
+                    prefecture:
+                      type: string
+                    address:
+                      type: string
+                    archive:
+                      type: string
+            example:
+              office:
+                name: テスト事務所
+                phone_number: '09012345678'
+                post_code: 110-0001
+                prefecture: 東京都
+                address: ''
+                archive: 'true'
+      responses:
+        '200':
+          description: ログイン状態の場合登録されること
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                  message:
+                    type: string
+              example:
+                status: 200
+                message: 登録しました
+        '401':
+          description: 登録されないこと
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                  message:
+                    type: string
+              example:
+                status: 401
+                message: Unauthorized
+        '400':
+          description: 登録されない
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                  message:
+                    type: string
+                  errors:
+                    type: object
+                    properties:
+                      name:
+                        type: array
+                        items:
+                          type: string
+              example:
+                status: 400
+                message: 登録出来ません。入力必須項目を確認してください
+                errors:
+                  name:
+                  - を入力してください
+        '409':
+          description: 登録されない
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                  message:
+                    type: string
+                  errors:
+                    type: object
+                    properties: {}
+              example:
+                status: 409
+                message: すでに所属済みです
+                errors: {}
+  "/api/v1/offices/{id}":
+    put:
+      summary: update
+      tags:
+      - Api::V1::Office
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+        example: 19930
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                office:
+                  type: object
+                  properties:
+                    name:
+                      type: string
+                    phone_number:
+                      type: string
+                    post_code:
+                      type: string
+                    prefecture:
+                      type: string
+                    address:
+                      type: string
+                    archive:
+                      type: string
+            example:
+              office:
+                name: 更新テスト
+                phone_number: '09012345678'
+                post_code: 110-0001
+                prefecture: 東京都
+                address: ''
+                archive: 'true'
+      responses:
+        '200':
+          description: ログイン状態の場合更新されること
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                  message:
+                    type: string
+              example:
+                status: 200
+                message: 更新しました
+        '401':
+          description: 更新されないこと
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                  message:
+                    type: string
+              example:
+                status: 401
+                message: Unauthorized
+        '400':
+          description: パラメータが無効な場合更新されないこと
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                  message:
+                    type: string
+                  errors:
+                    type: object
+                    properties:
+                      prefecture:
+                        type: array
+                        items:
+                          type: string
+                      phone_number:
+                        type: array
+                        items:
+                          type: string
+              example:
+                status: 400
+                message: 更新出来ません。入力必須項目を確認してください
+                errors:
+                  prefecture:
+                  - は漢字で入力して下さい
+                  phone_number:
+                  - でない値が入力されています
+        '403':
+          description: 更新されないこと
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                  message:
+                    type: string
+              example:
+                status: 403
+                message: Forbidden
+  "/api/v1/task_templates":
+    post:
+      summary: create
+      tags:
+      - Api::V1::TaskTemplate
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                task_template_group:
+                  type: object
+                  properties:
+                    office_id:
+                      nullable: true
+                    name:
+                      type: string
+                    description:
+                      type: string
+                    public_flg:
+                      type: string
+                    user_id:
+                      type: string
+                    matter_category_id:
+                      type: string
+                    task_templates_attributes:
+                      type: object
+                      properties:
+                        '0':
+                          type: object
+                          properties:
+                            name:
+                              type: string
+                            work_stage_id:
+                              type: string
+            example:
+              task_template_group:
+                office_id: 
+                name: テストタスクグループ2
+                description: タスクグループ詳細
+                public_flg: 'true'
+                user_id: '60033'
+                matter_category_id: '14845'
+                task_templates_attributes:
+                  '0':
+                    name: テストタスク2
+                    work_stage_id: '3139'
+      responses:
+        '200':
+          description: 登録できること
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                  message:
+                    type: string
+              example:
+                status: 200
+                message: 登録しました
+  "/api/v1/task_templates/{id}":
+    put:
+      summary: update
+      tags:
+      - Api::V1::TaskTemplate
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+        example: 1245
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                task_template_group:
+                  type: object
+                  properties:
+                    office_id:
+                      nullable: true
+                    name:
+                      type: string
+                    description:
+                      type: string
+                    public_flg:
+                      type: string
+                    user_id:
+                      type: string
+                    matter_category_id:
+                      type: string
+                    task_templates_attributes:
+                      type: object
+                      properties:
+                        '0':
+                          type: object
+                          properties:
+                            name:
+                              type: string
+                            id:
+                              type: string
+                            work_stage_id:
+                              type: string
+            example:
+              task_template_group:
+                office_id: 
+                name: テストタスクグループ4
+                description: タスクグループ詳細
+                public_flg: 'true'
+                user_id: '60159'
+                matter_category_id: '14894'
+                task_templates_attributes:
+                  '0':
+                    name: 更新
+                    id: '1214'
+                    work_stage_id: '3163'
+      responses:
+        '200':
+          description: 子モデルが更新されること
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                  message:
+                    type: string
+              example:
+                status: 200
+                message: 更新しました
+    delete:
+      summary: destroy
+      tags:
+      - Api::V1::TaskTemplate
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+        example: 1249
+      responses:
+        '200':
+          description: アーカイブされること
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                  message:
+                    type: string
+              example:
+                status: 200
+                message: 削除しました
+  "/api/v1/tasks":
+    post:
+      summary: create
+      tags:
+      - Api::V1::Task
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                task:
+                  type: object
+                  properties:
+                    name:
+                      type: string
+                    deadline:
+                      type: string
+                    description:
+                      type: string
+                    task_status:
+                      type: string
+                    priority:
+                      type: string
+                    complete:
+                      type: string
+                    archive:
+                      type: string
+                    matter_id:
+                      type: string
+                    work_stage_id:
+                      type: string
+                    task_assigns_attributes:
+                      type: object
+                      properties:
+                        '0':
+                          type: object
+                          properties:
+                            user_id:
+                              type: string
+            example:
+              task:
+                name: テストタスク16
+                deadline: '2030-01-01T17:30:00+09:00'
+                description: テストタスク詳細
+                task_status: 未稼働
+                priority: 低い
+                complete: 'false'
+                archive: 'true'
+                matter_id: '4699'
+                work_stage_id: '3228'
+                task_assigns_attributes:
+                  '0':
+                    user_id: '60362'
+      responses:
+        '200':
+          description: 登録されること
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                  message:
+                    type: string
+              example:
+                status: 200
+                message: 登録しました
+  "/api/v1/tasks/{id}":
+    put:
+      summary: update
+      tags:
+      - Api::V1::Task
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+        example: 1601
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                task:
+                  type: object
+                  properties:
+                    name:
+                      type: string
+                    deadline:
+                      type: string
+                    description:
+                      type: string
+                    task_status:
+                      type: string
+                    priority:
+                      type: string
+                    complete:
+                      type: string
+                    archive:
+                      type: string
+                    matter_id:
+                      type: string
+                    work_stage_id:
+                      type: string
+                    task_assigns_attributes:
+                      type: object
+                      properties:
+                        '0':
+                          type: object
+                          properties:
+                            user_id:
+                              type: string
+            example:
+              task:
+                name: 更新
+                deadline: '2030-01-01T17:30:00+09:00'
+                description: テストタスク詳細
+                task_status: 未稼働
+                priority: 低い
+                complete: 'false'
+                archive: 'true'
+                matter_id: '4715'
+                work_stage_id: '3279'
+                task_assigns_attributes:
+                  '0':
+                    user_id: '60682'
+      responses:
+        '200':
+          description: 更新されること
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                  message:
+                    type: string
+              example:
+                status: 200
+                message: 更新しました
+    delete:
+      summary: destroy
+      tags:
+      - Api::V1::Task
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+        example: 1609
+      responses:
+        '200':
+          description: アーカイブされること
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                  message:
+                    type: string
+              example:
+                status: 200
+                message: 削除しました
+  "/api/v1/user_invites/new":
+    get:
+      summary: new
+      tags:
+      - Api::V1::UserInvite
+      responses:
+        '204':
+          description: 204が返ってくること
+          content:
+            '':
+              schema:
+                type: string
+              example: ''
+        '200':
+          description: 招待URLが発行されること
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                  token_url:
+                    type: string
+                  user_invite:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                      sender_id:
+                        type: integer
+                      token:
+                        type: string
+                      limit_date:
+                        type: string
+                      join:
+                        type: boolean
+                      created_at:
+                        type: string
+                      updated_at:
+                        type: string
+              example:
+                status: 200
+                token_url: http://localhost:3000/api/v1/user_invites/102?tk=0123456789abcdef
+                user_invite:
+                  id: 102
+                  sender_id: 60991
+                  token: '0123456789abcdef'
+                  limit_date: '2022-08-02T14:34:22.183+09:00'
+                  join: false
+                  created_at: '2022-08-01T14:34:22.183+09:00'
+                  updated_at: '2022-08-01T14:34:22.183+09:00'
+        '401':
+          description: 401エラーが返ってくること
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                  message:
+                    type: string
+              example:
+                status: 401
+                message: Unauthorized
+        '403':
+          description: 403エラーが返ってくること
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                  message:
+                    type: string
+              example:
+                status: 403
+                message: Forbidden
+      parameters:
+      - name: user_invite
+        in: query
+        schema:
+          type: integer
+        example: 102
+  "/api/v1/user_invites":
+    post:
+      summary: create
+      tags:
+      - Api::V1::UserInvite
+      responses:
+        '200':
+          description: 登録されること
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                  user_invite:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                      sender_id:
+                        type: integer
+                      token:
+                        type: string
+                      limit_date:
+                        type: string
+                      join:
+                        type: boolean
+                      created_at:
+                        type: string
+                      updated_at:
+                        type: string
+              example:
+                status: 200
+                user_invite:
+                  id: 108
+                  sender_id: 61007
+                  token: 8nj5zPvNanmYKUKc39PqwA
+                  limit_date: '2022-08-02T14:34:22.413+09:00'
+                  join: false
+                  created_at: '2022-08-01T14:34:22.415+09:00'
+                  updated_at: '2022-08-01T14:34:22.415+09:00'
+        '401':
+          description: 登録されないこと
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                  message:
+                    type: string
+              example:
+                status: 401
+                message: Unauthorized
+        '403':
+          description: 登録されないこと
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                  message:
+                    type: string
+              example:
+                status: 403
+                message: Forbidden
+  "/api/v1/user_invites/{id}":
+    get:
+      summary: show
+      tags:
+      - Api::V1::UserInvite
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+        example: 114
+      - name: tk
+        in: query
+        schema:
+          type: string
+        example: NG_token
+      responses:
+        '200':
+          description: リクエストが成功すること
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                  user_invite:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                      sender_id:
+                        type: integer
+                      token:
+                        type: string
+                      limit_date:
+                        type: string
+                      join:
+                        type: boolean
+                      created_at:
+                        type: string
+                      updated_at:
+                        type: string
+                  invite_office:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                      name:
+                        type: string
+                      phone_number:
+                        type: string
+                      post_code:
+                        type: string
+                      prefecture:
+                        type: string
+                      address:
+                        type: string
+                      archive:
+                        type: boolean
+                      created_at:
+                        type: string
+                      updated_at:
+                        type: string
+                  params_token:
+                    type: string
+              example:
+                status: 200
+                user_invite:
+                  id: 113
+                  sender_id: 61027
+                  token: '0123456789abcdef'
+                  limit_date: '2022-08-02T14:34:22.639+09:00'
+                  join: false
+                  created_at: '2022-08-01T14:34:22.639+09:00'
+                  updated_at: '2022-08-01T14:34:22.639+09:00'
+                invite_office:
+                  id: 20194
+                  name: テスト事務所
+                  phone_number: '09012345678'
+                  post_code: 110-0001
+                  prefecture: 東京都
+                  address: ''
+                  archive: true
+                  created_at: '2022-08-01T14:34:22.614+09:00'
+                  updated_at: '2022-08-01T14:34:22.614+09:00'
+                params_token: '0123456789abcdef'
+        '400':
+          description: 400エラーが返ってくること
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                  message:
+                    type: string
+              example:
+                status: 400
+                message: 無効なURLです。
+  "/api/v1/user_invites/join":
+    post:
+      summary: join
+      tags:
+      - Api::V1::UserInvite
+      parameters:
+      - name: user_invite_id
+        in: query
+        schema:
+          type: integer
+        example: 122
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                password:
+                  type: string
+            example:
+              email: test7501@example.com
+              password: Test-1234
+      responses:
+        '200':
+          description: 移籍処理されること
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                  message:
+                    type: string
+                  id:
+                    type: integer
+                  email:
+                    type: string
+              example:
+                status: 200
+                message: 参加しました
+                id: 61046
+                email: test7483@example.com
+        '409':
+          description: 移籍処理されないこと
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                  message:
+                    type: string
+              example:
+                status: 409
+                message: Belonginginfo Conflict
+        '403':
+          description: 他事務所管理ユーザーでログインの場合、移籍処理されないこと
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                  message:
+                    type: string
+              example:
+                status: 403
+                message: 管理ユーザーは移籍出来ません
+  "/api/v1/user_invites/reg_and_join":
+    post:
+      summary: reg_and_join
+      tags:
+      - Api::V1::UserInvite
+      parameters:
+      - name: user_invite_id
+        in: query
+        schema:
+          type: integer
+        example: 128
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                invite_user_form:
+                  type: object
+                  properties:
+                    last_name:
+                      type: string
+                    first_name:
+                      type: string
+                    last_name_kana:
+                      type: string
+                    first_name_kana:
+                      type: string
+                    membership_number:
+                      type: string
+                    user_job_id:
+                      type: string
+                    email:
+                      type: string
+                    password:
+                      type: string
+                    password_confirmation:
+                      type: string
+                    status_id:
+                      type: string
+                    office_id:
+                      type: string
+            example:
+              invite_user_form:
+                last_name: ''
+                first_name: ユーザー
+                last_name_kana: てすと
+                first_name_kana: ゆーざー
+                membership_number: '11111'
+                user_job_id: '1'
+                email: invite_user_form6@example.com
+                password: Test-1234
+                password_confirmation: Test-1234
+                status_id: 所属
+                office_id: '20224'
+      responses:
+        '200':
+          description: 招待者の事務所にユーザー登録されること
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                  message:
+                    type: string
+                  id:
+                    type: integer
+                  email:
+                    type: string
+              example:
+                status: 200
+                message: 登録しました
+                id: 61084
+                email: invite_user_form4@example.com
+        '400':
+          description: 登録されないこと
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                  message:
+                    type: string
+                  errors:
+                    type: object
+                    properties:
+                      last_name:
+                        type: array
+                        items:
+                          type: string
+              example:
+                status: 400
+                message: 登録出来ません。入力必須項目を確認してください
+                errors:
+                  last_name:
+                  - を入力してください
+  "/api/v1/users":
+    post:
+      summary: create
+      tags:
+      - Api::V1::User
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                user:
+                  type: object
+                  properties:
+                    last_name:
+                      type: string
+                    first_name:
+                      type: string
+                    last_name_kana:
+                      type: string
+                    first_name_kana:
+                      type: string
+                    membership_number:
+                      type: string
+                    user_job_id:
+                      type: string
+                    email:
+                      type: string
+                    password:
+                      type: string
+                    password_confirmation:
+                      type: string
+                    archive:
+                      type: string
+            example:
+              user:
+                last_name: ''
+                first_name: ユーザー
+                last_name_kana: てすと
+                first_name_kana: ゆーざー
+                membership_number: '11111'
+                user_job_id: '1'
+                email: test7543@example.com
+                password: Test-1234
+                password_confirmation: Test-1234
+                archive: 'true'
+      responses:
+        '200':
+          description: 登録されること
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                  message:
+                    type: string
+                  id:
+                    type: integer
+                  email:
+                    type: string
+              example:
+                status: 200
+                message: 登録しました
+                id: 61098
+                email: test7531@example.com
+        '400':
+          description: 登録されないこと
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                  message:
+                    type: string
+                  errors:
+                    type: object
+                    properties:
+                      last_name:
+                        type: array
+                        items:
+                          type: string
+              example:
+                status: 400
+                message: 登録出来ません。入力必須項目を確認してください
+                errors:
+                  last_name:
+                  - を入力してください
+  "/api/v1/users/{id}":
+    put:
+      summary: update
+      tags:
+      - Api::V1::User
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+        example: 61123
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                user:
+                  type: object
+                  properties:
+                    last_name:
+                      type: string
+                    first_name:
+                      type: string
+                    last_name_kana:
+                      type: string
+                    first_name_kana:
+                      type: string
+                    membership_number:
+                      type: string
+                    user_job_id:
+                      type: string
+                    email:
+                      type: string
+                    password:
+                      type: string
+                    password_confirmation:
+                      type: string
+                    archive:
+                      type: string
+            example:
+              user:
+                last_name: ''
+                first_name: ユーザー
+                last_name_kana: てすと
+                first_name_kana: ゆーざー
+                membership_number: '11111'
+                user_job_id: '1'
+                email: test7570@example.com
+                password: Test-1234
+                password_confirmation: Test-1234
+                archive: 'true'
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                user:
+                  type: object
+                  properties:
+                    last_name:
+                      type: string
+                    first_name:
+                      type: string
+                    last_name_kana:
+                      type: string
+                    first_name_kana:
+                      type: string
+                    membership_number:
+                      type: string
+                    user_job_id:
+                      type: string
+                    email:
+                      type: string
+                    password:
+                      type: string
+                    password_confirmation:
+                      type: string
+                    archive:
+                      type: string
+                    avatar:
+                      type: string
+                      format: binary
+            example:
+              user:
+                last_name: テスト
+                first_name: ユーザー
+                last_name_kana: てすと
+                first_name_kana: ゆーざー
+                membership_number: '11111'
+                user_job_id: '1'
+                email: test7552@example.com
+                password: Test-1234
+                password_confirmation: Test-1234
+                archive: 'true'
+                avatar: test.jpg
+      responses:
+        '200':
+          description: 画像が登録されること
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                  message:
+                    type: string
+              example:
+                status: 200
+                message: Success Userscontroller Update
+        '401':
+          description: 更新されないこと
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                  message:
+                    type: string
+              example:
+                status: 401
+                message: Unauthorized
+        '403':
+          description: 更新されないこと
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                  message:
+                    type: string
+              example:
+                status: 403
+                message: Forbidden
+        '400':
+          description: 更新されないこと
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                  message:
+                    type: string
+                  errors:
+                    type: object
+                    properties:
+                      last_name:
+                        type: array
+                        items:
+                          type: string
+              example:
+                status: 400
+                message: 更新出来ません。入力必須項目を確認してください
+                errors:
+                  last_name:
+                  - を入力してください
+  "/api/v1/work_logs":
+    post:
+      summary: create
+      tags:
+      - Api::V1::WorkLog
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                work_log:
+                  type: object
+                  properties:
+                    working_time:
+                      type: string
+                    worked_date:
+                      type: string
+                    detail_reflection:
+                      type: string
+                    content:
+                      type: string
+                matter_id:
+                  type: string
+                task_id:
+                  type: string
+            example:
+              work_log:
+                working_time: '100'
+                worked_date: '2020-12-12'
+                detail_reflection: 'true'
+                content: テストコメント
+              matter_id: '4725'
+              task_id: '1621'
+      responses:
+        '200':
+          description: 登録されること
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                  message:
+                    type: string
+              example:
+                status: 200
+                message: 登録しました
+  "/api/v1/work_logs/{id}":
+    put:
+      summary: update
+      tags:
+      - Api::V1::WorkLog
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+        example: 441
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                work_log:
+                  type: object
+                  properties:
+                    working_time:
+                      type: string
+                    worked_date:
+                      type: string
+                    detail_reflection:
+                      type: string
+                    content:
+                      type: string
+            example:
+              work_log:
+                working_time: '100'
+                worked_date: '2020-12-12'
+                detail_reflection: 'true'
+                content: 更新
+      responses:
+        '200':
+          description: リクエストが成功すること
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                  message:
+                    type: string
+              example:
+                status: 200
+                message: 更新しました
+    delete:
+      summary: destroy
+      tags:
+      - Api::V1::WorkLog
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+        example: 457
+      responses:
+        '200':
+          description: 削除されること
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                  message:
+                    type: string
+              example:
+                status: 200
+                message: 削除しました
+  "/api/v1/work_stages":
+    post:
+      summary: create
+      tags:
+      - Api::V1::WorkStage
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                work_stage:
+                  type: object
+                  properties:
+                    name:
+                      type: string
+                    archive:
+                      type: string
+                    user_id:
+                      type: string
+                    matter_category_id:
+                      type: string
+            example:
+              work_stage:
+                name: テスト作業段階377
+                archive: 'true'
+                user_id: '61787'
+                matter_category_id: '15402'
+      responses:
+        '200':
+          description: 登録されること
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                  message:
+                    type: string
+              example:
+                status: 200
+                message: 登録しました
+  "/api/v1/work_stages/{id}":
+    put:
+      summary: update
+      tags:
+      - Api::V1::WorkStage
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+        example: 3444
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                work_stage:
+                  type: object
+                  properties:
+                    name:
+                      type: string
+                    archive:
+                      type: string
+                    user_id:
+                      type: string
+                    matter_category_id:
+                      type: string
+            example:
+              work_stage:
+                name: 更新
+                archive: 'true'
+                user_id: '61871'
+                matter_category_id: '15437'
+      responses:
+        '200':
+          description: 更新されること
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                  message:
+                    type: string
+              example:
+                status: 200
+                message: 更新しました
+    delete:
+      summary: destroy
+      tags:
+      - Api::V1::WorkStage
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+        example: 3464
+      responses:
+        '200':
+          description: アーカイブされること
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                  message:
+                    type: string
+              example:
+                status: 200
+                message: 削除しました

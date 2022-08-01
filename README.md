@@ -108,4 +108,10 @@
 以下URLの通り
 https://lucid.app/lucidchart/67df0b81-a2d6-4245-9c98-4910db3cbd42/edit?invitationId=inv_3aacf30b-aff7-4cdb-b876-d206ebfe502f&page=0_0#
 
+## APIドキュメント
+/doc/openapi.yml
+をswagger editorに貼り付けて閲覧のころ
+
+https://editor.swagger.io/
+
 ## インフラ構成図
