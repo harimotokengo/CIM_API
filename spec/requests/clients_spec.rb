@@ -19,6 +19,9 @@ RSpec.describe "Clients", type: :request do
   let!(:matter_category) { create(:matter_category) }
   let!(:matter_category) { create(:matter_category, name: '離婚', ancestry: nil) }
 
+  let!(:task_template_group) { create(:task_template_group, name: 'タスクテンプレート群', public_flg: true) }
+  let!(:task_template) { create(:task_template, name: 'タスクテンプレート', task_template_group_id: task_template_group.id) }
+
   let!(:client) { create(:client) }
   let!(:other_client) { create(:client) }
   let!(:matter) { create(:matter, client: client, user: user) }
@@ -95,8 +98,8 @@ RSpec.describe "Clients", type: :request do
       matter_join_params = { matter_joins_attributes: { "0": attributes_for(:matter_join) }}
       client_join_params = { client_joins_attributes: { "0": attributes_for(:client_join) }}
       matter_category_join_params = { matter_category_joins_attributes: { "0": attributes_for(:matter_category_join) }}
-      matter_params = { matters_attributes: { "0": attributes_for(:matter, user_id: user.id).merge(opponent_params, matter_join_params, matter_category_join_params) } }
-      min_matter_params = { matters_attributes: { "0": attributes_for(:matter, user_id: user.id).merge(matter_join_params, matter_category_join_params) }}
+      matter_params = { matters_attributes: { "0": attributes_for(:matter, task_template_group_id: task_template_group.id, user_id: user.id).merge(opponent_params, matter_join_params, matter_category_join_params) } }
+      min_matter_params = { matters_attributes: { "0": attributes_for(:matter, task_template_group_id: task_template_group.id, user_id: user.id).merge(matter_join_params, matter_category_join_params) }}
       contact_matter_params = {matters_attributes: { "0": attributes_for(:matter, user_id: user.id).merge(contact_opponent_params, matter_join_params)}}
       @client_params = attributes_for(:client).merge(matter_params, client_join_params, matter_category_join_params)
       @min_client_params =  attributes_for(:client).merge(min_matter_params, client_join_params)
@@ -118,7 +121,7 @@ RSpec.describe "Clients", type: :request do
           login_user(user, 'Test-1234', api_v1_login_path)
           expect do
             post api_v1_clients_path, params: { client: @client_params }
-          end.to change(Client, :count).by(1) and change(Matter, :count).by(1) and change(Opponent, :count).by(1) and change(MatterJoin, :count).by(1)
+          end.to change(Client, :count).by(1) and change(Matter, :count).by(1) and change(Opponent, :count).by(1) and change(MatterJoin, :count).by(1) and change(Task, :count).by(1)
         end
       end
 
@@ -132,7 +135,7 @@ RSpec.describe "Clients", type: :request do
           login_user(user, 'Test-1234', api_v1_login_path)
           expect do
             post api_v1_clients_path, params: { client: @min_client_params }
-          end.to change(Client, :count).by(1) and change(Matter, :count).by(1) and change(MatterJoin, :count).by(1)
+          end.to change(Client, :count).by(1) and change(Matter, :count).by(1) and change(MatterJoin, :count).by(1) and change(Task, :count).by(1)
         end
       end
       context '参加事務所ユーザーでログイン、クライアント、案件、クライアント連絡先を入力' do
@@ -148,7 +151,7 @@ RSpec.describe "Clients", type: :request do
           login_user(user, 'Test-1234', api_v1_login_path)
           expect do
             post api_v1_clients_path, params: { client: @contact_client_params }
-          end.to change(Client, :count).by(1) and change(Matter, :count).by(1) and change(Opponent, :count).by(1) and change(ContactPhoneNumber, :count).by(1) and change(MatterJoin, :count).by(1)
+          end.to change(Client, :count).by(1) and change(Matter, :count).by(1) and change(Opponent, :count).by(1) and change(ContactPhoneNumber, :count).by(1) and change(MatterJoin, :count).by(1) and change(Task, :count).by(1)
         end
       end
       # it '編集ログが登録されること' do
@@ -193,7 +196,7 @@ RSpec.describe "Clients", type: :request do
           login_user(user, 'Test-1234', api_v1_login_path)
           expect do
             post api_v1_clients_path, params: { client: @invalid_client_params }
-          end.to_not change(Client, :count) and change(Matter, :count) and change(MatterJoin, :count)
+          end.to_not change(Client, :count) and change(Matter, :count) and change(MatterJoin, :count) and change(Task, :count).by(1)
         end
       end
       
@@ -208,7 +211,7 @@ RSpec.describe "Clients", type: :request do
           login_user(user, 'Test-1234', api_v1_login_path)
           expect do
             post api_v1_clients_path, params: { client: @invalid_contact_client_params }
-          end.to_not change(Client, :count) and change(Matter, :count) and change(MatterJoin, :count) and change(ContactPhoneNumber, :count)
+          end.to_not change(Client, :count) and change(Matter, :count) and change(MatterJoin, :count) and change(ContactPhoneNumber, :count) and change(Task, :count).by(1)
         end
       end
     end

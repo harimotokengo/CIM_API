@@ -35,17 +35,10 @@ module Api
         matter_category_children = MatterCategory.find(params[:category_parent_id]).children
         render json: { data: matter_category_children}
       end
-      # client登録
-      #   client_joinとか
-      #   matter
-      #     matter_joinとか
-      #   今回使用するテンプレートを選択
-      # client.matters.lastのtask_template_groupから
-      # task_templateを取得
-      # task_templateからtaskを作成（名前と作業段階だけが入ったやつ）
 
       def create
         @client = Client.new(client_params)
+        template_group_id = params[:client][:matters_attributes][:"0"][:task_template_group_id]
         if @client.client_joins[0].belong_side_id == '組織'
           @client.client_joins[0].office_id = current_user.belonging_office.id
         else
@@ -61,6 +54,7 @@ module Api
         tag_list = params[:client][:matters_attributes][:"0"][:tag_name].split(',') unless params[:client][:matters_attributes][:"0"][:tag_name].nil?
         if @client.save
           @client.matters[0].save_matter_tags(tag_list) unless params[:client][:matters_attributes][:"0"][:tag_name].nil?
+          TaskTemplateGroup.find(template_group_id).save_matter_tasks(@client.matters[0], current_user)
           # @client.matters[0].save_matter_tasks
           # @client.create_client_log(current_user)
           

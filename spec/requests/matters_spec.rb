@@ -23,6 +23,9 @@ RSpec.describe 'matters_requests', type: :request do
   let!(:matter_category) { create(:matter_category) }
   let!(:pension_matter_category) { create(:matter_category, ancestry: '1', name: '年金') }
 
+  let!(:task_template_group) { create(:task_template_group, name: 'タスクテンプレート群', public_flg: true) }
+  let!(:task_template) { create(:task_template, name: 'タスクテンプレート', task_template_group_id: task_template_group.id) }
+
   let!(:client) { create(:client) }
   let!(:matter) { create(:matter, client: client) }
   let!(:matter_category_join) { create(:matter_category_join, matter: matter) }
@@ -130,7 +133,7 @@ RSpec.describe 'matters_requests', type: :request do
         }
         context '案件、相手方等、相手方連絡先を入力' do
           before do
-            @matter_params = attributes_for(:matter
+            @matter_params = attributes_for(:matter, task_template_group_id: task_template_group.id
               ).merge(@matter_join_params, @contact_opponent_params, @matter_category_join_params)
           end
           it 'リクエストが成功すること' do
@@ -142,12 +145,13 @@ RSpec.describe 'matters_requests', type: :request do
               post api_v1_client_matters_path(client), params: { matter: @matter_params }
             end.to change(Matter, :count).by(1) and change(Opponent, :count).by(1) and change(
               ContactEmail, :count).by(1) and change(ContactAddress, :count).by(1) and change(
-                ContactPhoneNumber, :count).by(1) and change(MatterJoin, :count).by(1)
+                ContactPhoneNumber, :count).by(1) and change(MatterJoin, :count).by(1) and change(
+                  Task, :count).by(1)
           end
         end
         context '案件のみ入力' do
           before do
-            @matter_params = attributes_for(:matter
+            @matter_params = attributes_for(:matter, task_template_group_id: task_template_group.id
               ).merge(@matter_join_params, @matter_category_join_params)
           end
           it 'リクエストが成功すること' do
@@ -157,18 +161,21 @@ RSpec.describe 'matters_requests', type: :request do
           it '登録されること' do
             expect do
               post api_v1_client_matters_path(client), params: { matter: @matter_params }
-            end.to change(Matter, :count).by(1) and change(MatterJoin, :count).by(1)
+            end.to change(Matter, :count).by(1) and change(MatterJoin, :count).by(1) and change(
+              Task, :count).by(1)
           end
         end
         context '案件と案件タグを入力' do
           before do
-            @matter_params = attributes_for(:matter, tag_name: '案件タグ'
+            @matter_params = attributes_for(:matter, task_template_group_id: task_template_group.id, tag_name: '案件タグ'
               ).merge(@matter_join_params)
           end
           it '登録されること' do
             expect do
               post api_v1_client_matters_path(client), params: { matter: @matter_params }
-            end.to change(Matter, :count).by(1) and change(MatterJoin, :count).by(1) and change(MatterTag, :count).by(1)
+            end.to change(Matter, :count).by(1) and change(
+              MatterJoin, :count).by(1) and change(MatterTag, :count).by(1) and change(
+                Task, :count).by(1)
           end
         end
       end
@@ -178,7 +185,7 @@ RSpec.describe 'matters_requests', type: :request do
           @matter_join_params = { matter_joins_attributes: { "0": attributes_for(:matter_join, user_id: session[:user_id], belong_side_id: '個人', office: nil) }}
         }
         context '案件、相手方等、相手方連絡先を入力' do
-          before{@matter_params = attributes_for(:matter
+          before{@matter_params = attributes_for(:matter, task_template_group_id: task_template_group.id
             ).merge(@matter_join_params, @contact_opponent_params, @matter_category_join_params)}
           it 'リクエストが成功すること' do
             post api_v1_client_matters_path(client), params: { matter: @matter_params }
@@ -189,11 +196,12 @@ RSpec.describe 'matters_requests', type: :request do
               post api_v1_client_matters_path(client), params: { matter: @matter_params }
             end.to change(Matter, :count).by(1) and change(Opponent, :count).by(1) and change(
               ContactEmail, :count).by(1) and change(ContactAddress, :count).by(1) and change(
-                ContactPhoneNumber, :count).by(1) and change(MatterJoin, :count).by(1)
+                ContactPhoneNumber, :count).by(1) and change(MatterJoin, :count).by(1) and change(
+                  Task, :count).by(1)
           end
         end
         context '案件のみ入力' do
-          before{@matter_params = attributes_for(:matter
+          before{@matter_params = attributes_for(:matter, task_template_group_id: task_template_group.id
           ).merge(@matter_join_params, @matter_category_join_params)}
           it 'リクエストが成功すること' do
             post api_v1_client_matters_path(client), params: { matter: @matter_params }
@@ -202,16 +210,18 @@ RSpec.describe 'matters_requests', type: :request do
           it '登録されること' do
             expect do
               post api_v1_client_matters_path(client), params: { matter: @matter_params }
-            end.to change(Matter, :count).by(1) and change(MatterJoin, :count).by(1)
+            end.to change(Matter, :count).by(1) and change(MatterJoin, :count).by(1) and change(
+              Task, :count).by(1)
           end
         end
         context '案件と案件タグを入力' do
-          before{@matter_params = attributes_for(:matter, tag_name: '案件タグ'
+          before{@matter_params = attributes_for(:matter, task_template_group_id: task_template_group.id, tag_name: '案件タグ'
           ).merge(@matter_join_params, @matter_category_join_params)}
           it '登録されること' do
             expect do
               post api_v1_client_matters_path(client), params: { matter: @matter_params }
-            end.to change(Matter, :count).by(1) and change(MatterJoin, :count).by(1) and change(MatterTag, :count).by(1)
+            end.to change(Matter, :count).by(1) and change(MatterJoin, :count).by(1) and change(
+              MatterTag, :count).by(1) and change(Task, :count).by(1)
           end
         end
       end
@@ -237,12 +247,12 @@ RSpec.describe 'matters_requests', type: :request do
         before{
           login_user(client_admin_user, 'Test-1234', api_v1_login_path)
           @matter_join_params = { matter_joins_attributes: { "0": attributes_for(:matter_join, user_id: session[:user_id], belong_side_id: '個人', office: nil) }}
-          @matter_params = attributes_for(:matter, matter_status_id: ''
+          @matter_params = attributes_for(:matter, task_template_group_id: task_template_group.id, matter_status_id: ''
             ).merge(@matter_join_params, @contact_opponent_params, @matter_category_join_params)
         }
-        it 'リクエストが成功すること' do
+        it '400エラーが返ってくること' do
           post api_v1_client_matters_path(client), params: { matter: @matter_params }
-          expect(response).to have_http_status 400
+          expect(response.status).to eq 400
           expect(JSON.parse(response.body)['message']).to eq "登録出来ません。入力必須項目を確認してください"
         end
         it '登録されない' do
@@ -255,7 +265,7 @@ RSpec.describe 'matters_requests', type: :request do
         before{
           login_user(injoin_user, 'Test-1234', api_v1_login_path)
           @matter_join_params = { matter_joins_attributes: { "0": attributes_for(:matter_join, user_id: session[:user_id], belong_side_id: '個人', office: nil) }}
-          @matter_params = attributes_for(:matter
+          @matter_params = attributes_for(:matter, task_template_group_id: task_template_group.id
             ).merge(@matter_join_params, @contact_opponent_params, @matter_category_join_params)
         }
         it '403エラーが返ってくること' do
@@ -273,7 +283,7 @@ RSpec.describe 'matters_requests', type: :request do
         before{
           login_user(injoin_office_user, 'Test-1234', api_v1_login_path)
           @matter_join_params = { matter_joins_attributes: { "0": attributes_for(:matter_join, office_id: User.find(session[:user_id]).belonging_office) }}
-          @matter_params = attributes_for(:matter
+          @matter_params = attributes_for(:matter, task_template_group_id: task_template_group.id
             ).merge(@matter_join_params, @contact_opponent_params, @matter_category_join_params)
         }
         it '403エラーを返すこと' do

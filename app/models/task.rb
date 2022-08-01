@@ -35,6 +35,7 @@ class Task < ApplicationRecord
   # end
 
   def deadline_check
+    return unless deadline
     if self.deadline > Time.now
       return true
     else
