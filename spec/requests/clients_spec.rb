@@ -89,6 +89,7 @@ RSpec.describe "Clients", type: :request do
   # # 事務所なしユーザーは組織で登録できない
   describe 'POST #create' do
     before do
+      folder_url_params = {folder_urls_attributes: { "0": attributes_for(:folder_url)}}
       contact_phone_number_params = {contact_phone_numbers_attributes: { "0": attributes_for(:contact_phone_number)}}
       invalid_contact_phone_number_params = { contact_phone_numbers_attributes: {"0": attributes_for(:contact_phone_number, phone_number: '123456') }}
       contact_email_params = { contact_emails_attributes: { "0": attributes_for(:contact_email) }  }
@@ -98,7 +99,7 @@ RSpec.describe "Clients", type: :request do
       matter_join_params = { matter_joins_attributes: { "0": attributes_for(:matter_join) }}
       client_join_params = { client_joins_attributes: { "0": attributes_for(:client_join) }}
       matter_category_join_params = { matter_category_joins_attributes: { "0": attributes_for(:matter_category_join) }}
-      matter_params = { matters_attributes: { "0": attributes_for(:matter, task_template_group_id: task_template_group.id, user_id: user.id).merge(opponent_params, matter_join_params, matter_category_join_params) } }
+      matter_params = { matters_attributes: { "0": attributes_for(:matter, task_template_group_id: task_template_group.id, user_id: user.id).merge(opponent_params, matter_join_params, matter_category_join_params, folder_url_params) } }
       min_matter_params = { matters_attributes: { "0": attributes_for(:matter, task_template_group_id: task_template_group.id, user_id: user.id).merge(matter_join_params, matter_category_join_params) }}
       contact_matter_params = {matters_attributes: { "0": attributes_for(:matter, user_id: user.id).merge(contact_opponent_params, matter_join_params)}}
       @client_params = attributes_for(:client).merge(matter_params, client_join_params, matter_category_join_params)
@@ -121,7 +122,7 @@ RSpec.describe "Clients", type: :request do
           login_user(user, 'Test-1234', api_v1_login_path)
           expect do
             post api_v1_clients_path, params: { client: @client_params }
-          end.to change(Client, :count).by(1) and change(Matter, :count).by(1) and change(Opponent, :count).by(1) and change(MatterJoin, :count).by(1) and change(Task, :count).by(1)
+          end.to change(Client, :count).by(1) and change(Matter, :count).by(1) and change(Opponent, :count).by(1) and change(MatterJoin, :count).by(1) and change(Task, :count).by(1) and change(FolderUrl, :count).by(1)
         end
       end
 
