@@ -82,9 +82,8 @@ module Api
         @full_name = @name + @first_name
         @harf_space_fullname = @name + ' ' + @first_name
         @hull_space_fullname = @name + '　' + @first_name
-        @clients = Client.joins(matters: :matter_joins)
+        @clients = Client.active.joins(matters: :matter_joins)
                           .joins(:client_joins)
-                          .where(['clients.archive = ?', true])
                           .where(['matters.archive = ?', true])
                           .where(['client_joins.user_id = ? or matter_joins.office_id = ? or client_joins.office_id = ? or matter_joins.user_id = ?', current_user.belonging_office, current_user, current_user.belonging_office, current_user])
                           .where(['name = ? AND first_name = ?', @name, @first_name]).distinct
@@ -93,15 +92,11 @@ module Api
                               .where(['clients.archive = ?', true])
                               .where(['matters.archive = ?', true])
                               .where(['client_joins.user_id = ? or matter_joins.office_id = ? or client_joins.office_id = ? or matter_joins.user_id = ?', current_user.belonging_office, current_user, current_user.belonging_office, current_user])
-                              .where(['name = ? OR name = ? OR name = ?', @full_name, @harf_space_fullname, @hull_space_fullname]).distinct
-        if !@clients && !@opponents
+                              .where(['opponents.name = ? OR opponents.name = ? OR opponents.name = ? OR opponents.name = ? AND opponents.first_name = ?', @full_name, @harf_space_fullname, @hull_space_fullname, @name, @first_name]).distinct
+        if @clients.blank? && @opponents.blank?
           render json: { status: 200, message: 'OK' }
-        # elsif @clients
-        #   render json: { status: 200, data: @clients }
-        # elsif @opponents
-        #   render json: { status: 200, data: @opponents }
         else
-          render json: { status: 200, message: "#{@clients.count + @opponents.count}件見つかりました", data: [@clients, @opponents] }
+          render json: { status: 200, message: "#{@clients.count + @opponents.count}件見つかりました", data: [clients: @clients, opponents: @opponents] }
         end
       end
 
