@@ -96,7 +96,15 @@ module Api
         if @clients.blank? && @opponents.blank?
           render json: { status: 200, message: 'OK' }
         else
-          render json: { status: 200, message: "#{@clients.count + @opponents.count}件見つかりました", data: [clients: @clients, opponents: @opponents] }
+          data = []
+          @clients.each do |client|
+            data << client.full_name
+          end
+          @opponents.each do |opponent|
+            data << opponent.full_name
+          end 
+          render json: { status: 200, message: "#{data.count}件見つかりました", data: data }
+          
         end
       end
 
