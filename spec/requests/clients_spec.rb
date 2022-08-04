@@ -23,8 +23,9 @@ RSpec.describe "Clients", type: :request do
   let!(:task_template) { create(:task_template, name: 'タスクテンプレート', task_template_group_id: task_template_group.id) }
 
   let!(:client) { create(:client) }
-  let!(:other_client) { create(:client) }
+  let!(:other_client) { create(:client, name: 'その他', first_name: 'クライアント') }
   let!(:matter) { create(:matter, client: client, user: user) }
+  let!(:opponent) { create(:opponent, matter: matter) }
   let!(:other_matter) { create(:matter, client: other_client, user: other_user) }
   let!(:matter_join_office) { create(:matter_join, matter: matter, office: office, belong_side_id: 1) }
   let!(:matter_join_other_user) { create(:matter_join, matter: matter, user: other_user, belong_side_id: 2) }
@@ -431,5 +432,51 @@ RSpec.describe "Clients", type: :request do
     end
   end
 
-  # conflict_check
+  describe 'GET #conflict_check' do
+    context '正常系' do
+      context '案件参加ユーザーでログイン' do
+        it 'リクエストが成功すること' do
+          login_user(user, 'Test-1234', api_v1_login_path)
+          get conflict_check_api_v1_clients_path, params: { name: client.name, first_name: client.first_name }
+          expect(response).to have_http_status 200
+        end
+        it 'クライアントデータが返ってくること' do
+          login_user(user, 'Test-1234', api_v1_login_path)
+          get conflict_check_api_v1_clients_path, params: { name: client.name, first_name: client.first_name }
+          expect(JSON.parse(response.body)['data'].first).to eq client.full_name
+        end
+        it '関係者のデータが返ってくること' do
+          login_user(user, 'Test-1234', api_v1_login_path)
+          get conflict_check_api_v1_clients_path, params: { name: matter.opponents.first.name, first_name: matter.opponents.first.first_name }
+          expect(JSON.parse(response.body)['data'].first).to eq matter.opponents.first.full_name
+        end
+        it '参加していないクライアントデータは返って来ないこと' do
+          login_user(user, 'Test-1234', api_v1_login_path)
+          get conflict_check_api_v1_clients_path, params: { name: other_matter.client.name, first_name: other_matter.client.first_name }
+          expect(JSON.parse(response.body)['data']).to eq nil
+        end
+      end
+    end
+    context '準正常系' do
+      context '未ログイン' do
+        it '401エラーが返ってくること' do
+          get conflict_check_api_v1_clients_path, params: { name: client.name, first_name: client.first_name }
+          expect(response).to have_http_status 401
+          expect(JSON.parse(response.body)['data']).to eq nil
+        end
+      end
+      context '不参加ユーザーでログイン' do
+        it 'リクエストが成功すること' do
+          login_user(injoin_user, 'Test-1234', api_v1_login_path)
+          get conflict_check_api_v1_clients_path, params: { name: client.name, first_name: client.first_name }
+          expect(response).to have_http_status 200
+        end
+        it 'クライアントデータが返ってこないこと' do
+          login_user(injoin_user, 'Test-1234', api_v1_login_path)
+          get conflict_check_api_v1_clients_path, params: { name: client.name, first_name: client.first_name }
+          expect(JSON.parse(response.body)['data']).to eq nil
+        end
+      end
+    end
+  end
 end
