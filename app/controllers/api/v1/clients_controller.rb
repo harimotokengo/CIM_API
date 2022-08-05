@@ -2,8 +2,6 @@ module Api
   module V1
     class ClientsController < Api::V1::Base
       before_action :response_unauthorized, unless: :logged_in?
-      # before_action :set_client, only: %i[show update destroy]
-      # before_action :response_forbidden, only: %i[show update destroy], unless: :correct_user
 
       def index
         clients = search_client
@@ -16,24 +14,35 @@ module Api
       def show
         @client = Client.find(params[:id])
         return response_forbidden unless correct_user
+        data = { 
+          client: @client, 
+          contact_phone_numbers: @client.contact_phone_numbers,
+          contact_emails: @client.contact_emails,
+          contact_addresses: @client.contact_addresses
+          }
         render json: { status: 200, data: @client}
       end
 
-      def matters
+      def client_matters
         @client = Client.active.find(params[:id])
         # pageとかsortとかは必要であれば追加
         matters = @client.matters
-        render json: { status: 200, data: matters}
+        data = []
+        matters.each do |matter|
+          matter.matter_assigns
+          data << {matter: matter, matter_assigns: matter.matter_assigns}
+        end
+        render json: { status: 200, data: data}
       end
 
       def get_category_parents
         matter_category_parents = MatterCategory.where(ancestry: nil)
-        render json: {data: category_parents}
+        render json: { status: 200, data: matter_category_parents}
       end
 
       def get_category_children
         matter_category_children = MatterCategory.find(params[:category_parent_id]).children
-        render json: { data: matter_category_children}
+        render json: { status: 200, data: matter_category_children}
       end
 
       def create
