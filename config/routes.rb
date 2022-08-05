@@ -29,11 +29,11 @@ Rails.application.routes.draw do
         collection do
           get 'conflict_check'
           get 'get_category_parents'
-          get 'get_category_childeren'
+          get 'get_category_children'
           get 'get_join_users'
         end
         member do
-          get 'get_matters'
+          get 'client_matters'
         end
         
       end
