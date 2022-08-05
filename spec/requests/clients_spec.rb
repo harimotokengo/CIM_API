@@ -16,7 +16,7 @@ RSpec.describe "Clients", type: :request do
   let!(:injoin_user) { create(:user) }
 
   let!(:matter_category_join) { create(:matter_category_join, matter: matter, matter_category: matter_category) }
-  let!(:matter_category) { create(:matter_category) }
+  let!(:matter_category_child) { create(:matter_category) }
   let!(:matter_category) { create(:matter_category, name: '離婚', ancestry: nil) }
 
   let!(:task_template_group) { create(:task_template_group, name: 'タスクテンプレート群', public_flg: true) }
@@ -476,6 +476,56 @@ RSpec.describe "Clients", type: :request do
           get conflict_check_api_v1_clients_path, params: { name: client.name, first_name: client.first_name }
           expect(JSON.parse(response.body)['data']).to eq nil
         end
+      end
+    end
+  end
+
+  describe 'GET #get_category_parents' do
+    context 'ログイン状態' do
+      it 'リクエストが成功すること' do
+        login_user(user, 'Test-1234', api_v1_login_path)
+        get get_category_parents_api_v1_clients_path
+        expect(response).to have_http_status 200
+      end
+      it '親案件カテゴリーデータが返ってくること' do
+        login_user(injoin_user, 'Test-1234', api_v1_login_path)
+        get get_category_parents_api_v1_clients_path
+        expect(JSON.parse(response.body)['data'].first).to include({"id"=>matter_category.id})
+      end
+    end
+  end
+
+  describe 'GET #get_category_children' do
+    context 'ログイン状態' do
+      it 'リクエストが成功すること' do
+        category_child = matter_category.children.create(name: '親権')
+        login_user(user, 'Test-1234', api_v1_login_path)
+        get get_category_children_api_v1_clients_path, params: { category_parent_id: matter_category.id }
+        expect(response).to have_http_status 200
+      end
+      it '子案件カテゴリーデータが返ってくること' do
+        category_child = matter_category.children.create(name: '親権')
+        login_user(user, 'Test-1234', api_v1_login_path)
+        get get_category_children_api_v1_clients_path, params: { category_parent_id: matter_category.id }
+        expect(JSON.parse(response.body)['data'].first).to include({"id"=>category_child.id})
+      end
+    end
+  end
+
+  describe 'GET #client_matters' do
+    context 'ログイン状態' do
+      it 'リクエストが成功すること' do
+        matter_assign = create(:matter_assign, matter: matter, user: user)
+        login_user(user, 'Test-1234', api_v1_login_path)
+        get client_matters_api_v1_client_path(client)
+        expect(response).to have_http_status 200
+      end
+      it 'クライアントの案件データが返ってくること' do
+        matter_assign = create(:matter_assign, matter: matter, user: user)
+        login_user(user, 'Test-1234', api_v1_login_path)
+        get client_matters_api_v1_client_path(client)
+        expect(JSON.parse(response.body)['data'][0]['matter']['id']).to eq client.matters.first.id
+        expect(JSON.parse(response.body)['data'][0]['matter_assigns'][0]['id']).to eq matter_assign.id
       end
     end
   end
