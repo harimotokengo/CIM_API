@@ -2,7 +2,7 @@
 openapi: 3.0.3
 info:
   title: cim
-  version: 0.5.0
+  version: 1.0.0
 servers: []
 paths:
   "/api/v1/matters/{matter_id}/charges":
@@ -635,7 +635,7 @@ paths:
               example:
                 status: 200
                 data:
-                - id: 4800
+                - id: 671
                   name: テスト姓
                   first_name: テスト名
                   name_kana: てすとせい
@@ -647,14 +647,14 @@ paths:
                   birth_date: '2000-01-01'
                   client_type_id: 法人
                   archive: true
-                  created_at: '2022-08-01T14:33:24.214+09:00'
-                  updated_at: '2022-08-01T14:33:24.214+09:00'
+                  created_at: '2022-08-09T19:26:14.333+09:00'
+                  updated_at: '2022-08-09T19:26:14.333+09:00'
                 - - 
-                  - id: 13800
+                  - id: 1205
                     name: 離婚
                     ancestry: 
-                    created_at: '2022-08-01T14:33:24.219+09:00'
-                    updated_at: '2022-08-01T14:33:24.219+09:00'
+                    created_at: '2022-08-09T19:26:14.372+09:00'
+                    updated_at: '2022-08-09T19:26:14.372+09:00'
                   - []
         '401':
           description: 401エラーが返ってくること
@@ -749,6 +749,16 @@ paths:
                                       type: string
                                     admin:
                                       type: string
+                            folder_urls_attributes:
+                              type: object
+                              properties:
+                                '0':
+                                  type: object
+                                  properties:
+                                    name:
+                                      type: string
+                                    url:
+                                      type: string
                     client_joins_attributes:
                       type: object
                       properties:
@@ -812,8 +822,8 @@ paths:
                     service_price: '12345678'
                     description: テストマタープロフィール
                     archive: 'true'
-                    task_template_group_id: '1161'
-                    user_id: '55217'
+                    task_template_group_id: '340'
+                    user_id: '4408'
                     opponents_attributes:
                       '0':
                         name: テスト姓
@@ -827,6 +837,10 @@ paths:
                       '0':
                         belong_side_id: 組織
                         admin: 'true'
+                    folder_urls_attributes:
+                      '0':
+                        name: テストURL名
+                        url: テストURL
                 client_joins_attributes:
                   '0':
                     belong_side_id: 組織
@@ -916,7 +930,7 @@ paths:
         required: true
         schema:
           type: integer
-        example: 4852
+        example: 723
       requestBody:
         content:
           application/x-www-form-urlencoded:
@@ -1038,7 +1052,7 @@ paths:
         required: true
         schema:
           type: integer
-        example: 4862
+        example: 733
       responses:
         '200':
           description: matterへの参加があるuserがアクセスする場合リクエストが成功すること
@@ -1080,6 +1094,108 @@ paths:
                         type: string
                       updated_at:
                         type: string
+                      client:
+                        type: object
+                        properties:
+                          id:
+                            type: integer
+                          name:
+                            type: string
+                          first_name:
+                            type: string
+                          name_kana:
+                            type: string
+                          first_name_kana:
+                            type: string
+                          maiden_name:
+                            nullable: true
+                          maiden_name_kana:
+                            nullable: true
+                          profile:
+                            type: string
+                          indentification_number:
+                            type: string
+                          birth_date:
+                            type: string
+                          client_type_id:
+                            type: string
+                          archive:
+                            type: boolean
+                          created_at:
+                            type: string
+                          updated_at:
+                            type: string
+                      contact_phone_numbers:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            id:
+                              type: integer
+                            category:
+                              type: integer
+                            memo:
+                              nullable: true
+                            phone_number:
+                              type: string
+                            client_id:
+                              type: integer
+                            opponent_id:
+                              nullable: true
+                            created_at:
+                              type: string
+                            updated_at:
+                              type: string
+                      contact_emails:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            id:
+                              type: integer
+                            category:
+                              type: string
+                            memo:
+                              nullable: true
+                            email:
+                              type: string
+                            client_id:
+                              type: integer
+                            opponent_id:
+                              nullable: true
+                            created_at:
+                              type: string
+                            updated_at:
+                              type: string
+                      contact_addresses:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            id:
+                              type: integer
+                            category:
+                              type: string
+                            memo:
+                              nullable: true
+                            post_code:
+                              type: string
+                            prefecture:
+                              type: string
+                            address:
+                              type: string
+                            building_name:
+                              nullable: true
+                            send_by_personal:
+                              type: boolean
+                            client_id:
+                              type: integer
+                            opponent_id:
+                              nullable: true
+                            created_at:
+                              type: string
+                            updated_at:
+                              type: string
               example:
                 status: 200
                 data:
@@ -1097,6 +1213,52 @@ paths:
                   archive: true
                   created_at: '2022-08-01T14:33:28.678+09:00'
                   updated_at: '2022-08-01T14:33:28.678+09:00'
+                  client:
+                    id: 729
+                    name: テスト姓
+                    first_name: テスト名
+                    name_kana: てすとせい
+                    first_name_kana: てすとめい
+                    maiden_name: 
+                    maiden_name_kana: 
+                    profile: テストプロフィール
+                    indentification_number: '452333443'
+                    birth_date: '2000-01-01'
+                    client_type_id: 法人
+                    archive: true
+                    created_at: '2022-08-09T19:26:19.347+09:00'
+                    updated_at: '2022-08-09T19:26:19.347+09:00'
+                  contact_phone_numbers:
+                  - id: 369
+                    category: 0
+                    memo: 
+                    phone_number: '09012345678'
+                    client_id: 729
+                    opponent_id: 
+                    created_at: '2022-08-09T19:26:19.415+09:00'
+                    updated_at: '2022-08-09T19:26:19.415+09:00'
+                  contact_emails:
+                  - id: 361
+                    category: 私用
+                    memo: 
+                    email: contact-email@example.com
+                    client_id: 729
+                    opponent_id: 
+                    created_at: '2022-08-09T19:26:19.417+09:00'
+                    updated_at: '2022-08-09T19:26:19.417+09:00'
+                  contact_addresses:
+                  - id: 353
+                    category: 現住所
+                    memo: 
+                    post_code: '1100001'
+                    prefecture: 東京都
+                    address: 渋谷区
+                    building_name: 
+                    send_by_personal: false
+                    client_id: 729
+                    opponent_id: 
+                    created_at: '2022-08-09T19:26:19.419+09:00'
+                    updated_at: '2022-08-09T19:26:19.419+09:00'
         '401':
           description: 401エラーを返すこと
           content:
@@ -3870,3 +4032,281 @@ paths:
               example:
                 status: 200
                 message: 削除しました
+  "/api/v1/clients/conflict_check":
+    get:
+      summary: conflict_check
+      tags:
+      - Api::V1::Client
+      parameters:
+      - name: name
+        in: query
+        schema:
+          type: string
+        example: テスト姓
+      - name: first_name
+        in: query
+        schema:
+          type: string
+        example: テスト名
+      responses:
+        '200':
+          description: クライアントデータが返ってこないこと
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                  message:
+                    type: string
+                  data:
+                    type: array
+                    items:
+                      type: string
+              example:
+                status: 200
+                message: OK
+                data:
+                - テスト姓テスト名
+                - テスト姓テスト名
+        '401':
+          description: 401エラーが返ってくること
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                  message:
+                    type: string
+              example:
+                status: 401
+                message: Unauthorized
+  "/api/v1/clients/get_category_parents":
+    get:
+      summary: get_category_parents
+      tags:
+      - Api::V1::Client
+      responses:
+        '200':
+          description: 親案件カテゴリーデータが返ってくること
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                        name:
+                          type: string
+                        ancestry:
+                          nullable: true
+                        created_at:
+                          type: string
+                        updated_at:
+                          type: string
+              example:
+                status: 200
+                data:
+                - id: 1353
+                  name: 離婚
+                  ancestry: 
+                  created_at: '2022-08-09T19:26:21.142+09:00'
+                  updated_at: '2022-08-09T19:26:21.142+09:00'
+        '401':
+          description: 401エラーが返ってくること
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                  message:
+                    type: string
+              example:
+                status: 401
+                message: Unauthorized
+  "/api/v1/clients/get_category_children":
+    get:
+      summary: get_category_children
+      tags:
+      - Api::V1::Client
+      parameters:
+      - name: category_parent_id
+        in: query
+        schema:
+          type: integer
+        example: 1371
+      responses:
+        '200':
+          description: 子案件カテゴリーデータが返ってくること
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                        name:
+                          type: string
+                        ancestry:
+                          type: string
+                        created_at:
+                          type: string
+                        updated_at:
+                          type: string
+              example:
+                status: 200
+                data:
+                - id: 1370
+                  name: 親権
+                  ancestry: '1366'
+                  created_at: '2022-08-09T19:26:21.713+09:00'
+                  updated_at: '2022-08-09T19:26:21.713+09:00'
+        '401':
+          description: 401エラーが返ってくること
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                  message:
+                    type: string
+              example:
+                status: 401
+                message: Unauthorized
+  "/api/v1/clients/{id}/client_matters":
+    get:
+      summary: client_matters
+      tags:
+      - Api::V1::Client
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+        example: 767
+      responses:
+        '200':
+          description: クライアントの案件データが返ってくること
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        matter:
+                          type: object
+                          properties:
+                            id:
+                              type: integer
+                            user_id:
+                              type: integer
+                            client_id:
+                              type: integer
+                            service_price:
+                              type: integer
+                            description:
+                              type: string
+                            start_date:
+                              nullable: true
+                            finish_date:
+                              nullable: true
+                            matter_status_id:
+                              type: string
+                            archive:
+                              type: boolean
+                            created_at:
+                              type: string
+                            updated_at:
+                              type: string
+                        matter_assigns:
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              id:
+                                type: integer
+                              matter_id:
+                                type: integer
+                              user_id:
+                                type: integer
+                              created_at:
+                                type: string
+                              updated_at:
+                                type: string
+              example:
+                status: 200
+                data:
+                - matter:
+                    id: 763
+                    user_id: 4798
+                    client_id: 763
+                    service_price: 12345678
+                    description: テストマタープロフィール
+                    start_date: 
+                    finish_date: 
+                    matter_status_id: 受任
+                    archive: true
+                    created_at: '2022-08-09T19:26:22.138+09:00'
+                    updated_at: '2022-08-09T19:26:22.138+09:00'
+                  matter_assigns:
+                  - id: 21
+                    matter_id: 763
+                    user_id: 4798
+                    created_at: '2022-08-09T19:26:22.237+09:00'
+                    updated_at: '2022-08-09T19:26:22.237+09:00'
+        '401':
+          description: 401エラーが返ってくること
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                  message:
+                    type: string
+              example:
+                status: 401
+                message: Unauthorized
+        '403':
+          description: 403エラーが返ってくること
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                  message:
+                    type: string
+              example:
+                status: 403
+                message: Forbidden
