@@ -20,11 +20,12 @@ module Api
           contact_emails: @client.contact_emails,
           contact_addresses: @client.contact_addresses
           }
-        render json: { status: 200, data: @client}
+        render json: { status: 200, data: data}
       end
 
       def client_matters
         @client = Client.active.find(params[:id])
+        return response_forbidden unless correct_user
         # pageとかsortとかは必要であれば追加
         matters = @client.matters
         data = []
@@ -206,8 +207,8 @@ module Api
       end
 
       def correct_user
-        if action_name == 'show'
-          return true if @client.join_check(current_user)
+        if action_name == 'show' || action_name == 'client_matters'
+          return true if @client.join_check(current_user) || @client.matters_join_check(current_user)
         else
           return true if @client.admin_check(current_user) && current_user.admin_check
         end
