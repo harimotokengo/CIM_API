@@ -16,15 +16,16 @@ RSpec.describe "Clients", type: :request do
   let!(:injoin_user) { create(:user) }
 
   let!(:matter_category_join) { create(:matter_category_join, matter: matter, matter_category: matter_category) }
-  let!(:matter_category) { create(:matter_category) }
+  let!(:matter_category_child) { create(:matter_category) }
   let!(:matter_category) { create(:matter_category, name: '離婚', ancestry: nil) }
 
   let!(:task_template_group) { create(:task_template_group, name: 'タスクテンプレート群', public_flg: true) }
   let!(:task_template) { create(:task_template, name: 'タスクテンプレート', task_template_group_id: task_template_group.id) }
 
   let!(:client) { create(:client) }
-  let!(:other_client) { create(:client) }
+  let!(:other_client) { create(:client, name: 'その他', first_name: 'クライアント') }
   let!(:matter) { create(:matter, client: client, user: user) }
+  let!(:opponent) { create(:opponent, matter: matter) }
   let!(:other_matter) { create(:matter, client: other_client, user: other_user) }
   let!(:matter_join_office) { create(:matter_join, matter: matter, office: office, belong_side_id: 1) }
   let!(:matter_join_other_user) { create(:matter_join, matter: matter, user: other_user, belong_side_id: 2) }
@@ -89,6 +90,7 @@ RSpec.describe "Clients", type: :request do
   # # 事務所なしユーザーは組織で登録できない
   describe 'POST #create' do
     before do
+      folder_url_params = {folder_urls_attributes: { "0": attributes_for(:folder_url)}}
       contact_phone_number_params = {contact_phone_numbers_attributes: { "0": attributes_for(:contact_phone_number)}}
       invalid_contact_phone_number_params = { contact_phone_numbers_attributes: {"0": attributes_for(:contact_phone_number, phone_number: '123456') }}
       contact_email_params = { contact_emails_attributes: { "0": attributes_for(:contact_email) }  }
@@ -98,7 +100,7 @@ RSpec.describe "Clients", type: :request do
       matter_join_params = { matter_joins_attributes: { "0": attributes_for(:matter_join) }}
       client_join_params = { client_joins_attributes: { "0": attributes_for(:client_join) }}
       matter_category_join_params = { matter_category_joins_attributes: { "0": attributes_for(:matter_category_join) }}
-      matter_params = { matters_attributes: { "0": attributes_for(:matter, task_template_group_id: task_template_group.id, user_id: user.id).merge(opponent_params, matter_join_params, matter_category_join_params) } }
+      matter_params = { matters_attributes: { "0": attributes_for(:matter, task_template_group_id: task_template_group.id, user_id: user.id).merge(opponent_params, matter_join_params, matter_category_join_params, folder_url_params) } }
       min_matter_params = { matters_attributes: { "0": attributes_for(:matter, task_template_group_id: task_template_group.id, user_id: user.id).merge(matter_join_params, matter_category_join_params) }}
       contact_matter_params = {matters_attributes: { "0": attributes_for(:matter, user_id: user.id).merge(contact_opponent_params, matter_join_params)}}
       @client_params = attributes_for(:client).merge(matter_params, client_join_params, matter_category_join_params)
@@ -121,7 +123,7 @@ RSpec.describe "Clients", type: :request do
           login_user(user, 'Test-1234', api_v1_login_path)
           expect do
             post api_v1_clients_path, params: { client: @client_params }
-          end.to change(Client, :count).by(1) and change(Matter, :count).by(1) and change(Opponent, :count).by(1) and change(MatterJoin, :count).by(1) and change(Task, :count).by(1)
+          end.to change(Client, :count).by(1) and change(Matter, :count).by(1) and change(Opponent, :count).by(1) and change(MatterJoin, :count).by(1) and change(Task, :count).by(1) and change(FolderUrl, :count).by(1)
         end
       end
 
@@ -399,16 +401,28 @@ RSpec.describe "Clients", type: :request do
         login_user(user, 'Test-1234', api_v1_login_path)
         get api_v1_client_path(client)
         expect(response).to have_http_status 200
+        expect(JSON.parse(response.body)['data']['client']['id']).to eq client.id
+        expect(JSON.parse(response.body)['data']['contact_phone_numbers'][0]['id']).to eq client.contact_phone_numbers.first.id
+        expect(JSON.parse(response.body)['data']['contact_emails'][0]['id']).to eq client.contact_emails.first.id
+        expect(JSON.parse(response.body)['data']['contact_addresses'][0]['id']).to eq client.contact_addresses.first.id
       end
       it 'matterへの参加が事務所の場合、同事務所のuserのリクエストが成功すること' do
         login_user(user2, 'Test-1234', api_v1_login_path)
         get api_v1_client_path(client)
         expect(response.status).to eq 200
+        expect(JSON.parse(response.body)['data']['client']['id']).to eq client.id
+        expect(JSON.parse(response.body)['data']['contact_phone_numbers'][0]['id']).to eq client.contact_phone_numbers.first.id
+        expect(JSON.parse(response.body)['data']['contact_emails'][0]['id']).to eq client.contact_emails.first.id
+        expect(JSON.parse(response.body)['data']['contact_addresses'][0]['id']).to eq client.contact_addresses.first.id
       end
       it 'matterへの参加があるuserがアクセスする場合リクエストが成功すること' do
         login_user(other_user, 'Test-1234', api_v1_login_path)
         get api_v1_client_path(client)
         expect(response).to have_http_status 200
+        expect(JSON.parse(response.body)['data']['client']['id']).to eq client.id
+        expect(JSON.parse(response.body)['data']['contact_phone_numbers'][0]['id']).to eq client.contact_phone_numbers.first.id
+        expect(JSON.parse(response.body)['data']['contact_emails'][0]['id']).to eq client.contact_emails.first.id
+        expect(JSON.parse(response.body)['data']['contact_addresses'][0]['id']).to eq client.contact_addresses.first.id
       end
     end
     context '準正常系' do
@@ -430,5 +444,142 @@ RSpec.describe "Clients", type: :request do
     end
   end
 
-  # conflict_check
+  describe 'GET #conflict_check' do
+    context '正常系' do
+      context '案件参加ユーザーでログイン' do
+        it 'リクエストが成功すること' do
+          login_user(user, 'Test-1234', api_v1_login_path)
+          get conflict_check_api_v1_clients_path, params: { name: client.name, first_name: client.first_name }
+          expect(response).to have_http_status 200
+        end
+        it 'クライアントデータが返ってくること' do
+          login_user(user, 'Test-1234', api_v1_login_path)
+          get conflict_check_api_v1_clients_path, params: { name: client.name, first_name: client.first_name }
+          expect(JSON.parse(response.body)['data'].first).to eq client.full_name
+        end
+        it '関係者のデータが返ってくること' do
+          login_user(user, 'Test-1234', api_v1_login_path)
+          get conflict_check_api_v1_clients_path, params: { name: matter.opponents.first.name, first_name: matter.opponents.first.first_name }
+          expect(JSON.parse(response.body)['data'].first).to eq matter.opponents.first.full_name
+        end
+        it '参加していないクライアントデータは返って来ないこと' do
+          login_user(user, 'Test-1234', api_v1_login_path)
+          get conflict_check_api_v1_clients_path, params: { name: other_matter.client.name, first_name: other_matter.client.first_name }
+          expect(JSON.parse(response.body)['data']).to eq nil
+        end
+      end
+    end
+    context '準正常系' do
+      context '未ログイン' do
+        it '401エラーが返ってくること' do
+          get conflict_check_api_v1_clients_path, params: { name: client.name, first_name: client.first_name }
+          expect(response).to have_http_status 401
+          expect(JSON.parse(response.body)['data']).to eq nil
+        end
+      end
+      context '不参加ユーザーでログイン' do
+        it 'リクエストが成功すること' do
+          login_user(injoin_user, 'Test-1234', api_v1_login_path)
+          get conflict_check_api_v1_clients_path, params: { name: client.name, first_name: client.first_name }
+          expect(response).to have_http_status 200
+        end
+        it 'クライアントデータが返ってこないこと' do
+          login_user(injoin_user, 'Test-1234', api_v1_login_path)
+          get conflict_check_api_v1_clients_path, params: { name: client.name, first_name: client.first_name }
+          expect(JSON.parse(response.body)['data']).to eq nil
+        end
+      end
+    end
+  end
+
+  describe 'GET #get_category_parents' do
+    context '正常系' do
+      context 'ログイン状態' do
+        it 'リクエストが成功すること' do
+          login_user(user, 'Test-1234', api_v1_login_path)
+          get get_category_parents_api_v1_clients_path
+          expect(response).to have_http_status 200
+        end
+        it '親案件カテゴリーデータが返ってくること' do
+          login_user(injoin_user, 'Test-1234', api_v1_login_path)
+          get get_category_parents_api_v1_clients_path
+          expect(JSON.parse(response.body)['data'].first).to include({"id"=>matter_category.id})
+        end
+      end
+    end
+
+    context '準正常系' do
+      context '未ログイン' do
+        it '401エラーが返ってくること' do
+          get get_category_parents_api_v1_clients_path
+          expect(response).to have_http_status 401
+        end
+      end
+    end
+  end
+
+  describe 'GET #get_category_children' do
+    context '正常系' do
+      context 'ログイン状態' do
+        it 'リクエストが成功すること' do
+          category_child = matter_category.children.create(name: '親権')
+          login_user(user, 'Test-1234', api_v1_login_path)
+          get get_category_children_api_v1_clients_path, params: { category_parent_id: matter_category.id }
+          expect(response).to have_http_status 200
+        end
+        it '子案件カテゴリーデータが返ってくること' do
+          category_child = matter_category.children.create(name: '親権')
+          login_user(user, 'Test-1234', api_v1_login_path)
+          get get_category_children_api_v1_clients_path, params: { category_parent_id: matter_category.id }
+          expect(JSON.parse(response.body)['data'].first).to include({"id"=>category_child.id})
+        end
+      end
+    end
+    context '準正常系' do
+      context '未ログイン' do
+        it '401エラーが返ってくること' do
+          category_child = matter_category.children.create(name: '親権')
+          get get_category_children_api_v1_clients_path, params: { category_parent_id: matter_category.id }
+          expect(response).to have_http_status 401
+        end
+      end
+    end
+  end
+
+  describe 'GET #client_matters' do
+    context '正常系' do
+      context 'ログイン状態' do
+        it 'リクエストが成功すること' do
+          matter_assign = create(:matter_assign, matter: matter, user: user)
+          login_user(user, 'Test-1234', api_v1_login_path)
+          get client_matters_api_v1_client_path(client)
+          expect(response).to have_http_status 200
+        end
+        it 'クライアントの案件データが返ってくること' do
+          matter_assign = create(:matter_assign, matter: matter, user: user)
+          login_user(user, 'Test-1234', api_v1_login_path)
+          get client_matters_api_v1_client_path(client)
+          expect(JSON.parse(response.body)['data'][0]['matter']['id']).to eq client.matters.first.id
+          expect(JSON.parse(response.body)['data'][0]['matter_assigns'][0]['id']).to eq matter_assign.id
+        end
+      end
+    end
+    context '準正常系' do
+      context '未ログイン' do
+        it '401エラーが返ってくること' do
+          matter_assign = create(:matter_assign, matter: matter, user: user)
+          get client_matters_api_v1_client_path(client)
+          expect(response).to have_http_status 401
+        end
+      end
+      context 'クライアント不参加ユーザーでログイン' do
+        it '403エラーが返ってくること' do
+          matter_assign = create(:matter_assign, matter: matter, user: user)
+          login_user(injoin_user, 'Test-1234', api_v1_login_path)
+          get client_matters_api_v1_client_path(client)
+          expect(response).to have_http_status 403
+        end
+      end
+    end
+  end
 end

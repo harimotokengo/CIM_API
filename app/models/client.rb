@@ -81,6 +81,14 @@ class Client < ApplicationRecord
     return true if personal_join_check(current_user) || office_join_check(current_user)
   end
 
+  def matters_join_check(current_user)
+    if current_user.belonging_office
+      return true if self.matters.joins(:matter_joins).where('matter_joins.user_id = ? OR matter_joins.office_id = ?', current_user.id, current_user.belonging_office.id).exists?
+    else
+      return true if self.matters.joins(:matter_joins).where('matter_joins.user_id = ?', current_user.id).exists?
+    end
+  end
+
   def admin_check(current_user)
     user_admin_check = client_joins.where(admin: true, user_id: current_user).exists?
     office_admin_check = client_joins.where(admin: true, 

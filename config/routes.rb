@@ -3,6 +3,7 @@ Rails.application.routes.draw do
     namespace 'v1' , defaults: { format: 'json' } do
       post '/login' => 'sessions#create'
       post '/logout' => 'sessions#destroy'
+      get '/me' => 'sessions#me'
       resources :users, only: [:create, :update]
       resources :offices, only: [:create, :show, :update] do
         resources :office_users
@@ -28,11 +29,11 @@ Rails.application.routes.draw do
         collection do
           get 'conflict_check'
           get 'get_category_parents'
-          get 'get_category_childeren'
+          get 'get_category_children'
           get 'get_join_users'
         end
         member do
-          get 'get_matters'
+          get 'client_matters'
         end
         
       end

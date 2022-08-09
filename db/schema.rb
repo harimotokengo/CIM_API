@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2022_07_28_105340) do
+ActiveRecord::Schema[7.0].define(version: 2022_08_02_013047) do
   create_table "active_storage_attachments", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.string "name", null: false
     t.string "record_type", null: false
@@ -148,6 +148,15 @@ ActiveRecord::Schema[7.0].define(version: 2022_07_28_105340) do
     t.datetime "updated_at", null: false
     t.index ["matter_id"], name: "index_fees_on_matter_id"
     t.index ["task_id"], name: "index_fees_on_task_id"
+  end
+
+  create_table "folder_urls", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
+    t.string "name", null: false
+    t.text "url", null: false
+    t.bigint "matter_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["matter_id"], name: "index_folder_urls_on_matter_id"
   end
 
   create_table "invite_urls", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
@@ -394,6 +403,7 @@ ActiveRecord::Schema[7.0].define(version: 2022_07_28_105340) do
   add_foreign_key "contact_phone_numbers", "opponents"
   add_foreign_key "fees", "matters"
   add_foreign_key "fees", "tasks"
+  add_foreign_key "folder_urls", "matters"
   add_foreign_key "invite_urls", "clients"
   add_foreign_key "invite_urls", "matters"
   add_foreign_key "invite_urls", "users"

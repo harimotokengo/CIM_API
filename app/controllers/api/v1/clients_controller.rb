@@ -2,8 +2,6 @@ module Api
   module V1
     class ClientsController < Api::V1::Base
       before_action :response_unauthorized, unless: :logged_in?
-      # before_action :set_client, only: %i[show update destroy]
-      # before_action :response_forbidden, only: %i[show update destroy], unless: :correct_user
 
       def index
         clients = search_client
@@ -16,24 +14,36 @@ module Api
       def show
         @client = Client.find(params[:id])
         return response_forbidden unless correct_user
-        render json: { status: 200, data: @client}
+        data = { 
+          client: @client, 
+          contact_phone_numbers: @client.contact_phone_numbers,
+          contact_emails: @client.contact_emails,
+          contact_addresses: @client.contact_addresses
+          }
+        render json: { status: 200, data: data}
       end
 
-      def matters
+      def client_matters
         @client = Client.active.find(params[:id])
+        return response_forbidden unless correct_user
         # pageとかsortとかは必要であれば追加
         matters = @client.matters
-        render json: { status: 200, data: matters}
+        data = []
+        matters.each do |matter|
+          matter.matter_assigns
+          data << {matter: matter, matter_assigns: matter.matter_assigns}
+        end
+        render json: { status: 200, data: data}
       end
 
       def get_category_parents
         matter_category_parents = MatterCategory.where(ancestry: nil)
-        render json: {data: category_parents}
+        render json: { status: 200, data: matter_category_parents}
       end
 
       def get_category_children
         matter_category_children = MatterCategory.find(params[:category_parent_id]).children
-        render json: { data: matter_category_children}
+        render json: { status: 200, data: matter_category_children}
       end
 
       def create
@@ -82,20 +92,29 @@ module Api
         @full_name = @name + @first_name
         @harf_space_fullname = @name + ' ' + @first_name
         @hull_space_fullname = @name + '　' + @first_name
-        @clients = Client.joins(matters: :matter_joins).where(['matters.archive = ?', true]).where(['matter_joins.office_id = ? OR matter_joins.user_id = ?', @office.id, current_user.id])
-                         .where(['name = ? AND first_name = ?', @name, @first_name]).distinct
-        # ============追加====client_joinしてるclientにもコンフリがないか確認
-        @opponents = Opponent.joins(matter: :matter_joins).where(['matters.archive = ?', true]).where(['matter_joins.office_id = ? OR matter_joins.user_id = ?', @office.id, current_user.id])
-                             .where(['name = ? OR name = ? OR name = ?', @full_name, @harf_space_fullname, @hull_space_fullname]).distinct
-        # ＝＝＝＝＝＝＝追加＝＝＝client_joinしてるmatterのopponentにコンフリが発生してるかも確認
-        if !@clients && !@opponents
+        @clients = Client.active.joins(matters: :matter_joins)
+                          .joins(:client_joins)
+                          .where(['matters.archive = ?', true])
+                          .where(['client_joins.user_id = ? or matter_joins.office_id = ? or client_joins.office_id = ? or matter_joins.user_id = ?', current_user.belonging_office, current_user, current_user.belonging_office, current_user])
+                          .where(['name = ? AND first_name = ?', @name, @first_name]).distinct
+        @opponents = Opponent.joins(matter: :matter_joins)
+                              .joins(matter: {client: :client_joins})
+                              .where(['clients.archive = ?', true])
+                              .where(['matters.archive = ?', true])
+                              .where(['client_joins.user_id = ? or matter_joins.office_id = ? or client_joins.office_id = ? or matter_joins.user_id = ?', current_user.belonging_office, current_user, current_user.belonging_office, current_user])
+                              .where(['opponents.name = ? OR opponents.name = ? OR opponents.name = ? OR opponents.name = ? AND opponents.first_name = ?', @full_name, @harf_space_fullname, @hull_space_fullname, @name, @first_name]).distinct
+        if @clients.blank? && @opponents.blank?
           render json: { status: 200, message: 'OK' }
-        # elsif @clients
-        #   render json: { status: 200, data: @clients }
-        # elsif @opponents
-        #   render json: { status: 200, data: @opponents }
         else
-          render json: { status: 200, message: "#{@clients.count + @opponents.count}件見つかりました", data: [@clients, @opponents] }
+          data = []
+          @clients.each do |client|
+            data << client.full_name
+          end
+          @opponents.each do |opponent|
+            data << opponent.full_name
+          end 
+          render json: { status: 200, message: "#{data.count}件見つかりました", data: data }
+          
         end
       end
 
@@ -144,7 +163,6 @@ module Api
             :id, :user_id, :service_price,
             :folder_url, :description, :matter_status_id,
             :start_date, :finish_date, 
-            # :task_group_template_id, 
             :_destroy,
             matter_category_joins_attributes: [
               :id, :matter_id, :matter_category_id,
@@ -157,9 +175,9 @@ module Api
             matter_assigns_attributes: %i[
 
             ],
-            # folder_urls_attributes: %i[
-            #   id name url _destroy
-            # ],
+            folder_urls_attributes: %i[
+              id name url _destroy
+            ],
             fees_attributes: %i[
               id fee_type_id price price_type
               monthly_date_id pay_times _destroy
@@ -189,8 +207,8 @@ module Api
       end
 
       def correct_user
-        if action_name == 'show'
-          return true if @client.join_check(current_user)
+        if action_name == 'show' || action_name == 'client_matters'
+          return true if @client.join_check(current_user) || @client.matters_join_check(current_user)
         else
           return true if @client.admin_check(current_user) && current_user.admin_check
         end
@@ -223,12 +241,3 @@ module Api
     end
   end
 end
-
-
-# matter.tasksからtemplate_groupおよびテンプレート作成
-# matter = Matter.find(params[:id])
-# tasks = matter.tasks
-# task_template_group = TaskTemplateGroup.create(name: params[:task_template_group][:name])
-# tasks.each do |task|
-#   TaskTemplate.create(name: task.name, template_group_id: task_template_group.id)
-# end
