@@ -49,6 +49,9 @@ Rails.application.routes.draw do
         member do
           get 'get_join_users'
         end
+        collection do
+          get 'tag_auto_complete'
+        end
       end
       resources :invite_urls, only: :show
       resources :tasks, only: [:index, :create, :update, :destroy]
