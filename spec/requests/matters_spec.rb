@@ -595,5 +595,20 @@ RSpec.describe 'matters_requests', type: :request do
       end
     end
   end
+
+  describe 'tag_auto_complete' do
+    context '正常系' do
+      context 'ログイン状態' do
+        it 'リクエストが成功すること' do
+          login_user(matter_join_user, 'Test-1234', api_v1_login_path)
+          get tag_auto_complete_api_v1_matters_path
+          expect(response).to have_http_status 200
+        end
+      end
+    end
+    context '準正常系' do
+
+    end
+  end
   # conflict
 end
