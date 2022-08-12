@@ -597,18 +597,31 @@ RSpec.describe 'matters_requests', type: :request do
   end
 
   describe 'tag_auto_complete' do
+    before{
+      @tags = create_list(:tag, 5)
+      @tags.each_with_index do |tag, i|
+        create(:matter_tag, matter_id: matter.id, tag_id: @tags[i].id)
+      end
+    }
     context '正常系' do
+      
       context 'ログイン状態' do
         it 'リクエストが成功すること' do
           login_user(matter_join_user, 'Test-1234', api_v1_login_path)
-          get tag_auto_complete_api_v1_matters_path
+          get tag_auto_complete_api_v1_matters_path, params: { term: '1'}
           expect(response).to have_http_status 200
+          expect(JSON.parse(response.body)['data']).to eq ['タグ1']
         end
       end
     end
     context '準正常系' do
-
+      context '未ログイン状態' do
+        it '401エラーが返ってくること' do
+          get tag_auto_complete_api_v1_matters_path, params: { term: '1'}
+          expect(response).to have_http_status 401
+          expect(JSON.parse(response.body)['data']).to eq nil
+        end
+      end
     end
   end
-  # conflict
 end
