@@ -64,13 +64,17 @@ module Api
       end
 
       def tag_auto_complete
-        matter_tags = Tag.joins(matter_tags: [matter: :matter_joins]).where(['matters.archive = ?', true]).where(['matter_joins.office_id = ? OR matter_joins.user_id = ?', @office.id, current_user.id])
-        inquiry_tags = Tag.joins(inquiry_tags: [inquiry: [project: :project_assigns]]).where(['projects.archive = ?', true]).where(['project_assigns.office_id = ? OR project_assigns.user_id = ?', @office.id, current_user.id])
-        tags = Tag.where(id: (matter_tags + inquiry_tags))
+        if current_user.belonging_office
+          matter_tags = Tag.joins(matter_tags: [matter: :matter_joins]).where(['matters.archive = ?', true]).where(['matter_joins.office_id = ? OR matter_joins.user_id = ?', current_user.belonging_office.id, current_user.id])
+        else
+          matter_tags = Tag.joins(matter_tags: [matter: :matter_joins]).where(['matters.archive = ?', true]).where(['matter_joins.user_id = ?', current_user.id])
+        end
+        
+        tags = Tag.where(id: matter_tags)
         tags_sql = Tag.sanitize_sql("tag_name like '%#{params[:term]}%'")
         tags = tags.select(:tag_name).where(tags_sql)
-        tags = tags.map(&:tag_name)
-        render json: {status: 200, data: tags}
+        tag_names = tags.map(&:tag_name)
+        render json: {status: 200, data: tag_names}
       end
 
       # 関係者の個人情報を空白にしてmatter.archiveをfalseにする
