@@ -598,6 +598,8 @@ RSpec.describe 'matters_requests', type: :request do
 
   describe 'tag_auto_complete' do
     before{
+      Tag.destroy_all
+      MatterTag.destroy_all
       @tags = create_list(:tag, 5)
       @tags.each_with_index do |tag, i|
         create(:matter_tag, matter_id: matter.id, tag_id: @tags[i].id)
@@ -608,9 +610,9 @@ RSpec.describe 'matters_requests', type: :request do
       context 'ログイン状態' do
         it 'リクエストが成功すること' do
           login_user(matter_join_user, 'Test-1234', api_v1_login_path)
-          get tag_auto_complete_api_v1_matters_path, params: { term: '1'}
+          get tag_auto_complete_api_v1_matters_path, params: { term: 'タグ'}
           expect(response).to have_http_status 200
-          expect(JSON.parse(response.body)['data']).to eq ['タグ1']
+          expect(JSON.parse(response.body)['data']).to eq @tags.map(&:tag_name)
         end
       end
     end
