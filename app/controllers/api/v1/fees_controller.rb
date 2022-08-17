@@ -1,0 +1,154 @@
+module Api
+  module V1
+    class FeesController < Api::V1::Base
+      before_action :response_unauthorized, unless: :logged_in?
+      # before_action :set_fee, only: %i[edit update destroy]
+      # before_action :set_create, only: %i[create]
+      before_action :check_parent, except: %i[index]
+      before_action :check_access
+
+      def index
+        @matters = Matter.active_matters.joins(:matter_joins).where(['matter_joins.office_id = ? OR matter_joins.user_id = ?', @office.id, current_user.id])
+        @advisor_matters = @matters.joins(:fees).where('fees.fee_type_id = ?', 3)
+        @spot_matters = @matters.joins(:fees).where.not('fees.fee_type_id = ?', 3)
+        @year_statistics = params[:year_statistics] if params[:year_statistics].present?
+        @sales_management = params[:sales_management] if params[:sales_management].present?
+        @month = params[:month] if params[:month].present?
+        @year = params[:year] if params[:year].present?
+        @now_month = if @month.present?
+                      "#{@month}-01".to_date
+                    else
+                      Time.now.beginning_of_month.to_date
+                    end
+        @now_year = if @year.present?
+                      "#{@year}-01-01".to_date
+                    else
+                      Time.now.beginning_of_month.to_date
+                    end
+        if @sales_management.present?
+          sales_management
+        elsif @year_statistics.present?
+          year_calculation
+        else
+          month_calculation
+        end
+      end
+
+      def create
+        @fee = Fee.new(fee_params)
+        @fee.price = 0 if @fee.fee_type_id == 6
+        if @fee.save
+          @fee.create_fee_log(current_user)
+          flash[:notice] = '登録しました。'
+          if @matter.present?
+            redirect_back(fallback_location: matter_fees_matter_path(@matter))
+          else
+            redirect_back(fallback_location: project_inquiry_path(@inquiry.project, @inquiry))
+          end
+        else
+          flash.now[:alert] = '登録出来ません。入力必須項目を確認してください。'
+          render :new
+        end
+      end
+
+      def update
+        @fee = Fee.find(params[:id])
+        @path = Rails.application.routes.recognize_path(request.referer)
+        params[:fee][:price] = 0 if params[:fee][:fee_type_id] == '6'
+        if params[:fee][:archive] == 'false' # アーカイブ用
+          if @fee.check_fee_destroy_admin(@current_user, @office, @current_belonging_info) == true
+            flash[:alert] = '報酬等を削除しました。'
+            @fee.update(fee_params)
+            @fee.task_fee_relations.destroy_all
+            @fee.delete_fee_log(current_user)
+            redirect_back(fallback_location: user_path(current_user))
+          else
+            redirect_to root_path, alert: '不正なアクセスです。'
+          end
+        elsif @fee.update(fee_params)
+          @fee.update_fee_log(current_user)
+          flash[:notice] = '更新しました。'
+          if @matter.present?
+            redirect_back(fallback_location: matter_fees_matter_path(@matter))
+          else
+            redirect_back(fallback_location: project_inquiry_path(@inquiry.project, @inquiry))
+          end
+        elsif @path[:controller] == 'fees' && @path[:action] == 'edit'
+          flash.now[:alert] = '更新出来ません。入力必須項目を確認してください。'
+          render :edit
+        else
+          flash[:alert] = '更新出来ません。'
+          redirect_back(fallback_location: user_path(current_user))
+        end
+      end
+
+      def destroy
+        @fee = Fee.find(params[:id])
+        # 中身はあとで
+      end
+
+      private
+
+      def fee_params
+        params.require(:fee).permit(
+          :fee_type_id, :price, :deadline,
+          :pay_times, :monthly_date_id,
+          :current_payment, :price_type, :paid_date,
+          :paid_amount, :pay_off, :description,
+          :matter_id, :inquiry_id, :archive
+        )
+      end
+
+      def check_parent
+        if params[:matter_id].present?
+          @matter = Matter.active_matters.find(params[:matter_id])
+          @parent = @matter
+        elsif params[:inquiry_id].present?
+          @inquiry = Inquiry.active_inquiries.find(params[:inquiry_id])
+          @parent = @inquiry
+        elsif @fee.matter.present? && @fee.inquiry.blank?
+          @matter = @fee.matter
+        elsif @fee.inquiry.present? && @fee.matter.blank?
+          @inquiry = @fee.inquiry
+        elsif @fee.matter.present? && @fee.inquiry.present?
+          @matter = @fee.matter
+          @inquiry = @fee.inquiry
+        else
+          flash[:alert] = '不正なアクセスです。'
+          redirect_to root_path
+        end
+      end
+
+      def month_calculation
+        # 顧問
+        @month_advisor_matters = @advisor_matters.where('start_date <= ? OR start_date IS NULL', @now_month.prev_month.end_of_month)
+                                                .where('finish_date >= ? OR finish_date IS NULL', @now_month.prev_month)
+        @month_advisor_fees = @month_advisor_matters.sum(:price)
+        @month_advisor_matters = @month_advisor_matters.distinct
+        # スポット（今月全額入金済（分割以外））
+        @full_amount_matters = @spot_matters.where('fees.pay_off = ? or fees.price <= fees.paid_amount', true)
+        @paid_spot_matters = @full_amount_matters.where('fees.paid_date BETWEEN ? AND ?', @now_month, @now_month.end_of_month)
+        @paid_spot_fees_sum_paid_amount = @paid_spot_matters.sum(:paid_amount)
+        @paid_spot_matters = @paid_spot_matters.distinct
+      end
+
+      def year_calculation; end
+
+      def sales_management
+        @no_apply_fee_matters = @spot_matters.joins(:matter_joins, :fees)
+                                            .where(['matter_joins.office_id = ? OR matter_joins.user_id = ?', @office.id, current_user.id])
+                                            .where(['fees.pay_off = ?', false])
+                                            .distinct
+        @fee_deadline_matters = @no_apply_fee_matters.where.not(['fees.fee_type_id = ? or fees.fee_type_id = ?', 3, 6])
+                                                    .where(['fees.deadline < ?', @now_month.end_of_month])
+                                                    #  SQLインジェクション要チェック
+                                                    .where('fees.paid_amount is null or fees.price > fees.paid_amount')
+        @fee_no_deadline_matters = @no_apply_fee_matters.where.not(['fees.fee_type_id = ? or fees.fee_type_id = ?', 3, 6])
+                                                        #  SQLインジェクション要チェック
+                                                        .where(['fees.deadline is null'])
+                                                        #  SQLインジェクション要チェック
+                                                        .where('fees.paid_amount is null or fees.price > fees.paid_amount')
+      end
+    end
+  end
+end
