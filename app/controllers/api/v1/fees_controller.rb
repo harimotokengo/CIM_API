@@ -4,7 +4,7 @@ module Api
       before_action :response_unauthorized, unless: :logged_in?
       # before_action :set_fee, only: %i[edit update destroy]
       # before_action :set_create, only: %i[create]
-      before_action :check_parent, except: %i[index]
+      # before_action :check_parent, except: %i[index]
       before_action :check_access
 
       def index
@@ -36,9 +36,11 @@ module Api
 
       def create
         @fee = Fee.new(fee_params)
+        @matter = @fee.matter
+        return response_forbidden unless correct_user
         @fee.price = 0 if @fee.fee_type_id == 6
         if @fee.save
-          @fee.create_fee_log(current_user)
+          # @fee.create_fee_log(current_user)
           flash[:notice] = '登録しました。'
           if @matter.present?
             redirect_back(fallback_location: matter_fees_matter_path(@matter))
@@ -53,38 +55,24 @@ module Api
 
       def update
         @fee = Fee.find(params[:id])
-        @path = Rails.application.routes.recognize_path(request.referer)
+        @matter = @fee.matter
+        return response_forbidden unless correct_user
         params[:fee][:price] = 0 if params[:fee][:fee_type_id] == '6'
-        if params[:fee][:archive] == 'false' # アーカイブ用
-          if @fee.check_fee_destroy_admin(@current_user, @office, @current_belonging_info) == true
-            flash[:alert] = '報酬等を削除しました。'
-            @fee.update(fee_params)
-            @fee.task_fee_relations.destroy_all
-            @fee.delete_fee_log(current_user)
-            redirect_back(fallback_location: user_path(current_user))
-          else
-            redirect_to root_path, alert: '不正なアクセスです。'
-          end
-        elsif @fee.update(fee_params)
-          @fee.update_fee_log(current_user)
-          flash[:notice] = '更新しました。'
-          if @matter.present?
-            redirect_back(fallback_location: matter_fees_matter_path(@matter))
-          else
-            redirect_back(fallback_location: project_inquiry_path(@inquiry.project, @inquiry))
-          end
-        elsif @path[:controller] == 'fees' && @path[:action] == 'edit'
-          flash.now[:alert] = '更新出来ません。入力必須項目を確認してください。'
-          render :edit
+        if @fee.update(fee_params)
+          # @fee.update_fee_log(current_user)
+          render json: {status: 200, message: '更新しました'}
         else
-          flash[:alert] = '更新出来ません。'
-          redirect_back(fallback_location: user_path(current_user))
+          render json: {status: 400, message: '更新出来ません。入力必須項目を確認してください', errors: @fee.erros}
         end
       end
 
       def destroy
         @fee = Fee.find(params[:id])
-        # 中身はあとで
+        @matter = @fee.matter
+        return response_forbidden unless correct_user
+        @fee.update(archive: false)
+        # @fee.delete_fee_log(current_user)
+        render json: {status: 200, message: '削除しました'}
       end
 
       private
@@ -95,13 +83,25 @@ module Api
           :pay_times, :monthly_date_id,
           :current_payment, :price_type, :paid_date,
           :paid_amount, :pay_off, :description,
-          :matter_id, :inquiry_id, :archive
+          :matter_id, :archive
         )
+      end
+
+      def correct_user
+        if action_name == 'create'
+          return true if @matter.join_check(current_user) || @matter.client.join_check(current_user)
+        elsif action_name == 'update'
+          return true if @matter.join_check(current_user) || @matter.client.join_check(current_user)
+        else
+          if @matter.admin_check(current_user) || @matter.client.admin_check(current_user)
+            return true if current_user.admin_check
+          end
+        end
       end
 
       def check_parent
         if params[:matter_id].present?
-          @matter = Matter.active_matters.find(params[:matter_id])
+          @matter = Matter.active_matters.find(params[:fee][:matter_id])
           @parent = @matter
         elsif params[:inquiry_id].present?
           @inquiry = Inquiry.active_inquiries.find(params[:inquiry_id])
