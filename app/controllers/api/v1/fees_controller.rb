@@ -4,8 +4,6 @@ module Api
       before_action :response_unauthorized, unless: :logged_in?
       # before_action :set_fee, only: %i[edit update destroy]
       # before_action :set_create, only: %i[create]
-      # before_action :check_parent, except: %i[index]
-      before_action :check_access
 
       def index
         @matters = Matter.active_matters.joins(:matter_joins).where(['matter_joins.office_id = ? OR matter_joins.user_id = ?', @office.id, current_user.id])
@@ -41,15 +39,9 @@ module Api
         @fee.price = 0 if @fee.fee_type_id == 6
         if @fee.save
           # @fee.create_fee_log(current_user)
-          flash[:notice] = '登録しました。'
-          if @matter.present?
-            redirect_back(fallback_location: matter_fees_matter_path(@matter))
-          else
-            redirect_back(fallback_location: project_inquiry_path(@inquiry.project, @inquiry))
-          end
+          render json: {status: 200, message: '登録しました'}
         else
-          flash.now[:alert] = '登録出来ません。入力必須項目を確認してください。'
-          render :new
+          render json: {status: 400, message: '登録出来ません。入力必須項目を確認してください', errors: @fee.erros}
         end
       end
 
@@ -96,26 +88,6 @@ module Api
           if @matter.admin_check(current_user) || @matter.client.admin_check(current_user)
             return true if current_user.admin_check
           end
-        end
-      end
-
-      def check_parent
-        if params[:matter_id].present?
-          @matter = Matter.active_matters.find(params[:fee][:matter_id])
-          @parent = @matter
-        elsif params[:inquiry_id].present?
-          @inquiry = Inquiry.active_inquiries.find(params[:inquiry_id])
-          @parent = @inquiry
-        elsif @fee.matter.present? && @fee.inquiry.blank?
-          @matter = @fee.matter
-        elsif @fee.inquiry.present? && @fee.matter.blank?
-          @inquiry = @fee.inquiry
-        elsif @fee.matter.present? && @fee.inquiry.present?
-          @matter = @fee.matter
-          @inquiry = @fee.inquiry
-        else
-          flash[:alert] = '不正なアクセスです。'
-          redirect_to root_path
         end
       end
 
