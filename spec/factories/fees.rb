@@ -1,6 +1,6 @@
 FactoryBot.define do
   factory :fee do
-    fee_type_id { 1 }
+    fee_type_id { '着手金' }
     price { 1_000_000 }
     description { 'テストマタープロフィール' }
     deadline { '2020-02-02' }
