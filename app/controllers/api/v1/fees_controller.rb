@@ -36,12 +36,12 @@ module Api
         @fee = Fee.new(fee_params)
         @matter = @fee.matter
         return response_forbidden unless correct_user
-        @fee.price = 0 if @fee.fee_type_id == 6
+        @fee.price = 0 if @fee.fee_type_id == 'タイムチャージ'
         if @fee.save
           # @fee.create_fee_log(current_user)
           render json: {status: 200, message: '登録しました'}
         else
-          render json: {status: 400, message: '登録出来ません。入力必須項目を確認してください', errors: @fee.erros}
+          render status: 400, json: {status: 400, message: '登録出来ません。入力必須項目を確認してください', errors: @fee.errors}
         end
       end
 
@@ -49,12 +49,12 @@ module Api
         @fee = Fee.find(params[:id])
         @matter = @fee.matter
         return response_forbidden unless correct_user
-        params[:fee][:price] = 0 if params[:fee][:fee_type_id] == '6'
+        params[:fee][:price] = 0 if params[:fee][:fee_type_id] == 'タイムチャージ'
         if @fee.update(fee_params)
           # @fee.update_fee_log(current_user)
           render json: {status: 200, message: '更新しました'}
         else
-          render json: {status: 400, message: '更新出来ません。入力必須項目を確認してください', errors: @fee.erros}
+          render status: 400, json: {status: 400, message: '更新出来ません。入力必須項目を確認してください', errors: @fee.errors}
         end
       end
 
@@ -75,7 +75,7 @@ module Api
           :pay_times, :monthly_date_id,
           :current_payment, :price_type, :paid_date,
           :paid_amount, :pay_off, :description,
-          :matter_id, :archive
+          :matter_id, :task_id, :archive
         )
       end
 
