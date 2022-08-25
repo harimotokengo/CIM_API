@@ -1,4 +1,6 @@
 class Matter < ApplicationRecord
+  include CommonNotification
+  
   belongs_to :user, optional: true
   belongs_to :client
 
@@ -20,7 +22,7 @@ class Matter < ApplicationRecord
   # has_many :user_matter_joins, -> { office_join }, class_name: 'MatterJoin'
   # has_many :matter_join_offices, through: :user_matter_joins, source: :user
   has_many :assigned_users, through: :matter_assigns, source: :user
-  # has_many :notifications, dependent: :destroy
+  has_many :notifications, dependent: :destroy
   # has_many :edit_logs, dependent: :destroy
   has_many :matter_category_joins, dependent: :destroy
   has_many :categories, through: :matter_category_joins, source: :matter_category

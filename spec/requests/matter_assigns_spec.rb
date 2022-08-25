@@ -76,7 +76,7 @@ RSpec.describe 'matter_assigns_requests', type: :request do
             matter_assign_params = attributes_for(:matter_assign, user_id: matter_join_user.id)
             expect do
               post api_v1_matter_matter_assigns_path(matter), params: { matter_assign: matter_assign_params }
-            end.to change(MatterAssign, :count).by(1)
+            end.to change(MatterAssign, :count).by(1) and change(Notification.where(action: 'matter_assign'), :count).by(1)
           end
         end
         context '案件参加事務所ユーザーを登録' do

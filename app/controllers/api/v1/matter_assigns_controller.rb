@@ -8,9 +8,9 @@ module Api
         return response_forbidden unless correct_user
         return response_bad_request unless @matter.assignable_check(params[:matter_assign][:user_id])
         matter_assign = @matter.matter_assigns.new(user_id: params[:matter_assign][:user_id])
-        
+        assign_user = User.find(matter_assign.user_id)
         if matter_assign.save
-          # @matter.create_notification_matter_assign!(current_user, assign_user)
+          @matter.create_assign_notification!(current_user, assign_user)
           render json: { status: 200, message: '登録しました。' }
         else
           render json: { status: 400, message: '登録できませんでした。'}

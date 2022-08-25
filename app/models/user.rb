@@ -11,6 +11,8 @@ class User < ApplicationRecord
   has_many :task_template_groups
   has_many :work_stages
   has_many :work_logs, dependent: :destroy
+  has_many :active_notifications, class_name: 'Notification', foreign_key: 'sender_id', dependent: :destroy
+  has_many :passive_notifications, class_name: 'Notification', foreign_key: 'receiver_id', dependent: :destroy
 
   # has_many :office_matter_joins,  -> { office_join }, class_name: 'MatterJoin'
   # has_many :user_matter_joins,  -> { user_join }, class_name: 'MatterJoin'
